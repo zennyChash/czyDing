@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:cache="http://www.hundsun.com/schema/cache"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd"
+	default-autowire="byName">
+
+	<context:property-placeholder location="classpath*:conf/*.properties" />
+
+	<!--(本地开发环境)-->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="testOnBorrow" value="true" />
+		<property name="maxActive" value="20" />
+		<property name="initialSize" value="3" />
+		<property name="maxIdle" value="2" />
+		<property name="maxWait" value="30000" />
+		<property name="validationQuery" value="select 1 from dual" />
+	</bean>
+	<!--(实际生产环境)-->
+	<!-- JNDI DataSource for JEE environments -->
+	<!--
+		  <jee:jndi-lookup id="dataSource" jndi-name="ncmDS"/>
+		  --> 
+	<!--java:comp/env/jdbc/ncmDS -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" p:dataSource-ref="dataSource" />
+	<bean id="namedParameterJdbcTemplate"  class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">  
+		 <constructor-arg ref="dataSource"/>
+	</bean>
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	<bean id="config" class="com.ifugle.utils.Configuration"/>
+	<bean id="authDao" class="com.ifugle.czy.service.AuthDao"/>
+	<context:annotation-config />
+	<tx:annotation-driven transaction-manager="txManager" />  
+	<!--<context:spring-configured />
+	<tx:annotation-driven />
+	 缓存处理配置
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation">
+			<value>classpath:ehcache.xml</value>
+		</property>
+	</bean> -->
+</beans>
