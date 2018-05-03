@@ -1,0 +1,58 @@
+{
+  "srList": [
+    {
+      "name": "税收收入",
+      "sssrMenu": [
+        {
+          "name": "电子金库",
+          "iconClass": "icon-jijin",
+          "url": "czy-dzjk",
+          "bj": "1"
+        },
+        {
+          "name": "单户查询",
+          "iconClass": "icon-dingdanchaxun",
+          "url": "czy-dhcxList-dhcx-dhlb",
+          "bj": "2"
+        },
+        {
+          "name": "税收排名",
+          "iconClass": "icon-heguipaiming",
+          "url": "czy-sspm",
+          "bj": "3"
+        },
+        {
+          "name": "重点税源",
+          "iconClass": "icon-zhihangzhongdian",
+          "url": "page-zdsyList-zdsy-zdsylb",
+          "bj": "4"
+        }
+      ]
+    },
+    {
+      "name": "其他收入",
+      "qtsrMenu": [
+        {
+          "name": "其他收入",
+          "iconClass": "icon-heguipaiming",
+          "url": "",
+          "bj": "1"
+        }
+      ]
+    }
+  ],
+  "banner": [
+    {
+      "imgUrl": "/static/imgs/sybanner.png"
+    },
+    {
+      "imgUrl": "/static/imgs/sybanner.png"
+    },
+    {
+      "imgUrl": "/static/imgs/sybanner.png"
+    },
+    {
+      "imgUrl": "/static/imgs/sybanner.png"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "qyxx":{
+    "iconCls":"iconfont icon-web-icon-",
+    "name":"杭州孚嘉科技有限公司",
+    "sh":"2928392324343553",
+    "title":"明细表(单位：万)",
+    "mxList":[
+      {"text":"时间","value":"2018年2月"},
+      {"text":"财政分片","value":"拱墅区"},
+      {"text":"税收收入","value":"23.231.187"},
+      {"text":"历年税收","value":""}
+    ]
+  }
+}
