@@ -1,10 +1,10 @@
-package com.ifugle.czy.system.bean;
+package com.ifugle.czy.utils.bean;
 
 public class User {
 	private String userid;
 	private String dingname;
 	private String dinginfo;
-	private short qybj;
+	private int qybj;
 	private String config;
 	
 	public String getDinginfo() {
@@ -13,10 +13,10 @@ public class User {
 	public void setDinginfo(String dinginfo) {
 		this.dinginfo = dinginfo;
 	}
-	public short getQybj() {
+	public int getQybj() {
 		return qybj;
 	}
-	public void setQybj(short qybj) {
+	public void setQybj(int qybj) {
 		this.qybj = qybj;
 	}
 	public String getConfig() {

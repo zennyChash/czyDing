@@ -72,21 +72,12 @@
 	    <listener-class>com.ifugle.utils.AppContextListener</listener-class>  
 	</listener>
 	<servlet>
-        <servlet-name>dispather</servlet-name>
+        <servlet-name>dispatcher</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
-        <servlet-name>dispather</servlet-name>
+        <servlet-name>dispatcher</servlet-name>
         <url-pattern>/api/*</url-pattern>
     </servlet-mapping>
-	<servlet>
-	    <display-name>DingUserServlet</display-name>
-	    <servlet-name>DingUserServlet</servlet-name>
-	    <servlet-class>com.ifugle.czy.servlet.DingUserServlet</servlet-class>
-  	</servlet>
-  	<servlet-mapping>
-    	<servlet-name>DingUserServlet</servlet-name>
-    	<url-pattern>/api/dingUserInfo</url-pattern>
-  	</servlet-mapping>
 </web-app>

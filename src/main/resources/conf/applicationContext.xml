@@ -43,7 +43,8 @@
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
 	<bean id="config" class="com.ifugle.utils.Configuration"/>
-	<bean id="authDao" class="com.ifugle.czy.service.AuthDao"/>
+	<bean id="authService" class="com.ifugle.czy.service.AuthService"/>
+	<bean id="rptDataService" class="com.ifugle.czy.service.ReportDataService"/>
 	<context:annotation-config />
 	<tx:annotation-driven transaction-manager="txManager" />  
 	<!--<context:spring-configured />
