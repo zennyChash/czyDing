@@ -40,18 +40,23 @@ public class AuthController {
 	@ResponseBody
 	public JResponse getUserConfig(@RequestParam("code") String code, @RequestParam("corpid") String corpid){
 		JResponse jr = new JResponse();
+		System.out.println("传入的code:"+code);
+		System.out.println("传入的corpID:"+corpid);
 		String accessToken = authService.getAccessToken();
 		User user = authService.getUserCzyConfig(accessToken,code);
+		System.out.println("最外层的调用中的user:"+user==null?"空":user.getConfig());
 		if(user!=null){
 			jr.setRetCode("0");
 			jr.setRetMsg("");
 			String uconfig = user.getConfig();
 			JSONObject jucg = JSON.parseObject(uconfig);
 			jr.setRetData(jucg);
+			System.out.println("数据库中的用户配置串:"+uconfig+"。。。。整个用户配置信息:"+jucg.toJSONString());
 		}else{
 			jr.setRetCode("9");
 			jr.setRetMsg("获取用户的配置信息失败！");
 			jr.setRetData(null);
+			System.out.println("出错了！用户配置信息没有获取到！");
 		}
 		return jr;
 	}

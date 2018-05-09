@@ -200,6 +200,7 @@ public class AuthService {
 		try{
 			CorpUserService corpUserService = ServiceFactory.getInstance().getOpenService(CorpUserService.class);
 			CorpUserBaseInfo cbu = corpUserService.getUserinfo(accessToken, code);
+			System.out.println("进入第一层getUserCzyConfig，获取到了CorpUserBaseInfo");
 			if(cbu!=null){
 				String userid = cbu.getUserid();
 				u = getCzyAuth(accessToken,userid);
@@ -210,6 +211,7 @@ public class AuthService {
 			log.error("登录钉钉验证失败："+e.toString());
 			e.printStackTrace();
 		}
+		System.out.println("从getUserCzyConfig返回获取到的数据库的USER配置："+u.getConfig());
         return u;
 	}
 	public User getCzyAuth(String accessToken,String userid){
@@ -220,6 +222,7 @@ public class AuthService {
 			if(ud==null){
 				return null;
 			}
+			System.out.println("进入了getCzyAuth，获取到了CorpUserDetail："+ud==null?"":ud.getName());
 			List users = jdbcTemplate.queryForList("select userid,dingname,dinginfo,config,qybj from users where userid=?",
 					new Object[]{userid});
 			if(users==null||users.size()==0){//不存在的，先插入一条新的用户记录。
@@ -245,9 +248,11 @@ public class AuthService {
 			jdbcTemplate.update("insert into user_log(id,userid,etime,eventtype)values(sq_user_log.nextval,?,sysdate,'login')",
 					new Object[]{userid});
 		}catch(Exception e){
+			System.out.println("getCzyAuth中发生错误！");
 			log.error("获取钉钉用户信息失败："+e.toString());
 			e.printStackTrace();
 		}
+		System.out.println("getCzyAuth中获得的自定义User："+u);
 		return u;
 	}
 }

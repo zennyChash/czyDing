@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ifugle.czy.utils.bean.RptDataJson;
 
 @Transactional
 public class ReportDataService {
@@ -20,10 +22,12 @@ public class ReportDataService {
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate){
 		this.jdbcTemplate = jdbcTemplate;
 	}
-	public Map getData(String dtID,String params){
-		JSONObject jparams = JSONObject.parseObject(params);
+	public Map getData(String rptID,RptDataJson params){
+		JSONObject jparams = params.parseJRptParams();
 		String cyear = jparams.getString("thisYear");
 		String lyear = jparams.getString("lastYear");
+		cyear = cyear!=null&&cyear.length()>3?cyear.substring(0,4):"";
+		lyear = lyear!=null&&lyear.length()>3?lyear.substring(0,4):"";
 		Map datas = new HashMap();
 		datas.put("total", "290912.78");
 		datas.put("rate", "75");
@@ -40,6 +44,41 @@ public class ReportDataService {
 		dtObjs.add(dObj);
 		line.put("object",dtObjs);
 		datas.put("line", line);
+		return datas;
+	}
+	public Map getParamOptions(String rptID, RptDataJson params) {
+		Map datas = new HashMap();
+		JSONArray joptions = params.parseJOptionParams();
+		List allOptions = new ArrayList();
+		for(int i=0;i<joptions.size();i++){
+			Map paramOp = new HashMap();
+			String spara = joptions.getString(i);
+			paramOp.put("paraName", spara);
+			if("pYearMonth".equals(spara)){
+				List range = new ArrayList();
+				range.add("201701");
+				range.add("201804");
+				paramOp.put("range", range);
+				paramOp.put("type", "date");
+				paramOp.put("format", "Ym");
+				paramOp.put("defaultOp", "2018");
+				allOptions.add(paramOp);
+			}else{
+				List ops = new ArrayList();
+				Map oneop = new HashMap();
+				oneop.put("bm", "01");
+				oneop.put("name", "西湖区");
+				ops.add(oneop);
+				oneop = new HashMap();
+				oneop.put("bm", "02");
+				oneop.put("name", "下城区");
+				ops.add(oneop);
+				paramOp.put("options", ops);
+				paramOp.put("defaultOp", "");
+				allOptions.add(paramOp);
+			}
+			datas.put("paramOptions", allOptions);
+		}
 		return datas;
 	}
 }

@@ -17,14 +17,29 @@ Zepto(function($){
 		  success: function(data){
 		    alert(data.retData.agentid);
 		    _config = data;
+		    var p = JSON.stringify({"rptID":"dzjk","optionParams":["pYearMonth","pDistrict"]})
 		    $.ajax({
-				  type: 'post',
-				  url: 'api/queryData/dzjk',
-				  data: { rptParams:JSON.stringify({thisYear:'2018',lastYear:"2017"}) ,code: 'ddd12345',corpid:'ccddd5678' },
-				  dataType: 'json',
-				  success: function(dt){
-				    alert(dt.retData);
-				  }
+				type: 'post',
+				url: 'api/paramOptions',
+				data: p,
+				headers: {
+			        "Content-Type": "application/json;charset=utf-8"
+			    },
+				success: function(dt){
+					alert(dt);
+				}
+		    });
+		   	p = JSON.stringify({"rptID":"dzjk","rptParams":{"thisYear":"201806","lastYear":"201704"}})
+		    $.ajax({
+				type: 'post',
+				url: 'api/queryData',
+				data: p,
+				headers: {
+			        "Content-Type": "application/json;charset=utf-8"
+			    },
+				success: function(dt){
+					alert(dt);
+				}
 		    });
 		  },
 		  error: function(xhr, type){
