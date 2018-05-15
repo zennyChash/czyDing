@@ -29,7 +29,8 @@ Zepto(function($){
 					alert(dt);
 				}
 		    });
-		   	p = JSON.stringify({"rptID":"dzjk","rptParams":{"thisYear":"201806","lastYear":"201704"}})
+		   	//p = JSON.stringify({"rptID":"dzjk","rptParams":{"thisYear":"201806","lastYear":"201704"}})
+		   	p = JSON.stringify({"rptID":"dzjk","rptParams":{"qDate":"201804"}})
 		    $.ajax({
 				type: 'post',
 				url: 'api/queryData',

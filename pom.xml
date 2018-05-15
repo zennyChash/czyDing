@@ -191,6 +191,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-elasticsearch</artifactId>
+			<version>3.0.7.RELEASE</version>
+		</dependency>
+        
+        <dependency>
             <groupId>com.ning</groupId>
             <artifactId>async-http-client</artifactId>
             <version>1.9.32</version>
