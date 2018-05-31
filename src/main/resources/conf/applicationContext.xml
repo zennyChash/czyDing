@@ -42,9 +42,15 @@
 	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
+	<bean id="esService" class="com.ifugle.czy.service.ElasticSearchServiceCzy" >
+		<property name="esClusterName" value="${ES_CLUSTER_NAME}" />
+		<property name="esIP" value="${ES_IP}" />
+		<property name="esPort" value="${ES_PORT}" />
+	</bean>
 	<bean id="config" class="com.ifugle.utils.Configuration"/>
 	<bean id="authService" class="com.ifugle.czy.service.AuthService"/>
 	<bean id="rptDataService" class="com.ifugle.czy.service.ReportDataService"/>
+	<bean id="rptEsService" class="com.ifugle.czy.service.ReportDataEsService"/>
 	<context:annotation-config />
 	<tx:annotation-driven transaction-manager="txManager" />  
 	<!--<context:spring-configured />

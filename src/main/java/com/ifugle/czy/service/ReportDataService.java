@@ -1,18 +1,25 @@
 package com.ifugle.czy.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ifugle.czy.utils.bean.DeleteUserObj;
+import com.ifugle.czy.utils.bean.QueryUserObj;
 import com.ifugle.czy.utils.bean.RptDataJson;
+import com.ifugle.czy.utils.bean.SaveUserObj;
+import com.ifugle.czy.utils.bean.User;
 
 @Transactional
 public class ReportDataService {
@@ -34,7 +41,7 @@ public class ReportDataService {
 	
 	public Map getParamOptions(String rptID, RptDataJson params) {
 		Map mapOps = new HashMap();
-		List allOptions = new ArrayList();
+		Map allOptions = new HashMap();
 		JSONArray jparams = params==null?null:params.parseJOptionParams();
 		if(jparams!=null){
 			for(int i=0;i<jparams.size();i++){
@@ -43,7 +50,7 @@ public class ReportDataService {
 				if(opinfo!=null){
 					String ostr=(String)opinfo.get("opsinfo"); 
 					JSONObject op = JSONObject.parseObject(ostr);
-					allOptions.add(op);
+					allOptions.put(spara,op);
 				}
 			}
 		}
@@ -205,4 +212,104 @@ public class ReportDataService {
 		datas.put("data", data);
 		return datas;
 	}*/
+	public Map saveUserInfo(SaveUserObj so) {
+		Map info = new HashMap();
+		String userid = so.getUserid();
+		JSONObject saveInfo = so.parseSaveContent();
+		if(saveInfo==null||StringUtils.isEmpty(saveInfo.getString("saveType"))){
+			info.put("saved", false);
+			info.put("msg", "未设置保存类型！");
+			return info;
+		}
+		JSONObject sobj = saveInfo.getJSONObject("saveObj");
+		if(sobj==null){
+			info.put("saved", false);
+			info.put("msg", "未找到要保存的内容！");
+			return info;
+		}
+		if("myFavorite".equals(saveInfo.getString("saveType"))){
+			info = saveMyFavorite(userid,sobj);
+		}
+		return info;
+	}
+	private Map saveMyFavorite(String userid,JSONObject sobj){
+		Map info = new HashMap();
+		String swdjzh=sobj.getString("swdjzh");
+		String mc = sobj.getString("mc");
+		int cc = jdbcTemplate.queryForObject("select count(*)cc from user_favorite where userid=? and swdjzh=?",
+				new Object[]{userid,swdjzh},Integer.class);
+		if(cc==0){
+			jdbcTemplate.update("insert into user_favorite(userid,swdjzh,mc)values(?,?,?)",
+					new Object[]{userid,swdjzh,mc});
+		}else{
+			jdbcTemplate.update("update user_favorite set mc=? where userid=? and swdjzh=?",
+					new Object[]{mc,userid,swdjzh});
+		}
+		//记录收藏事件
+		jdbcTemplate.update("insert into user_log(id,userid,etime,eventtype)values(sq_user_log.nextval,?,sysdate,?)",
+				new Object[]{userid,"add_myFavorite"});
+		
+		info.put("saved", true);
+		info.put("msg", "");
+		return info;
+	}
+	public Map deleteUserInfo(DeleteUserObj dobj) {
+		Map info = new HashMap();
+		String userid = dobj.getUserid();
+		JSONObject delInfo = dobj.parseDeleteContent();
+		if(delInfo==null||StringUtils.isEmpty(delInfo.getString("deleteType"))){
+			info.put("deleted", false);
+			info.put("msg", "未设置删除类型！");
+			return info;
+		}
+		JSONArray dels = delInfo.getJSONArray("deleteObj");
+		if(dels==null){
+			info.put("deleted", false);
+			info.put("msg", "未找到要删除的内容！");
+			return info;
+		}
+		if("myFavorite".equals(delInfo.getString("deleteType"))){
+			info = deleteMyFavorite(userid,dels);
+		}
+		return info;
+	}
+	private Map deleteMyFavorite(String userid, JSONArray dels) {
+		Map info = new HashMap();
+		//先获取用户的配置信息。
+		for(int i=0;i<dels.size();i++){
+			String swdjzh=dels.getJSONObject(i).getString("swdjzh");
+			jdbcTemplate.update("delete from user_favorite where userid=? and swdjzh=?",
+					new Object[]{userid,swdjzh});
+		}
+		//记录收藏事件
+		jdbcTemplate.update("insert into user_log(id,userid,etime,eventtype)values(sq_user_log.nextval,?,sysdate,?)",
+				new Object[]{userid,"delete_myFavorite"});
+		info.put("deleted", true);
+		info.put("msg", "");
+		return info;
+	}
+	public Map getUserInfo(QueryUserObj qo) {
+		Map info =  new HashMap();
+		String userid = qo.getUserid();
+		JSONObject jcdt = qo.parseQueryContent();
+		String qtype = jcdt.getString("qType");
+		if("myFavorite".equals(qtype)){
+			info = getMyFavorite(userid,jcdt.getJSONObject("params"));
+		}
+		return info;
+	}
+	private Map getMyFavorite(String userid,JSONObject params){
+		Map info =  new HashMap();
+		int start = params.getIntValue("start");
+		int limit = params.getIntValue("limit");
+		int cc = jdbcTemplate.queryForObject("select count(*) from user_favorite where userid=?", new Object[]{userid},Integer.class);
+		info.put("total", cc);
+		StringBuffer sql = new StringBuffer("select swdjzh,mc from user_favorite where userid=?");
+		StringBuffer rSql = new StringBuffer("select * from (select a.*, rownum r from (");
+		rSql.append(sql);
+		rSql.append(") a where rownum<=?) b where r>?");
+		List fvs = jdbcTemplate.queryForList(rSql.toString(),new Object[]{userid,start+limit,start});
+		info.put("rows", fvs);
+		return info;
+	}
 }

@@ -27,7 +27,6 @@ import com.ifugle.utils.Configuration;
 import org.apache.log4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.ParameterizedBeanPropertyRowMapper;
 import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AuthService {
