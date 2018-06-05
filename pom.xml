@@ -28,6 +28,8 @@
 		<log4j.core.version>2.8.2</log4j.core.version>
 		<elasticsearch.client.version>6.2.4</elasticsearch.client.version>
 		<elasticsearch.analysis.version>6.2.4</elasticsearch.analysis.version>
+		<velocity>1.7</velocity>
+		<dom4j.version>1.6.1</dom4j.version>
 		<jetty.version>6.1.10</jetty.version>
 	</properties>
 	<dependencies>
@@ -80,6 +82,12 @@
 			<artifactId>commons-fileupload</artifactId>
 			<version>${commons.fileupload.version}</version>
 		</dependency> 
+		<!-- https://mvnrepository.com/artifact/dom4j/dom4j -->
+		<dependency>
+		    <groupId>dom4j</groupId>
+		    <artifactId>dom4j</artifactId>
+		    <version>${dom4j.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>${jdbc.groupId}</groupId>
 			<artifactId>${jdbc.artifactId}</artifactId>
@@ -249,7 +257,12 @@
             <groupId>org.elasticsearch</groupId>  
             <artifactId>elasticsearch-analysis-ik</artifactId>  
             <version>${elasticsearch.analysis.version}</version>  
-        </dependency>  
+        </dependency>
+        <dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>${velocity}</version>
+		</dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

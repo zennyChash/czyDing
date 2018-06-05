@@ -42,7 +42,7 @@
 	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
-	<bean id="esService" class="com.ifugle.czy.service.ElasticSearchServiceCzy" >
+	<bean id="esClient" class="com.ifugle.czy.service.ESClientFactory" >
 		<property name="esClusterName" value="${ES_CLUSTER_NAME}" />
 		<property name="esIP" value="${ES_IP}" />
 		<property name="esPort" value="${ES_PORT}" />

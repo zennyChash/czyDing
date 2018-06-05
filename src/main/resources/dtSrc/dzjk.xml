@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="dzjk_taxOfYear" name="折线图" description="用于折线图的数据" sourceType ="procedure">
+		<procedure name="pkg_test.djzk" totalIndex="1" datasetIndex="2">
+			<in referTo="sart"/>
+			<in referTo="limit"/>
+			<in referTo="exeDate"/>
+			<out dataType="1"/>
+			<out dataType="3"/>
+		</procedure>
+		<cols>
+			<col name="ny"  dataType="string" isFilter="1"/>
+		</cols>
+	</src>
+	<src id="dzjkTotal" name="总数" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select swdjzh, se, year from rtk where rownum<10000
+		]]>
+		</sql>
+		<cols>
+			<col name="year" dataType="string" canOrder="1" isFilter="1"/>
+			<col name="swdjzh" dataType="string" />
+			<col name="se" dataType="double" canOrder="1" analyzer="" search_analyzer=""/>
+		</cols>
+	</src>
+</dataSource>
+

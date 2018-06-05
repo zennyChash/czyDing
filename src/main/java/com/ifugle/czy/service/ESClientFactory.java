@@ -9,8 +9,8 @@ import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class ElasticSearchServiceCzy {
-	private static Logger log = Logger.getLogger(ElasticSearchServiceCzy.class);
+public class ESClientFactory {
+	private static Logger log = Logger.getLogger(ESClientFactory.class);
 	private TransportClient client;  
 	private String esClusterName;
 	private String esIP;

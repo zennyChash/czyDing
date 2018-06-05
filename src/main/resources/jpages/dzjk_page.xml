@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<jpage id="dzjk" name="电子金库" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"line":{
+					"month":[1,2,3,4,5,6,7,8,9,10,11,12],
+					"object":[{
+						"data":[1900.89,2018.9,3309.8,4099.93,3809.1,5090.89,4578.9,6789.9,4456.89,2988.9,5674.55,3456.78],
+						"name":"2018年"
+					},{
+						"data":[1878.9,3009.87,3456.65,5543.5,2347.8,4567.34,3356.78,5643.22,3122.11,2987.5,4322.12,1233.45],
+						"name":"2017年"
+					}]
+				},
+				"rate":"75",
+				"total":"290912.78"
+			}
+		]]>
+		</jTemplate>
+		<vDs name="cYearTax" refDtSrc="dzjk_taxOfYear">
+			<filter name = "ny" value="2018"/>
+			<filter name = "test" value="2018"/>
+			<orderBy name = "ny" dir="asc"/>
+		</vDs>
+		<vDs name="lstYearTax" refDtSrc="dzjk_taxOfYear">
+			<filter name = "ny" value="2017"/>
+			<orderBy name = "ny" dir="asc"/>
+		</vDs>
+		<vDs name="dzjkTotal">
+			<filter name = "ny" value="2018"/>
+		</vDs>
+	</jpage>
+</pages>
+

@@ -72,7 +72,7 @@ Zepto(function($){
 // 				}
 // 		    });
 		    
-// 		 	p = JSON.stringify({"rptID":"enbasic","rptParams":{"sugType":"completion","searchKey":"金龙","from":10,"size":10}});
+// 		 	p = JSON.stringify({"rptID":"enbasic","rptParams":{"sugType":"completion","searchKey":"金龙","start":0,"limit":10}});
 // 		    $.ajax({
 // 				type: 'post',
 // 				url: 'api/searchForWord',
@@ -84,18 +84,18 @@ Zepto(function($){
 // 					alert(dt);
 // 				}
 // 		    });
-// 		    p = JSON.stringify({"rptID":"enBasic","rptParams":{"sugType":"","searchKey":"百货","from":0,"size":10}});
-// 		    $.ajax({
-// 				type: 'post',
-// 				url: 'api/searchForWord',
-// 				data: p,
-// 				headers: {
-// 			        "Content-Type": "application/json;charset=utf-8"
-// 			    },
-// 				success: function(dt){
-// 					alert(dt);
-// 				}
-// 		    });
+		    p = JSON.stringify({"rptID":"enBasic","rptParams":{"sugType":"","searchKey":"丽水横山后","start":0,"limit":"10"}});
+		    $.ajax({
+				type: 'post',
+				url: 'api/searchForWord',
+				data: p,
+				headers: {
+			        "Content-Type": "application/json;charset=utf-8"
+			    },
+				success: function(dt){
+					alert("string:"+dt);
+				}
+		    });
 // 		    p = JSON.stringify({"userid":"manager431","saveContent":{"saveType":"myFavorite","saveObj":{"swdjzh":"3302xxxx","mc":"浙江广厦"}}});
 // 		    $.ajax({
 // 				type: 'post',
@@ -109,18 +109,18 @@ Zepto(function($){
 // 				}
 // 		    });
 		    
-		    p = JSON.stringify({"userid":"manager431","deleteContent":{"deleteType":"myFavorite","deleteObj":[{"swdjzh":"3309xxxx"},{"swdjzh":"3302xxxx"}]}});
-		    $.ajax({
-				type: 'post',
-				url: 'api/deleteUserInfo',
-				data: p,
-				headers: {
-			        "Content-Type": "application/json;charset=utf-8"
-			    },
-				success: function(dt){
-					alert(dt);
-				}
-		    });
+// 		    p = JSON.stringify({"userid":"manager431","deleteContent":{"deleteType":"myFavorite","deleteObj":[{"swdjzh":"3309xxxx"},{"swdjzh":"3302xxxx"}]}});
+// 		    $.ajax({
+// 				type: 'post',
+// 				url: 'api/deleteUserInfo',
+// 				data: p,
+// 				headers: {
+// 			        "Content-Type": "application/json;charset=utf-8"
+// 			    },
+// 				success: function(dt){
+// 					alert(dt);
+// 				}
+// 		    });
 		    
 // 		    p = JSON.stringify({"userid":"manager431","queryContent":{"qType":"myFavorite","params":{"start":0,"limit":5}}});
 // 		    $.ajax({

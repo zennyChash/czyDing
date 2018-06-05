@@ -48,10 +48,10 @@ import com.ifugle.czy.utils.bean.RptDataJson;
 @Transactional
 public class ReportDataEsService {
 	private static Logger log = Logger.getLogger(ReportDataEsService.class);
-	protected ElasticSearchServiceCzy esService;
+	protected ESClientFactory esClient;
 	@Autowired
-	public void setEsService(ElasticSearchServiceCzy esService){
-		this.esService = esService;
+	public void setEsService(ESClientFactory esClient){
+		this.esClient = esClient;
 	}
 	protected JdbcTemplate jdbcTemplate;
 	@Autowired
@@ -61,7 +61,7 @@ public class ReportDataEsService {
 	
 	public Map getData(String rptID,RptDataJson params){
 		JSONObject jrpt = null;
-		TransportClient client = esService.getClient();
+		TransportClient client = esClient.getClient();
 		GetResponse response = client.prepareGet("rptData","dzjk","201805").execute()    
                 .actionGet();    
         String json = response.getSourceAsString();    
@@ -78,7 +78,7 @@ public class ReportDataEsService {
 		JSONObject jparams = params==null?null:params.parseJRptParams();
 		String sugType = jparams.getString("sugType");
 		String indexName = index+("completion".equals(sugType)?"_cs":"");
-		TransportClient client = esService.getClient();
+		TransportClient client = esClient.getClient();
 		IndicesExistsRequest inExistsRequest = new IndicesExistsRequest(indexName);  
         IndicesExistsResponse inExistsResponse = client.admin().indices()  
                 .exists(inExistsRequest).actionGet();  
@@ -86,7 +86,7 @@ public class ReportDataEsService {
 	    	DeleteIndexResponse dResponse = client.admin().indices().prepareDelete(indexName)  
 	                .execute().actionGet();  
 	    }
-        CreateIndexRequestBuilder  cib=client.admin().indices().prepareCreate(indexName);
+        CreateIndexRequestBuilder cib=client.admin().indices().prepareCreate(indexName);
         CreateIndexResponse res=cib.execute().actionGet(); 
         if(res.isAcknowledged()){
 	    	createIKMapping(indexName,type,sugType);
@@ -126,7 +126,7 @@ public class ReportDataEsService {
 		StringBuffer info= new StringBuffer("{success:");
 		//如果传入的indexName不存在会出现异常，先判断要删除的是否存在
 		IndicesExistsRequest inExistsRequest = new IndicesExistsRequest(indexName);  
-		TransportClient client = esService.getClient();
+		TransportClient client = esClient.getClient();
         IndicesExistsResponse inExistsResponse = client.admin().indices()  
                 .exists(inExistsRequest).actionGet();  
         if(inExistsResponse.isExists()){  
@@ -159,7 +159,7 @@ public class ReportDataEsService {
 		size = jparams.getIntValue("limit");
 		Map result = new HashMap();
 		List<Map> qymcs = new ArrayList<Map>();
-		SearchResponse searchResponse = esService.getClient().prepareSearch(index)
+		SearchResponse searchResponse = esClient.getClient().prepareSearch(index)
 			.setTypes(type)
 			.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
 			.setQuery(QueryBuilders.matchQuery("mc",str))
@@ -192,7 +192,7 @@ public class ReportDataEsService {
 		sgBuilder.analyzer("ik_max_word");
 		sgBuilder.text(str).size(size);
 
-        SearchResponse searchResponse = esService.getClient().prepareSearch(index)
+        SearchResponse searchResponse = esClient.getClient().prepareSearch(index)
                 .setTypes(type)
                 //.setQuery(QueryBuilders.matchAllQuery())
                 .suggest(new SuggestBuilder().addSuggestion("mc_sg",sgBuilder))
@@ -237,8 +237,8 @@ public class ReportDataEsService {
                         .endObject().endObject().endObject();
         	}
             PutMappingRequest map = Requests.putMappingRequest(indexName).type(typeName).source(mapping);
-            esService.getClient().admin().indices().putMapping(map).actionGet();
-            esService.getClient().admin().indices().prepareRefresh().get();
+            esClient.getClient().admin().indices().putMapping(map).actionGet();
+            esClient.getClient().admin().indices().prepareRefresh().get();
         } catch (IOException e) {  
             e.printStackTrace();  
         }  
