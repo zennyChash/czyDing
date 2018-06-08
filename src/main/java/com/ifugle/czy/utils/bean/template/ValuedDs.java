@@ -9,8 +9,30 @@ public class ValuedDs {
 	//记录集使用的名称，应符合变量名命名规则；
 	//对相同的数据源（refDtSr），使用不同参数，形成不同name的记录集。
 	private String name;  
+	private boolean paging;
+	private String startParam;
+	private String sizeParam;
 	private List filterFlds;
 	private List orderByFlds;
+	
+	public boolean isPaging() {
+		return paging;
+	}
+	public void setPaging(boolean paging) {
+		this.paging = paging;
+	}
+	public String getStartParam() {
+		return startParam;
+	}
+	public void setStartParam(String startParam) {
+		this.startParam = startParam;
+	}
+	public String getSizeParam() {
+		return sizeParam;
+	}
+	public void setSizeParam(String sizeParam) {
+		this.sizeParam = sizeParam;
+	}
 	public String getRefDtSrc() {
 		return refDtSrc;
 	}

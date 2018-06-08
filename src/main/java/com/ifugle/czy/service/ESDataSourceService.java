@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +55,7 @@ public class ESDataSourceService {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 	//删除索引
-	public String clearIndex(String indexName){
+	public String delelteIndex(String indexName){
 		StringBuffer info= new StringBuffer("{success:");
 		//如果传入的indexName不存在会出现异常，先判断要删除的是否存在
 		IndicesExistsRequest inExistsRequest = new IndicesExistsRequest(indexName);  
@@ -70,27 +71,12 @@ public class ESDataSourceService {
         }
 		return info.toString();
 	}
-	//建索引。如果已存在，删除旧的重建
-	public String buildIndex(String indexName){
-		StringBuffer info= new StringBuffer("{success:");
-		TransportClient client = esClient.getClient();
-		
-		clearIndex(indexName);
-		
-        CreateIndexRequestBuilder cib=client.admin().indices().prepareCreate(indexName);
-        CreateIndexResponse res=cib.execute().actionGet(); 
-        if(res.isAcknowledged()){
-        	buildMappings(indexName);
-        }
-        info.append("true}");
-        return info.toString();
-	}
-	//重新索引数据。如果指定reMapping，就重建索引本身。reMapping为false表示只将数据重索引。
-	public String reIndexData(String indexName,boolean reMapping,boolean deleteOldData, Map paramVals){
+	//重新索引数据。如果指定reMapping，就重建整个索引。reMapping为false表示只将数据重索引。
+	public String indexData(String indexName,boolean reMapping,boolean deleteOldData, Map paramVals){
 		StringBuffer info= new StringBuffer("{success:");
 		TransportClient client = esClient.getClient();
 		if(reMapping){
-			buildIndex(indexName);
+			buildNewIndex(indexName);
 		}else{
 			//检查是否存在
 			IndicesExistsRequest inExistsRequest = new IndicesExistsRequest(indexName);  
@@ -102,28 +88,54 @@ public class ESDataSourceService {
 	            if(res.isAcknowledged()){
 	            	buildMappings(indexName);
 	            }
-	        }
-		}
-		if(deleteOldData){
-			//先删除以前的数据，按查询删除数据
-			DeleteByQueryAction.INSTANCE.newRequestBuilder(client)
-			.source(indexName)
-			.filter(QueryBuilders.matchAllQuery())
-			.get(); 
+	        }else if(deleteOldData){//如果已经存在，检查是否需要删除旧数据。
+				//先删除以前的数据，按查询删除数据
+				DeleteByQueryAction.INSTANCE.newRequestBuilder(client)
+				.source(indexName)
+				.filter(QueryBuilders.matchAllQuery())
+				.get(); 
+			}
 		}
 		//取数，执行，将数据作为document添加到索引。
 		try{
 			int cc = indexDbData(indexName,paramVals);
 			info.append("true,indexDocs:").append(cc).append("}");
 		}catch(Exception e){
-			info.append("false,info:'").append("从数据库读取数据生成ES索引时发生错误！/n"+e.getMessage()+"'}");
+			info.append("false,info:'").append("从数据库读取数据生成ES索引时发生错误！数据源："+indexName+"。错误信息："+e.getMessage()+"'}");
 			log.error(e.toString());
 		}
-		
 		return info.toString();
 	}
-
-	public XContentBuilder buildMappings(String indexName){
+	//建索引。如果已存在，删除旧的重建
+	private String buildNewIndex(String indexName){
+		StringBuffer info= new StringBuffer("{success:");
+		TransportClient client = esClient.getClient();
+		
+		delelteIndex(indexName);
+		
+        CreateIndexRequestBuilder cib=client.admin().indices().prepareCreate(indexName);
+        CreateIndexResponse res=cib.execute().actionGet(); 
+        if(res.isAcknowledged()){
+        	buildMappings(indexName);
+        }
+        info.append("true}");
+        return info.toString();
+	}
+	private int indexDbData(String indexName,Map paramVals)throws Exception{
+		int cc = 0;
+		DataSrc ds = TemplatesLoader.getTemplatesLoader().getDataSrc(indexName);
+	    if(ds==null){
+	    	throw new Exception("未找到ID为"+indexName+"的数据源定义信息！");
+	    }
+	    if(ds.getSourceType()==1){
+	    	cc = excuteSql(ds,paramVals);
+		}else if(ds.getSourceType()==2){
+			cc = excuteProcedure(ds,paramVals);
+		}
+		return cc;
+	}
+	
+	private XContentBuilder buildMappings(String indexName){
 		XContentBuilder mapping = null;
 		DataSrc ds = TemplatesLoader.getTemplatesLoader().getDataSrc(indexName);
 	    if(ds==null){
@@ -135,11 +147,15 @@ public class ESDataSourceService {
 		    List cols = ds.getCols();
 		    for(int i = 0;i<cols.size();i++){
 		    	Column col = (Column)cols.get(i);
-		    	String dtype = col.getDataType();
+		    	String fldtype = col.getFldType();
 		    	if(col.getIsFilter()==1||col.getCanOrder()==1){
-		    		dtype = "keyword";
+		    		fldtype = "keyword";
 		    	}
-		    	mapping.startObject(col.getName()).field("type",dtype);
+		    	mapping.startObject(col.getName()).field("type",fldtype);
+		    	if(col.getIsFilter()==1||col.getCanOrder()==1){
+		    		mapping.startObject("fields").startObject("raw")
+		    		.field("type",col.getFldType()).endObject().endObject();
+		    	}
 		    	if(!StringUtils.isEmpty(col.getAnalyzer())){
 		    		mapping.field("analyzer",col.getAnalyzer());
 		    	}
@@ -156,20 +172,6 @@ public class ESDataSourceService {
 	    	log.error(e.toString());
 	    }
 		return mapping;
-	}
-	
-	public int indexDbData(String indexName,Map paramVals)throws Exception{
-		int cc = 0;
-		DataSrc ds = TemplatesLoader.getTemplatesLoader().getDataSrc(indexName);
-	    if(ds==null){
-	    	throw new Exception("未找到ID为"+indexName+"的数据源定义信息！");
-	    }
-	    if(ds.getSourceType()==1){
-	    	cc = excuteSql(ds,paramVals);
-		}else if(ds.getSourceType()==2){
-			cc = excuteProcedure(ds,paramVals);
-		}
-		return cc;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -216,100 +218,102 @@ public class ESDataSourceService {
 			}
 		}
 		proStmt.append("}");
-		try{
-			cc=(Integer)jdbcTemplate.execute(proStmt.toString(),new CallableStatementCallback(){
-				public Object doInCallableStatement(CallableStatement cs)throws SQLException, DataAccessException {
-					if(parasIn!=null&&parasIn.size()>0){
-						for(int i=0;i<parasIn.size();i++){
-							//过程参数引用方式分直接引用固定值和引用参数两种
-							ProParaIn pi=(ProParaIn)parasIn.get(i);
-							if(pi!=null&&pi.getReferMode()==0){
-								if(pi.getDataType()==1){
-									int ival=0;
-									try{ival=Integer.parseInt(pi.getValue());}
-									catch(Exception e){}
-									cs.setInt(i+1, ival);
-									log.info("参数(整型)"+pi.getReferTo()+":"+ival);
-								}else if(pi.getDataType()==2){
-									double dval=0;
-									try{dval=Double.parseDouble(pi.getValue());}
-									catch(Exception e){}
-									cs.setDouble(i+1, dval);
-									log.info("参数(小数)"+pi.getReferTo()+":"+dval);
-								}else{
-									cs.setString(i+1, pi.getValue());
-									log.info("参数(字符串)"+pi.getReferTo()+":"+pi.getValue());
-								}
+		cc=(Integer)jdbcTemplate.execute(proStmt.toString(),new CallableStatementCallback(){
+			public Object doInCallableStatement(CallableStatement cs)throws SQLException, DataAccessException {
+				if(parasIn!=null&&parasIn.size()>0){
+					for(int i=0;i<parasIn.size();i++){
+						//过程参数引用方式分直接引用固定值和引用参数两种
+						ProParaIn pi=(ProParaIn)parasIn.get(i);
+						if(pi!=null&&pi.getReferMode()==0){
+							if(pi.getDataType()==1){
+								int ival=0;
+								try{ival=Integer.parseInt(pi.getValue());}
+								catch(Exception e){}
+								cs.setInt(i+1, ival);
+								log.info("参数(整型)"+pi.getReferTo()+":"+ival);
+							}else if(pi.getDataType()==2){
+								double dval=0;
+								try{dval=Double.parseDouble(pi.getValue());}
+								catch(Exception e){}
+								cs.setDouble(i+1, dval);
+								log.info("参数(小数)"+pi.getReferTo()+":"+dval);
 							}else{
-								if(paramVals==null){
-									log.error("缺少参数值。参数："+pi.getReferTo());
-								}
-								//找出输入参数的定义
-								String val=(String)paramVals.get(pi.getReferTo());
-								if(val==null){
-									log.error("缺少参数"+pi.getReferTo()+"的值！");
-								}
-								if(pi.getDataType()==1){
-									int iVal=0;
-									try{
-										iVal=Integer.parseInt(val);
-									}catch(Exception e){}
-									cs.setInt(i+1, iVal);
-									log.info("参数(整型)"+pi.getReferTo()+":"+iVal);
-								}else if(pi.getDataType()==2){
-									double dVal=0;
-									try{
-										dVal=Double.parseDouble(val);
-									}catch(Exception e){}
-									cs.setDouble(i+1, dVal);
-									log.info("参数(小数)"+pi.getReferTo()+":"+dVal);
-								}else{
-									cs.setString(i+1,val);
-									log.info("参数(字符串)"+pi.getReferTo()+":"+val);
-								}
+								cs.setString(i+1, pi.getValue());
+								log.info("参数(字符串)"+pi.getReferTo()+":"+pi.getValue());
+							}
+						}else{
+							if(paramVals==null){
+								log.error("缺少参数值。参数："+pi.getReferTo());
+							}
+							//找出输入参数的定义
+							String val=(String)paramVals.get(pi.getReferTo());
+							if(val==null){
+								log.error("缺少参数"+pi.getReferTo()+"的值！");
+							}
+							if(pi.getDataType()==1){
+								int iVal=0;
+								try{
+									iVal=Integer.parseInt(val);
+								}catch(Exception e){}
+								cs.setInt(i+1, iVal);
+								log.info("参数(整型)"+pi.getReferTo()+":"+iVal);
+							}else if(pi.getDataType()==2){
+								double dVal=0;
+								try{
+									dVal=Double.parseDouble(val);
+								}catch(Exception e){}
+								cs.setDouble(i+1, dVal);
+								log.info("参数(小数)"+pi.getReferTo()+":"+dVal);
+							}else{
+								cs.setString(i+1,val);
+								log.info("参数(字符串)"+pi.getReferTo()+":"+val);
 							}
 						}
 					}
-					//注册输出参数
-					int oStart=parasIn==null?1:parasIn.size()+1;
-					if(parasOut!=null){
-						for(int i=0;i<parasOut.size();i++){
-							ProParaOut po=(ProParaOut)parasOut.get(i);
-							if(po.getDataType()==1||po.getDataType()==2){
-								cs.registerOutParameter(oStart+i, Types.NUMERIC);
-							}else if(po.getDataType()==0){
-								cs.registerOutParameter(oStart+i, Types.VARCHAR);
-							}else if(po.getDataType()==3){
-								cs.registerOutParameter(oStart+i, oracle.jdbc.OracleTypes.CURSOR);
-							}
-						}
-					}
-	                cs.execute();  
-	                ResultSet rs = (ResultSet)cs.getObject(oStart-1+pro.getDataSetIndex()); 
-	                if(rs==null){
-	                	return 0;
-	                }
-	                int count = 0;
-	                ResultSetMetaData rsmd=rs.getMetaData();
-	        		//获取元信息
-	        		int colNum=rsmd.getColumnCount();
-	        		TransportClient client = esClient.getClient();
-	    	        BulkRequestBuilder bulkRequest = client.prepareBulk();
-	                while (rs.next()) {
-	                	Map row = new HashMap();
-	                	for(int i=1;i<=colNum;i++){
-	        				String sVal=rs.getString(i);
-	        				String colName = rsmd.getColumnLabel(i).toLowerCase();
-	        				row.put(colName, sVal);
-	        			}
-	                	bulkRequest.add(client.prepareIndex(ds.getId(),"_doc").setSource(row));
-	                	count++;
-	                }
-	                return new Integer(count);
 				}
-			});
-		}catch(Exception e){
-		}
+				//注册输出参数
+				int oStart=parasIn==null?1:parasIn.size()+1;
+				if(parasOut!=null){
+					for(int i=0;i<parasOut.size();i++){
+						ProParaOut po=(ProParaOut)parasOut.get(i);
+						if(po.getDataType()==1||po.getDataType()==2){
+							cs.registerOutParameter(oStart+i, Types.NUMERIC);
+						}else if(po.getDataType()==0){
+							cs.registerOutParameter(oStart+i, Types.VARCHAR);
+						}else if(po.getDataType()==3){
+							cs.registerOutParameter(oStart+i, oracle.jdbc.OracleTypes.CURSOR);
+						}
+					}
+				}
+                cs.execute();  
+                ResultSet rs = (ResultSet)cs.getObject(oStart-1+pro.getDataSetIndex()); 
+                if(rs==null){
+                	return 0;
+                }
+                int count = 0;
+                ResultSetMetaData rsmd=rs.getMetaData();
+        		//获取元信息
+        		int colNum=rsmd.getColumnCount();
+        		TransportClient client = esClient.getClient();
+    	        BulkRequestBuilder bulkRequest = client.prepareBulk();
+                while (rs.next()) {
+                	Map row = new HashMap();
+                	for(int i=1;i<=colNum;i++){
+        				String sVal=rs.getString(i);
+        				String colName = rsmd.getColumnLabel(i).toLowerCase();
+        				row.put(colName, sVal);
+        			}
+                	bulkRequest.add(client.prepareIndex(ds.getId(),"_doc").setSource(row));
+                	count++;
+                }
+                BulkResponse bulkResponse = bulkRequest.execute().actionGet();  
+    	        if (bulkResponse.hasFailures()) {  
+    	        	log.error("索引创建失败!"+bulkResponse.buildFailureMessage());  
+    	        	throw new SQLException("索引创建失败!"+bulkResponse.buildFailureMessage());
+    	        }
+                return new Integer(count);
+			}
+		});
 		return cc;
 	}
 	private int excuteSql(DataSrc ds, Map paramVals)throws Exception{
@@ -325,8 +329,14 @@ public class ESDataSourceService {
 	        BulkRequestBuilder bulkRequest = client.prepareBulk(); 
 	        for(int i=0;i<lst.size();i++){
 	        	Map row = (Map)lst.get(i);
-		        bulkRequest.add(client.prepareIndex(ds.getId(),"_doc").setSource(row));
+	        	Map nr = new HashMap();
+	        	for (Iterator it = row.keySet().iterator(); it.hasNext();) {  
+	        		String key = (String)it.next();  
+	        		nr.put(key.toLowerCase(), row.get(key));  
+		        } 
+		        bulkRequest.add(client.prepareIndex(ds.getId(),"_doc").setSource(nr));
 	        }
+	        
 	        cc = lst.size();
 	        BulkResponse bulkResponse = bulkRequest.execute().actionGet();  
 	        if (bulkResponse.hasFailures()) {  

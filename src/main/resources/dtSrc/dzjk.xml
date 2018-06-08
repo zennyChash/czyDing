@@ -2,26 +2,26 @@
 <dataSource>
 	<src id="dzjk_taxOfYear" name="折线图" description="用于折线图的数据" sourceType ="procedure">
 		<procedure name="pkg_test.djzk" totalIndex="1" datasetIndex="2">
-			<in referTo="sart"/>
-			<in referTo="limit"/>
-			<in referTo="exeDate"/>
 			<out dataType="1"/>
 			<out dataType="3"/>
 		</procedure>
 		<cols>
-			<col name="ny"  dataType="string" isFilter="1"/>
+			<col name="nian" fldType="integer" canOrder="1" isFilter="1"/>
+			<col name="yue" fldType="integer" canOrder="1" isFilter="1"/>
+			<col name="mse" fldType="double" />
 		</cols>
 	</src>
 	<src id="dzjkTotal" name="总数" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select swdjzh, se, year from rtk where rownum<10000
+			select lse total,prate,nian,yue from djzk
 		]]>
 		</sql>
 		<cols>
-			<col name="year" dataType="string" canOrder="1" isFilter="1"/>
-			<col name="swdjzh" dataType="string" />
-			<col name="se" dataType="double" canOrder="1" analyzer="" search_analyzer=""/>
+			<col name="nian" fldType="integer" canOrder="1" isFilter="1"/>
+			<col name="yue" fldType="integer" canOrder="1" isFilter="1"/>
+			<col name="total" fldType="double" analyzer="" search_analyzer=""/>
+			<col name="prate" fldType="double" />
 		</cols>
 	</src>
 </dataSource>

@@ -51,14 +51,35 @@ public class JPageParser {
 							Element dsNode=(Element)ids.next();
 							ValuedDs vds = new ValuedDs();
 							vds.setName(dsNode.attributeValue("name"));
-							vds.setRefDtSrc(dsNode.attributeValue("refDtSrc"));
+							//由于索引都是小写，引用数据源ID强制转为小写
+							String refDs = dsNode.attributeValue("refDtSrc");
+							refDs = StringUtils.isEmpty(refDs)?vds.getName():refDs;
+							vds.setRefDtSrc(refDs.toLowerCase());
+							String paging = dsNode.attributeValue("paging");
+							if("true".equals(paging)||"1".equals(paging)){
+								vds.setPaging(true);
+							}else{
+								vds.setPaging(false);
+							}
+							vds.setStartParam(dsNode.attributeValue("startParam"));
+							vds.setSizeParam(dsNode.attributeValue("sizeParam"));
 							if(dsNode.elementIterator("filter")!=null){
 								List filterFlds = new ArrayList();
 								for(Iterator iflt=dsNode.elementIterator("filter");iflt.hasNext();){
 									Element fNode=(Element)iflt.next();
 									FilterField ffld = new FilterField();
 									ffld.setName(fNode.attributeValue("name"));
+									ffld.setRefParam(fNode.attributeValue("refParam"));
 									ffld.setValue(fNode.attributeValue("value"));
+									ffld.setFtype(fNode.attributeValue("ftype"));
+									String sdtype = fNode.attributeValue("dataType");
+									if("1".equals(sdtype)||"int".equalsIgnoreCase(sdtype)){
+										ffld.setDataType(1);
+									}else if("2".equals(sdtype)||"double".equalsIgnoreCase(sdtype)){
+										ffld.setDataType(2);
+									}else{
+										ffld.setDataType(0);
+									}
 									filterFlds.add(ffld);
 								}
 								vds.setFilterFlds(filterFlds);

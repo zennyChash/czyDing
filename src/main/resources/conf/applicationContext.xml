@@ -51,6 +51,8 @@
 	<bean id="authService" class="com.ifugle.czy.service.AuthService"/>
 	<bean id="rptDataService" class="com.ifugle.czy.service.ReportDataService"/>
 	<bean id="rptEsService" class="com.ifugle.czy.service.ReportDataEsService"/>
+	<bean id="esDataService" class="com.ifugle.czy.service.ESQueryDataService"/>
+	<bean id="esDtSrcService" class="com.ifugle.czy.service.ESDataSourceService"/>
 	<context:annotation-config />
 	<tx:annotation-driven transaction-manager="txManager" />  
 	<!--<context:spring-configured />

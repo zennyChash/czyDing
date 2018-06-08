@@ -28,7 +28,7 @@ Zepto(function($){
 // 					alert(dt);
 // 				}
 // 		    });
-		   	//p = JSON.stringify({"rptID":"dzjk","rptParams":{"thisYear":"201806","lastYear":"201704"}})
+		   	//p = JSON.stringify({"rptID":"dzjk","rptParams":{"thisYear":"2018","lastYear":"2017"}})
 // 		   	p = JSON.stringify({"rptID":"dhcx_sshistory","rptParams":{"swdjzh":"201804"}})
 // 		    $.ajax({
 // 				type: 'post',
@@ -84,18 +84,18 @@ Zepto(function($){
 // 					alert(dt);
 // 				}
 // 		    });
-		    p = JSON.stringify({"rptID":"enBasic","rptParams":{"sugType":"","searchKey":"丽水横山后","start":0,"limit":"10"}});
-		    $.ajax({
-				type: 'post',
-				url: 'api/searchForWord',
-				data: p,
-				headers: {
-			        "Content-Type": "application/json;charset=utf-8"
-			    },
-				success: function(dt){
-					alert("string:"+dt);
-				}
-		    });
+// 		    p = JSON.stringify({"rptID":"enBasic","rptParams":{"sugType":"","searchKey":"丽水横山后","start":0,"limit":"10"}});
+// 		    $.ajax({
+// 				type: 'post',
+// 				url: 'api/searchForWord',
+// 				data: p,
+// 				headers: {
+// 			        "Content-Type": "application/json;charset=utf-8"
+// 			    },
+// 				success: function(dt){
+// 					alert("string:"+dt);
+// 				}
+// 		    });
 // 		    p = JSON.stringify({"userid":"manager431","saveContent":{"saveType":"myFavorite","saveObj":{"swdjzh":"3302xxxx","mc":"浙江广厦"}}});
 // 		    $.ajax({
 // 				type: 'post',
@@ -134,7 +134,32 @@ Zepto(function($){
 // 					alert(dt);
 // 				}
 // 		    });
-		    
+// 			p = JSON.stringify({"dsID":"dzjk_taxOfYear","dsParams":{"reMapping":true,"deleteOldData":true}});
+// 			$.ajax({
+// 				type: 'post',
+// 				url: 'api/indexData2ES',
+// 				data: p,
+// 				headers: {
+// 			        "Content-Type": "application/json;charset=utf-8"
+// 			    },
+// 				success: function(dt){
+// 					alert("string:"+dt);
+// 				}
+// 			});
+			
+			p = JSON.stringify({"rptID":"dzjk","rptParams":{"thisYear":"2018","lastYear":"2017","start":0,"size":12}});
+			$.ajax({
+				type: 'post',
+				url: 'api/queryESData',
+				data: p,
+				headers: {
+			        "Content-Type": "application/json;charset=utf-8"
+			    },
+				success: function(dt){
+					alert("string:"+dt);
+				}
+			});
+			
 //		},
 // 		error: function(xhr, type){
 // 		    alert('Out Ajax error!'+type)

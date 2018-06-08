@@ -7,29 +7,39 @@
 				"line":{
 					"month":[1,2,3,4,5,6,7,8,9,10,11,12],
 					"object":[{
-						"data":[1900.89,2018.9,3309.8,4099.93,3809.1,5090.89,4578.9,6789.9,4456.89,2988.9,5674.55,3456.78],
-						"name":"2018年"
+						"data":[
+							#foreach($row in $cYearTax.rows)
+	     						$!{row.mse}#if($velocityCount != $cYearTax.rows.size()),#end
+	     					#end
+						],
+						"name":"$!{thisYear}年"
 					},{
-						"data":[1878.9,3009.87,3456.65,5543.5,2347.8,4567.34,3356.78,5643.22,3122.11,2987.5,4322.12,1233.45],
-						"name":"2017年"
+						"data":[
+							#foreach($row in $lstYearTax.rows)
+	     						$!{row.mse}#if($velocityCount != $cYearTax.rows.size()),#end
+	     					#end
+						],
+						"name":"$!{lastYear}年"
 					}]
 				},
-				"rate":"75",
-				"total":"290912.78"
+				"rate":"$!{dzjkTotal.rows[1].prate}",
+				"total":"$!{dzjkTotal.rows[1].total}"
 			}
 		]]>
 		</jTemplate>
-		<vDs name="cYearTax" refDtSrc="dzjk_taxOfYear">
-			<filter name = "ny" value="2018"/>
-			<filter name = "test" value="2018"/>
-			<orderBy name = "ny" dir="asc"/>
+		<!-- 筛选字段的name，要和页面中传递过来的查询参数名一致。查询时，参数值使用请求中传递过来的值，
+		如果请求中没有，则用设计文件中的值，即filter中的value属性值，起默认值的作用，排序字段也类似。-->
+		<vDs name="cYearTax" refDtSrc="dzjk_taxOfYear" paging="true" startParam="start" sizeParam="size">
+			<filter  name = "nian" refParam="thisYear" />
+			<orderBy name = "yue" dir="asc"/>
 		</vDs>
 		<vDs name="lstYearTax" refDtSrc="dzjk_taxOfYear">
-			<filter name = "ny" value="2017"/>
-			<orderBy name = "ny" dir="asc"/>
+			<filter name = "nian" refParam="lastYear" />
+			<orderBy name = "yue" dir="asc"/>
 		</vDs>
 		<vDs name="dzjkTotal">
-			<filter name = "ny" value="2018"/>
+			<filter name = "nian" refParam="thisYear" value="2018"/>
+			<orderBy name = "yue" dir="desc"/>
 		</vDs>
 	</jpage>
 </pages>

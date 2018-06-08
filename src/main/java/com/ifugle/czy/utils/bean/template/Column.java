@@ -2,7 +2,7 @@ package com.ifugle.czy.utils.bean.template;
 
 public class Column {
 	private String name;
-	private String dataType;
+	private String fldType;
 	private int canOrder;
 	private int isFilter;
 	private String analyzer;
@@ -37,10 +37,10 @@ public class Column {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public String getDataType() {
-		return dataType;
+	public String getFldType() {
+		return fldType;
 	}
-	public void setDataType(String dataType) {
-		this.dataType = dataType;
+	public void setFldType(String fldType) {
+		this.fldType = fldType;
 	}
 }

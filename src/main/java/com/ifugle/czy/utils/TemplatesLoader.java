@@ -34,15 +34,19 @@ public class TemplatesLoader {
 		}
 	}
 	public void loadDataSrcs(){
-		String loadDs=Configuration.getConfig().getString("loadDataSrcTemplates", "0");
+		String loadDs=Configuration.getConfig().getString("loadDataSrcTemplates", "1");
 		//数据源模板不是每次都需要加载，可以不加载。
 		if("0".equals(loadDs)){
 			return;
 		}
+		dataSrcMap=new HashMap();
+		dataSrcTemplates = new ArrayList();
 		loadTemplatesFromFile("dataSrc",dataSrcTemplates,dataSrcMap);
 	}
 	
 	public void loadJSONPages(){
+		JSONPageMap=new HashMap();
+		JSONPageTemplates = new ArrayList();
 		loadTemplatesFromFile("JSONPage",JSONPageTemplates,JSONPageMap);
 	}
 	public void loadTemplatesFromFile(String tmpType,List tslst,Map tsmap){
@@ -72,8 +76,6 @@ public class TemplatesLoader {
 			}
 		}
 		List pathes=new ArrayList();
-		tsmap=new HashMap();
-		tslst = new ArrayList();
 		InputStream is=null;
 		try{
 			java.io.File dir=new java.io.File(path);
@@ -136,7 +138,8 @@ public class TemplatesLoader {
 		if(jpID==null||"".equals(jpID))
 			return null;
 		if(JSONPageMap==null){
-			loadTemplatesFromFile("dataSrc",dataSrcTemplates,dataSrcMap);
+			JSONPageMap=new HashMap();
+			JSONPageTemplates = new ArrayList();
 			loadTemplatesFromFile("JSONPage",JSONPageTemplates,JSONPageMap);
 		}
 		JPage jp=(JPage)JSONPageMap.get(jpID);
@@ -146,9 +149,11 @@ public class TemplatesLoader {
 		if(dtID==null||"".equals(dtID))
 			return null;
 		if(dataSrcMap==null){
+			dataSrcMap=new HashMap();
+			dataSrcTemplates = new ArrayList();
 			loadTemplatesFromFile("dataSrc",dataSrcTemplates,dataSrcMap);
 		}
-		DataSrc dts=(DataSrc)JSONPageMap.get(dtID);
+		DataSrc dts=(DataSrc)dataSrcMap.get(dtID);
 		return dts;
 	}
 	

@@ -59,20 +59,6 @@ public class ReportDataEsService {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 	
-	public Map getData(String rptID,RptDataJson params){
-		JSONObject jrpt = null;
-		TransportClient client = esClient.getClient();
-		GetResponse response = client.prepareGet("rptData","dzjk","201805").execute()    
-                .actionGet();    
-        String json = response.getSourceAsString();    
-        if (null != json) {    
-        	jrpt = JSONObject.parseObject(json); 
-        } else {    
-            System.out.println("未查询到任何结果！");    
-        }    
-		return jrpt;
-	}
-	
 	public String addIndexAndDocumentEn(String index,String type,RptDataJson params){ 
 		StringBuffer info= new StringBuffer("{success:");
 		JSONObject jparams = params==null?null:params.parseJRptParams();

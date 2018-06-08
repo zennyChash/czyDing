@@ -18,6 +18,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ifugle.czy.service.ESQueryDataService;
 import com.ifugle.czy.service.ReportDataEsService;
 import com.ifugle.czy.service.ReportDataService;
 import com.ifugle.czy.utils.JResponse;
@@ -33,7 +34,7 @@ public class QueryDataController {
 	private ReportDataService rptDataService;
 	@Autowired
 	private ReportDataEsService rptEsService;
-
+	
 	@RequestMapping(value="/queryData",method = RequestMethod.POST)
 	@ResponseBody
 	public JResponse getRptData(@RequestBody RptDataJson params){

@@ -8,6 +8,7 @@ public class JPage {
 	private String desc;
 	private String jTemplate;
 	private List valuedDs;
+	
 	public List getValuedDs() {
 		return valuedDs;
 	}

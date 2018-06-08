@@ -43,7 +43,8 @@ public class DataSourceTemplateParser {
 				for(Iterator it=root.elementIterator("src");it.hasNext();){
 					Element snode=(Element)it.next();
 					DataSrc ds = new DataSrc();
-				    ds.setId(snode.attributeValue("id"));
+					//由于索引都是小写，数据源ID强制转为小写
+				    ds.setId(snode.attributeValue("id").toLowerCase());
 				    ds.setName(snode.attributeValue("name"));
 				    ds.setDesc(snode.attributeValue("description"));
 				    String st = snode.attributeValue("sourceType");
@@ -62,10 +63,10 @@ public class DataSourceTemplateParser {
 							List columns=new ArrayList();
 							Map mfcols = new HashMap();
 							for(Iterator cit=fcnode.elementIterator("col");cit.hasNext();){
-								Element clnode=(Element)it.next();
+								Element clnode=(Element)cit.next();
 								Column col = new Column();
 								col.setName(clnode.attributeValue("name"));
-								col.setDataType(clnode.attributeValue("dataType"));
+								col.setFldType(clnode.attributeValue("fldType"));
 								String scanOrder = clnode.attributeValue("canOrder");
 								String sIsFilter = clnode.attributeValue("isFilter");
 								int canOrder = 0;
@@ -88,7 +89,8 @@ public class DataSourceTemplateParser {
 						}
 					}
 				    tslst.add(ds);
-				    tsmap.put(ds.getId(), ds);
+				    //由于索引都是小写，数据源ID强制转为小写，并以小写引用
+				    tsmap.put(ds.getId().toLowerCase(), ds);
 				}
 		    }
 		}catch(Exception e){
