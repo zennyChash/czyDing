@@ -1,5 +1,6 @@
 package com.ifugle.czy.service;
 
+import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -31,6 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.CallableStatementCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.jdbc.support.rowset.SqlRowSetMetaData;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
@@ -75,8 +78,10 @@ public class ESDataSourceService {
 	public String indexData(String indexName,boolean reMapping,boolean deleteOldData, Map paramVals){
 		StringBuffer info= new StringBuffer("{success:");
 		TransportClient client = esClient.getClient();
+		boolean needRemap = false;
 		if(reMapping){
 			buildNewIndex(indexName);
+			needRemap = true;
 		}else{
 			//检查是否存在
 			IndicesExistsRequest inExistsRequest = new IndicesExistsRequest(indexName);  
@@ -85,9 +90,10 @@ public class ESDataSourceService {
 	        if(!inExistsResponse.isExists()){  
 	        	CreateIndexRequestBuilder cib=client.admin().indices().prepareCreate(indexName);
 	            CreateIndexResponse res=cib.execute().actionGet(); 
-	            if(res.isAcknowledged()){
-	            	buildMappings(indexName);
-	            }
+	            needRemap = true;
+//	            if(res.isAcknowledged()){
+//	            	buildMappings(indexName);
+//	            }
 	        }else if(deleteOldData){//如果已经存在，检查是否需要删除旧数据。
 				//先删除以前的数据，按查询删除数据
 				DeleteByQueryAction.INSTANCE.newRequestBuilder(client)
@@ -98,7 +104,7 @@ public class ESDataSourceService {
 		}
 		//取数，执行，将数据作为document添加到索引。
 		try{
-			int cc = indexDbData(indexName,paramVals);
+			int cc = indexDbData(indexName,paramVals,needRemap);
 			info.append("true,indexDocs:").append(cc).append("}");
 		}catch(Exception e){
 			info.append("false,info:'").append("从数据库读取数据生成ES索引时发生错误！数据源："+indexName+"。错误信息："+e.getMessage()+"'}");
@@ -115,27 +121,27 @@ public class ESDataSourceService {
 		
         CreateIndexRequestBuilder cib=client.admin().indices().prepareCreate(indexName);
         CreateIndexResponse res=cib.execute().actionGet(); 
-        if(res.isAcknowledged()){
-        	buildMappings(indexName);
-        }
+//        if(res.isAcknowledged()){
+//        	buildMappings(indexName);
+//        }
         info.append("true}");
         return info.toString();
 	}
-	private int indexDbData(String indexName,Map paramVals)throws Exception{
+	private int indexDbData(String indexName,Map paramVals,boolean needRemap)throws Exception{
 		int cc = 0;
 		DataSrc ds = TemplatesLoader.getTemplatesLoader().getDataSrc(indexName);
 	    if(ds==null){
 	    	throw new Exception("未找到ID为"+indexName+"的数据源定义信息！");
 	    }
 	    if(ds.getSourceType()==1){
-	    	cc = excuteSql(ds,paramVals);
+	    	cc = excuteSql(ds,paramVals,needRemap);
 		}else if(ds.getSourceType()==2){
-			cc = excuteProcedure(ds,paramVals);
+			cc = excuteProcedure(ds,paramVals,needRemap);
 		}
 		return cc;
 	}
 	
-	private XContentBuilder buildMappings(String indexName){
+	private XContentBuilder buildMappings(String indexName,List meta){
 		XContentBuilder mapping = null;
 		DataSrc ds = TemplatesLoader.getTemplatesLoader().getDataSrc(indexName);
 	    if(ds==null){
@@ -144,23 +150,28 @@ public class ESDataSourceService {
 	    try{
 		    mapping = XContentFactory.jsonBuilder().startObject()  
 	                .startObject("_doc").startObject("properties");
-		    List cols = ds.getCols();
-		    for(int i = 0;i<cols.size();i++){
-		    	Column col = (Column)cols.get(i);
-		    	String fldtype = col.getFldType();
-		    	if(col.getIsFilter()==1||col.getCanOrder()==1){
-		    		fldtype = "keyword";
-		    	}
-		    	mapping.startObject(col.getName()).field("type",fldtype);
-		    	if(col.getIsFilter()==1||col.getCanOrder()==1){
-		    		mapping.startObject("fields").startObject("raw")
-		    		.field("type",col.getFldType()).endObject().endObject();
-		    	}
-		    	if(!StringUtils.isEmpty(col.getAnalyzer())){
-		    		mapping.field("analyzer",col.getAnalyzer());
-		    	}
-		    	if(!StringUtils.isEmpty(col.getSearch_analyzer())){
-		    		mapping.field("search_analyzer",col.getSearch_analyzer());
+		    Map cols = ds.getColMap();
+		    for(int i = 0;i<meta.size();i++){
+		    	Map oneCol = (Map)meta.get(i);
+		    	String cn = (String)oneCol.get("cName");
+		    	String ctype = (String)oneCol.get("cType");
+		    	//如果在xml中特别定义了col，按col定义，否则，默认按字段属性构造mapping
+		    	if(cols.containsKey(cn)){
+		    		Column col = (Column)cols.get(cn);
+			    	String fldtype = StringUtils.isEmpty(col.getFldType())?"text":col.getFldType();
+			    	mapping.startObject(col.getName()).field("type",fldtype);
+			    	if(col.getIsFilter()==1||col.getCanOrder()==1){
+			    		mapping.startObject("fields").startObject("raw")
+			    		.field("type","keyword").endObject().endObject();
+			    	}
+			    	if(!StringUtils.isEmpty(col.getAnalyzer())){
+			    		mapping.field("analyzer",col.getAnalyzer());
+			    	}
+			    	if(!StringUtils.isEmpty(col.getSearch_analyzer())){
+			    		mapping.field("search_analyzer",col.getSearch_analyzer());
+			    	}
+		    	}else{
+		    		mapping.startObject(cn).field("type",ctype);
 		    	}
 		    	mapping.endObject();
 		    }
@@ -175,7 +186,7 @@ public class ESDataSourceService {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private int excuteProcedure(DataSrc ds, Map paramVals)throws Exception{
+	private int excuteProcedure(DataSrc ds, Map paramVals,boolean needRemap)throws Exception{
 		int cc = 0;
 		ProcedureBean pro=ds.getProcedure();
 		if(pro==null){
@@ -294,6 +305,17 @@ public class ESDataSourceService {
                 ResultSetMetaData rsmd=rs.getMetaData();
         		//获取元信息
         		int colNum=rsmd.getColumnCount();
+        		if( needRemap){
+        			List colsMeata = new ArrayList();
+        			for (int i = 1; i <= colNum; i++) {  
+        				Map<String,String> col = new HashMap<String,String>();
+        				col.put("cName", rsmd.getColumnLabel(i).toLowerCase());
+        				col.put("cType", getTypeName(rsmd.getColumnType(i)));
+        				colsMeata.add(col);
+        			}
+        			buildMappings(ds.getId(),colsMeata);
+        		}
+        		
         		TransportClient client = esClient.getClient();
     	        BulkRequestBuilder bulkRequest = client.prepareBulk();
                 while (rs.next()) {
@@ -316,15 +338,29 @@ public class ESDataSourceService {
 		});
 		return cc;
 	}
-	private int excuteSql(DataSrc ds, Map paramVals)throws Exception{
+	private int excuteSql(DataSrc ds, Map paramVals,boolean needRemap)throws Exception{
 		int cc = 0;
 		String sql = ds.getSql();
 		if(StringUtils.isEmpty(sql)){
 			throw new Exception("数据源定了sql取数方式，但未找到sql语句！");
 		}
 		sql = parseParamValue(sql,paramVals);
+		if( needRemap){
+			SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql);
+			SqlRowSetMetaData metaData = rowSet.getMetaData();
+			int columnCount = metaData.getColumnCount();
+			List colsMeata = new ArrayList();
+			for (int i = 1; i <= columnCount; i++) {  
+				Map<String,String> col = new HashMap<String,String>();
+				col.put("cName", metaData.getColumnLabel(i).toLowerCase());
+				col.put("cType", getTypeName(metaData.getColumnType(i)));
+				colsMeata.add(col);
+			}
+			buildMappings(ds.getId(),colsMeata);
+		}
 		List lst = jdbcTemplate.queryForList(sql);
 		if(lst!=null){
+			Map esCols = ds.getColMap();
 			TransportClient client = esClient.getClient();
 	        BulkRequestBuilder bulkRequest = client.prepareBulk(); 
 	        for(int i=0;i<lst.size();i++){
@@ -332,7 +368,18 @@ public class ESDataSourceService {
 	        	Map nr = new HashMap();
 	        	for (Iterator it = row.keySet().iterator(); it.hasNext();) {  
 	        		String key = (String)it.next();  
-	        		nr.put(key.toLowerCase(), row.get(key));  
+	        		if(esCols.containsKey(key)){
+	        			Column escol = (Column)esCols.get(key);
+	        			if("integer".equals(escol.getFldType())){
+	        				nr.put(key.toLowerCase(), (Integer)row.get(key));
+	        			}else if("double".equals(escol.getFldType())){
+	        				nr.put(key.toLowerCase(),((BigDecimal)row.get(key)).doubleValue());
+	        			}else{
+	        				nr.put(key.toLowerCase(), row.get(key)); 
+	        			}
+	        		}else{
+	        			nr.put(key.toLowerCase(), row.get(key)); 
+	        		}
 		        } 
 		        bulkRequest.add(client.prepareIndex(ds.getId(),"_doc").setSource(nr));
 	        }
@@ -363,4 +410,16 @@ public class ESDataSourceService {
     	}
     	return s;
     }
+	private String getTypeName(int type) throws SQLException {
+        switch (type){
+	        case Types.BIGINT:
+	            return "integer";
+	        case Types.BIT:
+	            return "integer";
+	        case Types.DOUBLE:
+	        	return "double";
+	        default :
+	        	return "text";
+        }
+	}
 }

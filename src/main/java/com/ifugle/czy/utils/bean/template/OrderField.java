@@ -2,6 +2,8 @@ package com.ifugle.czy.utils.bean.template;
 
 public class OrderField {
 	private String name;
+	private int dataType;
+	private String dir;
 	public String getName() {
 		return name;
 	}
@@ -14,5 +16,10 @@ public class OrderField {
 	public void setDir(String dir) {
 		this.dir = dir;
 	}
-	private String dir;
+	public int getDataType() {
+		return dataType;
+	}
+	public void setDataType(int dataType) {
+		this.dataType = dataType;
+	}
 }

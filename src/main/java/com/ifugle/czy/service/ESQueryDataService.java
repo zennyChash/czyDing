@@ -19,6 +19,7 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.sort.SortBuilder;
@@ -26,11 +27,12 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ifugle.czy.utils.TemplatesLoader;
 import com.ifugle.czy.utils.bean.RptDataJson;
 import com.ifugle.czy.utils.bean.template.FilterField;
-import com.ifugle.czy.utils.bean.template.JPage;
+import com.ifugle.czy.utils.bean.template.JOutput;
 import com.ifugle.czy.utils.bean.template.OrderField;
 import com.ifugle.czy.utils.bean.template.ValuedDs;
 import com.ifugle.utils.Configuration;
@@ -43,24 +45,37 @@ public class ESQueryDataService {
 		this.esClient = esClient;
 	}
 	
-	public Map searchByKeyWord(String index,RptDataJson params){
+	public Map searchByKeyWord(String rptID,RptDataJson params){
 		Map info = null;
 		JSONObject jparams = params==null?null:params.parseJRptParams();
 		String str="",fld = "",fldsToGet="";
 		int from =0,size=10;
 		str = jparams.getString("searchKey");
-		from = jparams.getIntValue("start");
-		size = jparams.getIntValue("limit");
+		from = jparams.getIntValue("from");
+		size = jparams.getIntValue("size");
 		fld = jparams.getString("field")==null?"mc":jparams.getString("field");
 		fldsToGet = jparams.getString("fldsToGet")==null?"swdjzh,mc":jparams.getString("fldsToGet");
+		JSONObject filterBy = jparams.getJSONObject("filterBy");
 		Map result = new HashMap();
 		List<Map> qymcs = new ArrayList<Map>();
-		SearchResponse searchResponse = esClient.getClient().prepareSearch(index)
-			.setTypes("_doc")
-			.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+		//如果有filterBy，说明关键字检索的结果还要筛选过。比如街道用户，搜索结果应限制在该用户街道
+		BoolQueryBuilder qb = null;
+		if(filterBy!=null){
+			qb = QueryBuilders.boolQuery();
+			for (Map.Entry entry : filterBy.entrySet()) {  
+			   String key = (String)entry.getKey();  
+			   String value = (String)entry.getValue();
+			   qb.filter(QueryBuilders.termsQuery(key+".raw", value));
+			}	
+		}
+		SearchRequestBuilder sReq = esClient.getClient().prepareSearch(rptID).setTypes("_doc");
+		if(qb!=null){
+			sReq.setQuery(qb);
+		}
+		sReq.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
 			.setQuery(QueryBuilders.matchQuery(fld,str))
-			.setFrom(from).setSize(size)
-			.get();
+			.setFrom(from).setSize(size);
+		SearchResponse searchResponse =sReq.get();
 	    SearchHits hits = searchResponse.getHits();
 	    long total = hits.getTotalHits();
 	    result.put("total", total);
@@ -81,11 +96,11 @@ public class ESQueryDataService {
 		Map result = new HashMap();
 		JSONObject jrpt = null;
 		TransportClient client = esClient.getClient();
-		JPage jp = TemplatesLoader.getTemplatesLoader().getJPage(jpID);
+		JOutput jp = TemplatesLoader.getTemplatesLoader().getJOutput(jpID);
 		if(jp==null){
 			result.put("done", false);
 			result.put("info", "未找到页面数据的定义信息。");
-			log.equals("未找到JPage信息，ID："+jpID);
+			log.equals("未找到JOutput信息，ID："+jpID);
 			return result;
 		}
 		Properties p=new Properties(); 
@@ -109,20 +124,24 @@ public class ESQueryDataService {
 				List flts = vd.getFilterFlds();
 				List orders = vd.getOrderByFlds();
 				SearchRequestBuilder sReq = client.prepareSearch(dsRef).setTypes("_doc");
+				//如果指定了获取的字段，只取指定字段
+				if(!StringUtils.isEmpty(vd.getFields())){
+					sReq.setFetchSource(vd.getFields().split(","),null);
+				}
 				BoolQueryBuilder qb = QueryBuilders.boolQuery();
 				if(flts!=null){
 					for(int j=0;j<flts.size();j++){
 						FilterField flt = (FilterField)flts.get(j);
 						String ftype = flt.getFtype();
 						String fname = flt.getName();
-						String refParam = flt.getRefParam();
+						String refParam = StringUtils.isEmpty(flt.getRefParam())?fname:flt.getRefParam();
 						String fv = flt.getValue();
 						if(params.containsKey(refParam)){
 							fv = params.getString(refParam);
 						}
 						int dtype = flt.getDataType();
 						if("terms".equalsIgnoreCase(ftype)){
-							qb.filter(QueryBuilders.termsQuery(fname, fv));
+							qb.filter(QueryBuilders.termsQuery(fname+".raw", fv));
 						}else if("range".equalsIgnoreCase(ftype)){
 							if(StringUtils.isEmpty(fv)||fv.indexOf(",")<0){
 								continue;
@@ -141,25 +160,70 @@ public class ESQueryDataService {
 								fv = fv.substring(0, fv.length()-1);
 							}
 							String[] sranges = fv.split(",");
-							String sfrom = sranges[0],sto = sranges[1];
-							if(dtype==1){
-								qb.filter(QueryBuilders.rangeQuery(fname).from(Integer.parseInt(sfrom),includeLower)
-										.to(Integer.parseInt(sfrom), includeUpper));
-							}else if(dtype==2){
-								qb.filter(QueryBuilders.rangeQuery(fname).from(Double.parseDouble(sfrom),includeLower)
-										.to(Double.parseDouble(sfrom), includeUpper));
+							String sfrom = "",sto = "";
+							if(sranges.length==1){
+								if(fv.startsWith(",")){
+									sto = sranges[0];
+								}else{
+									sfrom = sranges[0];
+								}
 							}else{
-								qb.filter(QueryBuilders.rangeQuery(fname).from(sfrom, includeLower).to(sto, includeUpper));
+								sfrom = sranges[0];
+								sto = sranges[1];
+							}
+							if(dtype==1){
+								RangeQueryBuilder rq = QueryBuilders.rangeQuery(fname);
+								if(!StringUtils.isEmpty(sfrom)){
+									if(includeLower){
+										rq.gte(Integer.parseInt(sfrom));
+									}else{
+										rq.gt(Integer.parseInt(sfrom));
+									}
+								}
+								if(!StringUtils.isEmpty(sto)){
+									if(includeUpper){
+										rq.lte(Integer.parseInt(sto));
+									}else{
+										rq.lt(Integer.parseInt(sto));
+									}
+								}
+								qb.filter(rq);
+							}else if(dtype==2){
+								RangeQueryBuilder rq = QueryBuilders.rangeQuery(fname);
+								if(!StringUtils.isEmpty(sfrom)){
+									if(includeLower){
+										rq.gte(Double.parseDouble(sfrom));
+									}else{
+										rq.gt(Double.parseDouble(sfrom));
+									}
+								}
+								if(!StringUtils.isEmpty(sto)){
+									if(includeUpper){
+										rq.lte(Double.parseDouble(sto));
+									}else{
+										rq.lt(Double.parseDouble(sto));
+									}
+								}
+								qb.filter(rq);
+							}else{
+								RangeQueryBuilder rq = QueryBuilders.rangeQuery(fname+".raw");
+								if(!StringUtils.isEmpty(sfrom)){
+									rq = rq.from(sfrom,includeLower);
+								}
+								if(!StringUtils.isEmpty(sto)){
+									rq = rq.to(sto, includeUpper);
+								}
+								qb.filter(rq);
 							}
 						}else{
-							qb.filter(QueryBuilders.termQuery(fname, fv));
+							qb.filter(QueryBuilders.termsQuery(fname+".raw", fv));
 						}
 					}
 				}
 				if(orders!=null){
 					for(int k=0;k<orders.size();k++){
 						OrderField oflt = (OrderField)orders.get(k);
-						SortBuilder sortBuilder = SortBuilders.fieldSort(oflt.getName()+".raw");
+						SortBuilder sortBuilder = SortBuilders.fieldSort(oflt.getDataType()==0?oflt.getName()+".raw":oflt.getName());
 						if("desc".equalsIgnoreCase(oflt.getDir())){
 							sortBuilder.order(SortOrder.DESC);
 						}else{
@@ -190,6 +254,7 @@ public class ESQueryDataService {
 						sReq.setFrom(0).setSize(20);
 					}
 				}
+				
 				SearchResponse response = sReq.get();
 				SearchHits hits = response.getHits();
 			    long total = hits.getTotalHits();

@@ -20,7 +20,7 @@ public class InitTemplatesListener implements ServletContextListener{
     	}
 		//json数据模板
     	try{
-    		ltmp.loadJSONPages();
+    		ltmp.loadJSONOutputs();
     	}catch(Exception e){
     		e.printStackTrace();
     	}

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="dhcx_df_ny" name="单户查询-最大月份" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"latestValidMonth":"$!{en_maxny.rows[0].ny}",
+				"format":"Ym" 
+			}
+		]]>
+		</jTemplate>
+		<vDs name="en_maxny" refDtSrc="en_maxny" fields="ny">
+			<filter name = "swdjzh"/>
+		</vDs>
+	</joutput>
+	<joutput id="dhcx_year" name="单户查询-有数据的年" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"options":[
+					#foreach($row in $dhcx_year.rows)
+	   						{"bm":"$!{row.nian}","name":"$!{row.nian}"}#if($velocityCount != $dhcx_year.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{dhcx_year.rows[0].nian}"
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dhcx_year" refDtSrc="en_year" fields="nian">
+			<filter name = "swdjzh"/>
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="dhcx_month" name="单户查询-有数据的月份选项" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"options":[
+					#foreach($row in $en_month.rows)
+	   						{"bm":"$!{row.ny}","name":"$!{row.ny}"}#if($velocityCount != $en_month.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{en_month.rows[0].ny}"
+			}
+		]]>
+		</jTemplate>
+		<vDs name="en_month" refDtSrc="en_month" fields="ny">
+			<filter name = "swdjzh"/>
+			<filter name = "nian" refParam="year"/>
+			<orderBy name = "ny" dir="desc"/>
+		</vDs>
+	</joutput>
+<!-- 	<joutput id="ens_test" name="企业" description="">  -->
+<!-- 		<jTemplate> -->
+<!-- 		<![CDATA[ -->
+<!-- 			{ -->
+<!-- 				"options":[ -->
+<!-- 					#foreach($row in $en_test.rows) -->
+<!-- 	   						{"bm":"$!{row.pyorder}","name":"$!{row.mc}"}#if($velocityCount != $en_rq.rows.size()),#end -->
+<!-- 	   					#end -->
+<!-- 				], -->
+<!-- 				"defaultOp":"$!{en_rq.rows[0].mc}" -->
+<!-- 			} -->
+<!-- 		]]> -->
+<!-- 		</jTemplate> -->
+<!-- 		<vDs name="en_test" refDtSrc="enbasic" fields="swdjzh,mc,pyorder" paging="true" > -->
+<!-- 			<filter name = "pyorder" dataType="integer" ftype="range" value="[1,)"/> -->
+<!-- 			<orderBy name = "pyorder" dataType="integer" dir="asc"/> -->
+<!-- 		</vDs> -->
+<!-- 	</joutput> -->
+	<joutput id="dhcx_basic" name="单户查询——企业信息"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"swdjzh":"$!{dhcx_basic.rows[0].swdjzh}",
+				"mc":"$!{dhcx_basic.rows[0].mc}",
+				"czfp":"$!{dhcx_basic.rows[0].czfp}",
+				"fddbr":"$!{dhcx_basic.rows[0].fddbr}",
+				"dz":"$!{dhcx_basic.rows[0].dz}",
+				"hy":"$!{dhcx_basic.rows[0].hy}"
+			}
+		]]>
+		</jTemplate>
+		<!-- 筛选字段的name，和数据源中的field一致，筛选值则使用请求中传递过来的值，refParam是其对应的请求参数名。
+		如果不设置refParam，就从请求中查找“参数名=filter的name”的参数值。
+		如果请求中未获得参数值，则用设计文件中的静态值，即filter中的value属性值；
+		排序字段也类似。-->
+		<vDs name="dhcx_basic" refDtSrc="enbasic" fields="swdjzh,mc,czfp,fddbr,dz,hy">
+			<filter name = "swdjzh" />
+		</vDs>
+	</joutput>
+	<joutput id="dhcx_tax" name="单户查询——企业税收信息"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"swdjzh":"$!{en_tax.rows[0].swdjzh}",
+				"mc":"$!{en_tax.rows[0].mc}",
+				"czfp":"$!{en_tax.rows[0].czfp}",
+				"bnlj":"$!{en_tax.rows[0].bn_zse}",
+				"sntq":"$!{en_tax.rows[0].sn_zse}",
+				"tb":"$!{en_tax.rows[0].tbzz}",
+				"zzs":"$!{en_tax.rows[0].bn_zz}",
+				"ygz":"$!{en_tax.rows[0].bn_ygz}",
+				"qysd":"$!{en_tax.rows[0].bn_qysd}",
+				"grsd":"$!{en_tax.rows[0].bn_grsd}",
+				"cswhjs":"$!{en_tax.rows[0].bn_cswhjs}",
+				"yh":"$!{en_tax.rows[0].bn_yh}"
+			}
+		]]>
+		</jTemplate>
+		<!-- 筛选字段的name，和数据源中的field一致，筛选值则使用请求中传递过来的值，refParam是其对应的请求参数名。
+		如果不设置refParam，就从请求中查找“参数名=filter的name”的参数值。
+		如果请求中未获得参数值，则用设计文件中的静态值，即filter中的value属性值；
+		排序字段也类似。-->
+		<vDs name="en_tax" fields="swdjzh,mc,czfp,bn_zse,sn_zse,tbzz,bn_zz,bn_ygz,bn_qysd,bn_grsd,bn_cswhjs,bn_yh">
+			<filter name = "swdjzh" />
+			<filter name = "ny"/>
+		</vDs>
+	</joutput>
+</pages>
+

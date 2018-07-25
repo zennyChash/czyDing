@@ -123,18 +123,18 @@ Zepto(function($){
 // 					alert(dt);
 // 				}
 // 		    });
-// 			p = JSON.stringify({"dsID":"enbasic","dsParams":{"reMapping":true,"deleteOldData":true}});
-// 			$.ajax({
-// 				type: 'post',
-// 				url: 'api/indexData2ES',
-// 				data: p,
-// 				headers: {
-// 			        "Content-Type": "application/json;charset=utf-8"
-// 			    },
-// 				success: function(dt){
-// 					alert("string:"+dt);
-// 				}
-// 			});
+			p = JSON.stringify({"dsID":"en_year","dsParams":{"reMapping":true,"deleteOldData":true}});
+			$.ajax({
+				type: 'post',
+				url: 'api/indexData2ES',
+				data: p,
+				headers: {
+			        "Content-Type": "application/json;charset=utf-8"
+			    },
+				success: function(dt){
+					alert("string:"+dt);
+				}
+			});
 			
 // 			p = JSON.stringify({"rptID":"dzjk","rptParams":{"thisYear":"2018","lastYear":"2017","start":0,"size":12}});
 // 			$.ajax({
@@ -148,18 +148,18 @@ Zepto(function($){
 // 					alert("string:"+dt);
 // 				}
 // 			});
-			p = JSON.stringify({"rptID":"dhcx_tax","rptParams":{"swdjzh":"91330604146165334B","ny":"201805","from":0,"size":10}});
-			$.ajax({
-				type: 'post',
-				url: 'api/queryData',
-				data: p,
-				headers: {
-			        "Content-Type": "application/json;charset=utf-8"
-			    },
-				success: function(dt){
-					alert("string:"+dt);
-				}
-			});
+// 			p = JSON.stringify({"rptID":"dhcx_df_ny","rptParams":{"swdjzh":"91330604146165334B","from":0,"size":10}});
+// 			$.ajax({
+// 				type: 'post',
+// 				url: 'api/queryData',
+// 				data: p,
+// 				headers: {
+// 			        "Content-Type": "application/json;charset=utf-8"
+// 			    },
+// 				success: function(dt){
+// 					alert("string:"+dt);
+// 				}
+// 			});
 			
 //		},
 // 		error: function(xhr, type){

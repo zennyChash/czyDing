@@ -35,7 +35,7 @@ public class QueryDataController {
 	@Autowired
 	private ReportDataEsService rptEsService;
 	
-	@RequestMapping(value="/queryData",method = RequestMethod.POST)
+	@RequestMapping(value="/queryDataDB",method = RequestMethod.POST)
 	@ResponseBody
 	public JResponse getRptData(@RequestBody RptDataJson params){
 		JResponse jr = null;
@@ -49,7 +49,7 @@ public class QueryDataController {
 		return jr;
 	}
 	
-	@RequestMapping(value="/paramOptions",method = RequestMethod.POST)
+	@RequestMapping(value="/paramOptionsDB",method = RequestMethod.POST)
 	@ResponseBody
 	public JResponse getParamOptions(@RequestBody RptDataJson params){
 		JResponse jr = null;
@@ -62,57 +62,57 @@ public class QueryDataController {
 		}
 		return jr;
 	}
-	@RequestMapping(value="/buildIndex",method = RequestMethod.POST)
-	@ResponseBody
-	public JResponse buildIndex(@RequestBody RptDataJson params){
-		JResponse jr = null;
-		if(params!=null){
-			String rptID = params.getRptID();
-			if(StringUtils.isEmpty(rptID)){
-				return new JResponse("9","未设置索引的类型！",null);
-			}else{
-				String data = rptEsService.addIndexAndDocumentEn("rptdata", rptID.toLowerCase(),params);
-				jr = new JResponse("0","",data);
-			}
-		}else{
-			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
-		}
-		return jr;
-	}
-	@RequestMapping(value="/deleteIndex",method = RequestMethod.POST)
-	@ResponseBody
-	public JResponse deleteIndex(@RequestBody RptDataJson params){
-		JResponse jr = null;
-		if(params!=null){
-			String rptID = params.getRptID();
-			if(StringUtils.isEmpty(rptID)){
-				return new JResponse("9","未设置索引的类型！",null);
-			}else{
-				String data = rptEsService.deleteIndex("rptdata");
-				jr = new JResponse("0","",data);
-			}
-		}else{
-			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
-		}
-		return jr;
-	}
-	@RequestMapping(value="/searchForWord",method = RequestMethod.POST)
-	@ResponseBody
-	public JResponse searchForWord(@RequestBody RptDataJson params){
-		JResponse jr = null;
-		if(params!=null){
-			String rptID = params.getRptID();
-			if(StringUtils.isEmpty(rptID)){
-				return new JResponse("9","未设置索引的类型！",null);
-			}else{
-				Map data = rptEsService.searchForWord("rptdata", rptID.toLowerCase(),params);
-				jr = new JResponse("0","",data);
-			}
-		}else{
-			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
-		}
-		return jr;
-	}
+//	@RequestMapping(value="/buildIndexOld",method = RequestMethod.POST)
+//	@ResponseBody
+//	public JResponse buildIndex(@RequestBody RptDataJson params){
+//		JResponse jr = null;
+//		if(params!=null){
+//			String rptID = params.getRptID();
+//			if(StringUtils.isEmpty(rptID)){
+//				return new JResponse("9","未设置索引的类型！",null);
+//			}else{
+//				String data = rptEsService.addIndexAndDocumentEn("rptdata", rptID.toLowerCase(),params);
+//				jr = new JResponse("0","",data);
+//			}
+//		}else{
+//			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
+//		}
+//		return jr;
+//	}
+//	@RequestMapping(value="/deleteIndex",method = RequestMethod.POST)
+//	@ResponseBody
+//	public JResponse deleteIndex(@RequestBody RptDataJson params){
+//		JResponse jr = null;
+//		if(params!=null){
+//			String rptID = params.getRptID();
+//			if(StringUtils.isEmpty(rptID)){
+//				return new JResponse("9","未设置索引的类型！",null);
+//			}else{
+//				String data = rptEsService.deleteIndex("rptdata");
+//				jr = new JResponse("0","",data);
+//			}
+//		}else{
+//			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
+//		}
+//		return jr;
+//	}
+//	@RequestMapping(value="/searchForWordOld",method = RequestMethod.POST)
+//	@ResponseBody
+//	public JResponse searchForWord(@RequestBody RptDataJson params){
+//		JResponse jr = null;
+//		if(params!=null){
+//			String rptID = params.getRptID();
+//			if(StringUtils.isEmpty(rptID)){
+//				return new JResponse("9","未设置索引的类型！",null);
+//			}else{
+//				Map data = rptEsService.searchForWord("rptdata", rptID.toLowerCase(),params);
+//				jr = new JResponse("0","",data);
+//			}
+//		}else{
+//			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
+//		}
+//		return jr;
+//	}
 	@RequestMapping(value="/saveUserInfo",method = RequestMethod.POST)
 	@ResponseBody
 	public JResponse saveUserInfo(@RequestBody SaveUserObj so){

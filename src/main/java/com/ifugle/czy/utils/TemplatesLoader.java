@@ -10,15 +10,15 @@ import java.util.List;
 import java.util.Map;
 
 import com.ifugle.czy.utils.bean.template.DataSrc;
-import com.ifugle.czy.utils.bean.template.JPage;
+import com.ifugle.czy.utils.bean.template.JOutput;
 import com.ifugle.utils.Configuration;
 
 public class TemplatesLoader {
 	private static Map dataSrcMap;
 	private static List dataSrcTemplates;
 	private static TemplatesLoader tLoader;
-	private static Map JSONPageMap;
-	private static List JSONPageTemplates;
+	private static Map JSONOutputMap;
+	private static List JSONOutputTemplates;
 	private TemplatesLoader(){};
 	/**
 	 * 获取模板加载器的实例。
@@ -44,10 +44,10 @@ public class TemplatesLoader {
 		loadTemplatesFromFile("dataSrc",dataSrcTemplates,dataSrcMap);
 	}
 	
-	public void loadJSONPages(){
-		JSONPageMap=new HashMap();
-		JSONPageTemplates = new ArrayList();
-		loadTemplatesFromFile("JSONPage",JSONPageTemplates,JSONPageMap);
+	public void loadJSONOutputs(){
+		JSONOutputMap=new HashMap();
+		JSONOutputTemplates = new ArrayList();
+		loadTemplatesFromFile("JSONOutput",JSONOutputTemplates,JSONOutputMap);
 	}
 	public void loadTemplatesFromFile(String tmpType,List tslst,Map tsmap){
 		String path=Configuration.getConfig().getString(tmpType+"TemplatesPath", "");
@@ -102,7 +102,7 @@ public class TemplatesLoader {
 						}
 					}else{
 						try{
-							loadJSONPageTemplate(tInfo,tslst,tsmap);
+							loadJSONOutputTemplate(tInfo,tslst,tsmap);
 						}catch(Exception e){
 							System.out.println();
 						}
@@ -130,19 +130,19 @@ public class TemplatesLoader {
 		return;
 	}
 	
-	private void loadJSONPageTemplate(String tInfo,List tslst,Map tsmap) {
-		JPageParser parser=JPageParser.getParser();
-		parser.parseTemplateToJPage(tInfo,tslst,tsmap);
+	private void loadJSONOutputTemplate(String tInfo,List tslst,Map tsmap) {
+		JOutputParser parser=JOutputParser.getParser();
+		parser.parseTemplateToJOutput(tInfo,tslst,tsmap);
 	}
-	public JPage getJPage(String jpID){
+	public JOutput getJOutput(String jpID){
 		if(jpID==null||"".equals(jpID))
 			return null;
-		if(JSONPageMap==null){
-			JSONPageMap=new HashMap();
-			JSONPageTemplates = new ArrayList();
-			loadTemplatesFromFile("JSONPage",JSONPageTemplates,JSONPageMap);
+		if(JSONOutputMap==null){
+			JSONOutputMap=new HashMap();
+			JSONOutputTemplates = new ArrayList();
+			loadTemplatesFromFile("JSONOutput",JSONOutputTemplates,JSONOutputMap);
 		}
-		JPage jp=(JPage)JSONPageMap.get(jpID);
+		JOutput jp=(JOutput)JSONOutputMap.get(jpID);
 		return jp;
 	}
 	public DataSrc getDataSrc(String dtID){

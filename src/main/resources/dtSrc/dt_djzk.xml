@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="dzjk_maxnyr" name="最大有效日期" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select max(zwrq_jk)nyr from YSSR
+		]]>
+		</sql>
+		<cols>
+			<col name="nyr" canOrder="1"/>
+		</cols>
+	</src>
+	<src id="dzjk_year" name="有数据的年份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select distinct substr(zwrq_jk,1,4)nian from YSSR
+		]]>
+		</sql>
+		<cols>
+			<col name="nian" canOrder="1"/>
+		</cols>
+	</src>
+	<src id="dzjk_month" name="有数据的月份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select distinct substr(zwrq_jk,1,4)nian,substr(zwrq_jk,5,2)ny from yssr
+		]]>
+		</sql>
+		<cols>
+			<col name="nian" isFilter="1"/>
+			<col name="ny" canOrder="1"/>
+		</cols>
+	</src>
+	<src id="dzjk_day" name="有数据的日期" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select distinct substr(zwrq_jk,1,4)nian,substr(zwrq_jk,5,2)ny,zwrq_jk nyr from yssr
+		]]>
+		</sql>
+		<cols>
+			<col name="nian" isFilter="1"/>
+			<col name="ny" isFilter="1"/>
+			<col name="nyr" canOrder="1"/>
+		</cols>
+	</src>
+	<src id="dzjk_srjd" name="收入进度信息" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select zwrq_jk zwrq,nlj_jk nlj_jk_o,round(nlj_jk/10000,2)nlj_jk,round(nlj_jk/jhs*100) wcjd from(
+				select ny||ri zwrq_jk,sum(nlj_jk) nlj_jk,jhs from yssr_hztj r,yssr_tb t 
+				where substr(ny,1,4)=nian group by ny||ri,jhs)
+		]]>
+		</sql>
+		<cols>
+			<col name="zwrq" canOrder="1" isFilter="1"/>
+			<col name="nlj_jk" fldType="double" />
+			<col name="wcjd" fldType="double" />
+		</cols>
+	</src>
+	<src id="dzjk_srzb_jg" name="机构收入占比信息" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select zwrq_jk zwrq,jgdm_jk,jg,round(nlj_jk/sum(nlj_jk) over (partition by zwrq_jk)*100) zb
+			from( select ny||ri zwrq_jk,sum(nlj_jk) nlj_jk,jgdm_jk,jg
+				from yssr_hztj group by jgdm_jk,jg,ny||ri
+			)order by zwrq_jk,jgdm_jk
+		]]>
+		</sql>
+		<cols>
+			<col name="zwrq" canOrder="1" isFilter="1"/>
+			<col name="zb" fldType="double"/>
+		</cols>
+	</src>
+	<src id="dzjk_year" name="分年度税收对比" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select nian,yue,sum(bnlj) bnlj,round(sum(bnlj)/10000,2)bnlj_w,sum(sntq)sntq,round(sum(sntq)/10000,2)sntq_w from(
+				SELECT substr(ny,1,4) nian,substr(ny,5,2) yue,sum(nlj_jk) bnlj,0 sntq FROM yssr_hztj where ny||ri in
+				(SELECT  max(zwrq_jk) FROM yssr_index group by substr(zwrq_jk,1,6))
+				group by substr(ny,1,4),substr(ny,5,2)
+			union
+				SELECT substr(i.zwrq_jk,1,4) nian,substr(i.zwrq_jk,5,2) yue,0 bnlj,sum(nlj_jk) sntq FROM yssr_hztj y,yssr_index i
+			where  y.ny||y.ri=i.zwrq_tq and ny||ri in
+				(SELECT  max(zwrq_tq) FROM yssr_index group by substr(zwrq_tq,1,6))
+				group by substr(i.zwrq_jk,1,4),substr(i.zwrq_jk,5,2)
+			)
+			group by nian,yue
+		]]>
+		</sql>
+		<cols>
+			<col name="nian" canOrder="1" isFilter="1"/>
+			<col name="yue" canOrder="1"/>
+			<col name="bnlj" fldType="double"/>
+			<col name="sntq" fldType="double"/>
+			<col name="bnlj_w" fldType="double"/>
+			<col name="sntq_w" fldType="double"/>
+		</cols>
+	</src>
+	<src id="dzjk_fsz" name="分税种详情" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select zwrq_jk zwrq,szbm,sz,bnlj,round(bnlj/10000,2)bnlj_w,sntq,round(sntq/10000,2)sntq_w,tbzz,
+			round(bnlj/sum(bnlj) over (partition by zwrq_jk)*100,2) srzb from (
+				select zwrq_jk,szbm,sz,sum(bnlj) bnlj,sum(sntq) sntq,
+				case when sum(sntq)=0 then 0 else  round((sum(bnlj)-sum(sntq))/sum(sntq)*100,1) end tbzz
+				from (
+					SELECT ny||ri zwrq_jk,szbm,sz,sum(nlj_jk) bnlj,0 sntq FROM yssr_hztj
+					where szbm in ('10101','10104','10106') group by szbm,sz,ny||ri union
+					SELECT ny||ri zwrq_jk,'90000' szbm,'其他税' sz,sum(nlj_jk) bnlj,0 sntq FROM  yssr_hztj
+					where szbm not in ('10101','10104','10106') group by ny||ri union
+					SELECT to_char(i.zwrq_jk),szbm,sz,0 bnlj,sum(nlj_jk) sntq FROM yssr_hztj y,yssr_index i
+					where y.ny||y.ri=i.zwrq_tq and  szbm in ('10101','10104','10106') group by szbm,sz,i.zwrq_jk union
+					SELECT to_char(i.zwrq_jk),'90000' szbm,'其他税' sz,0 bnlj,sum(nlj_jk) sntq FROM yssr_hztj y,yssr_index i
+					where y.ny||y.ri=i.zwrq_tq and szbm not in ('10101','10104','10106') group by i.zwrq_jk
+				)
+			group by zwrq_jk,szbm,sz)order by zwrq_jk,szbm
+		]]>
+		</sql>
+		<cols>
+			<col name="zwrq" canOrder="1" isFilter="1"/>
+			<col name="szbm" canOrder="1" />
+			<col name="bnlj" fldType="double"/>
+			<col name="sntq" fldType="double"/>
+			<col name="bnlj_w" fldType="double"/>
+			<col name="sntq_w" fldType="double"/>
+			<col name="tbzz" fldType="double"/>
+			<col name="srzb" fldType="double"/>
+		</cols>
+	</src>
+	
+</dataSource>
+

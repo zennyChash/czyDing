@@ -31,10 +31,15 @@ public class ReportDataService {
 	}
 	public Map getData(String rptID,RptDataJson params){
 		JSONObject jrpt = null;
-		Map rpt = jdbcTemplate.queryForMap("select rptinfo from rptdata where rptid=?",new Object[]{rptID});
-		if(rpt!=null){
-			String rptinfo=(String)rpt.get("rptinfo"); 
-			jrpt = JSONObject.parseObject(rptinfo);
+		String jparam = params.getRptParams();
+		try{
+			Map rpt = jdbcTemplate.queryForMap("select rptinfo from rptdata where rptid=? and params=?",new Object[]{rptID,jparam});
+			if(rpt!=null){
+				String rptinfo=(String)rpt.get("rptinfo"); 
+				jrpt = JSONObject.parseObject(rptinfo);
+			}
+		}catch(Exception e){
+			log.error(e.toString());
 		}
 		return jrpt;
 	}
@@ -43,16 +48,20 @@ public class ReportDataService {
 		Map mapOps = new HashMap();
 		Map allOptions = new HashMap();
 		JSONArray jparams = params==null?null:params.parseJOptionParams();
-		if(jparams!=null){
-			for(int i=0;i<jparams.size();i++){
-				String spara = jparams.getString(i);
-				Map opinfo = jdbcTemplate.queryForMap("select opsinfo from paramoptions where rptid=? and paramid=?",new Object[]{rptID,spara});
-				if(opinfo!=null){
-					String ostr=(String)opinfo.get("opsinfo"); 
-					JSONObject op = JSONObject.parseObject(ostr);
-					allOptions.put(spara,op);
+		try{
+			if(jparams!=null){
+				for(int i=0;i<jparams.size();i++){
+					String spara = jparams.getString(i);
+					Map opinfo = jdbcTemplate.queryForMap("select opsinfo from paramoptions where rptid=? and paramid=?",new Object[]{rptID,spara});
+					if(opinfo!=null){
+						String ostr=(String)opinfo.get("opsinfo"); 
+						JSONObject op = JSONObject.parseObject(ostr);
+						allOptions.put(spara,op);
+					}
 				}
 			}
+		}catch(Exception e){
+			log.error(e.toString());
 		}
 		mapOps.put("paramOptions",allOptions);
 		return mapOps;
@@ -300,15 +309,15 @@ public class ReportDataService {
 	}
 	private Map getMyFavorite(String userid,JSONObject params){
 		Map info =  new HashMap();
-		int start = params.getIntValue("start");
-		int limit = params.getIntValue("limit");
+		int from = params.getIntValue("from");
+		int size = params.getIntValue("size");
 		int cc = jdbcTemplate.queryForObject("select count(*) from user_favorite where userid=?", new Object[]{userid},Integer.class);
 		info.put("total", cc);
 		StringBuffer sql = new StringBuffer("select swdjzh,mc from user_favorite where userid=?");
 		StringBuffer rSql = new StringBuffer("select * from (select a.*, rownum r from (");
 		rSql.append(sql);
 		rSql.append(") a where rownum<=?) b where r>?");
-		List fvs = jdbcTemplate.queryForList(rSql.toString(),new Object[]{userid,start+limit,start});
+		List fvs = jdbcTemplate.queryForList(rSql.toString(),new Object[]{userid,from+size,from});
 		info.put("rows", fvs);
 		return info;
 	}

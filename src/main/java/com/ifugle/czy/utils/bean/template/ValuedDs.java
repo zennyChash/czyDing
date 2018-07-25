@@ -12,9 +12,16 @@ public class ValuedDs {
 	private boolean paging;
 	private String startParam;
 	private String sizeParam;
+	private String fields;
 	private List filterFlds;
 	private List orderByFlds;
 	
+	public String getFields() {
+		return fields;
+	}
+	public void setFields(String fields) {
+		this.fields = fields;
+	}
 	public boolean isPaging() {
 		return paging;
 	}

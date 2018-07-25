@@ -141,8 +141,8 @@ public class ReportDataEsService {
 		int from =0,size=10;
 		JSONObject jparams = params==null?null:params.parseJRptParams();
 		str = jparams.getString("searchKey");
-		from = jparams.getIntValue("start");
-		size = jparams.getIntValue("limit");
+		from = jparams.getIntValue("from");
+		size = jparams.getIntValue("size");
 		Map result = new HashMap();
 		List<Map> qymcs = new ArrayList<Map>();
 		SearchResponse searchResponse = esClient.getClient().prepareSearch(index)

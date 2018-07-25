@@ -3,6 +3,7 @@ package com.ifugle.czy.controller;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,12 +19,13 @@ import com.ifugle.czy.utils.bean.DataSourceJson;
 import com.ifugle.czy.utils.bean.RptDataJson;
 @Controller
 public class ESController {
+	private static Logger log = Logger.getLogger(ESController.class);
 	@Autowired
 	private ESQueryDataService esDataService;
 	@Autowired
 	private ESDataSourceService esDtSrcServicev;
 	
-	@RequestMapping(value="/queryESData",method = RequestMethod.POST)
+	@RequestMapping(value="/queryData",method = RequestMethod.POST)
 	@ResponseBody
 	public JResponse queryESData(@RequestBody RptDataJson params){
 		JResponse jr = null;
@@ -43,6 +45,7 @@ public class ESController {
 			}else{
 				jr = new JResponse("9","获取页面数据失败！",null);
 			}
+			log.info(rptID+"的输出:"+jr.toString());
 		}else{
 			jr = new JResponse("9","获取报表数据失败，没有获得正确的请求参数！",null);
 		}
@@ -81,6 +84,23 @@ public class ESController {
 			}else{
 				//索引名一律转化为小写
 				String data = esDtSrcServicev.delelteIndex(dsID.toLowerCase());
+				jr = new JResponse("0","",data);
+			}
+		}else{
+			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
+		}
+		return jr;
+	}
+	@RequestMapping(value="/searchForWord",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse searchForWord(@RequestBody RptDataJson params){
+		JResponse jr = null;
+		if(params!=null){
+			String rptID = params.getRptID();
+			if(StringUtils.isEmpty(rptID)){
+				return new JResponse("9","未设置索引的类型！",null);
+			}else{
+				Map data = esDataService.searchByKeyWord(rptID,params);
 				jr = new JResponse("0","",data);
 			}
 		}else{

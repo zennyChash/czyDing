@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="dzjk_df_nyr" name="最大日期" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"latestValidMonth":"$!{dzjk_maxnyr.rows[0].nyr}",
+				"format":"Ymd" 
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_maxnyr" refDtSrc="dzjk_maxnyr" fields="nyr"/>
+	</joutput>
+	<joutput id="dzjk_year" name="有数据的年" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"options":[
+					#foreach($row in $dzjk_year.rows)
+	   						{"bm":"$!{row.nian}","name":"$!{row.nian}"}#if($velocityCount != $dzjk_year.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{dzjk_year.rows[0].nian}"
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_year" refDtSrc="dzjk_year" fields="nian">
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="dzjk_month" name="有数据的月份选项" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"options":[
+					#foreach($row in $dzjk_month.rows)
+	   						{"bm":"$!{row.ny}","name":"$!{row.ny}"}#if($velocityCount != $dzjk_month.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{dzjk_month.rows[0].ny}"
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_month" refDtSrc="dzjk_month" fields="ny">
+			<filter name = "nian" refParam="year"/>
+			<orderBy name = "ny" dir="desc"/>
+		</vDs>
+	</joutput>
+		<joutput id="dzjk_day" name="有数据的日" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"options":[
+					#foreach($row in $dzjk_day.rows)
+	   						{"bm":"$!{row.nyr}","name":"$!{row.nyr}"}#if($velocityCount != $dzjk_day.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{dzjk_day.rows[0].nyr}"
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_day" refDtSrc="dzjk_month" fields="nyr">
+			<filter name = "ny" refParam="yearMonth"/>
+			<orderBy name = "nyr" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="dzjk_srjd" name="电子金库-收入进度"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"nlj_jk":"$!{dzjk_srjd.rows[0].nlj_jk}",
+				"wcjd":"$!{dzjk_srjd.rows[0].wcjd}",
+				"nlj_type":{
+				
+				},
+				"srtb_line":{
+					
+				}
+			}
+		]]>
+		</jTemplate>
+		<!-- 筛选字段的name，和数据源中的field一致，筛选值则使用请求中传递过来的值，refParam是其对应的请求参数名。
+		如果不设置refParam，就从请求中查找“参数名=filter的name”的参数值。
+		如果请求中未获得参数值，则用设计文件中的静态值，即filter中的value属性值；
+		排序字段也类似。-->
+		<vDs name="dzjk_srjd" refDtSrc="dzjk_srjd" fields="nlj_jk,wcjd">
+			<filter name = "zwrq" />
+		</vDs>
+		<vDs name="dzjk_srzb_jg" refDtSrc="dzjk_srzb_jg" fields="zwrq,jgdm_jk,jg,zb">
+			<filter name = "zwrq" />
+		</vDs>
+		<vDs name="dzjk_year" refDtSrc="dzjk_year" fields="nian,yue,bnlj_w,sntq_w">
+			<filter name = "year" />
+		</vDs>
+	</joutput>
+	<joutput id="dzjk_fsz" name="金库-分税种"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"chart":{ 
+				},
+				"fszTax":[
+					#foreach($row in $dzjk_day.rows)
+		   				{"szbm":"$!{row.szbm}","sz":"$!{row.sz}","bnlj":"$!{row.bnlj}",
+		   				"sntq":"$!{row.sntq}","tbzz":"$!{row.tbzz}","srzb":"$!{row.srzb}"
+		   				}#if($velocityCount != $dzjk_day.rows.size()),#end
+		   			#end
+				]
+			}
+		]]>
+		</jTemplate>
+		<!-- 筛选字段的name，和数据源中的field一致，筛选值则使用请求中传递过来的值，refParam是其对应的请求参数名。
+		如果不设置refParam，就从请求中查找“参数名=filter的name”的参数值。
+		如果请求中未获得参数值，则用设计文件中的静态值，即filter中的value属性值；
+		排序字段也类似。-->
+		<vDs name="dzjk_fsz" fields="zwrq,sz,bnlj_w,sntq_w,tbzz,srzb">
+			<filter name = "zwrq" />
+			<orderBy name = "szbm" />
+		</vDs>
+	</joutput>
+</pages>
+
