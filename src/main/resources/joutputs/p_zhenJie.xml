@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="zjsrtj_df_ny" name="最大日期" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($zj_maxny&&$zj_maxny.rows.size()>0)
+				"latestValidMonth":"$!{zj_maxny.rows[0].ny}",
+				"format":"Ym" 
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="zj_maxny" refDtSrc="zjsrtj_maxny" fields="ny">
+			<filter name = "czfpbm" value="330604201"/>
+		</vDs>
+	</joutput>
+	<joutput id="zjsrtj_year" name="有数据的年" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($zj_year&&$zj_year.rows.size()>0)
+				"options":[
+					#foreach($row in $zj_year.rows)
+	   						{"bm":"$!{row.nian}"}#if($velocityCount != $zj_year.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{zj_year.rows[0].nian}"
+			#end	
+			}
+		]]>
+		</jTemplate>
+		<vDs name="zj_year" refDtSrc="zjsrtj_year" fields="nian">
+			<filter name = "czfpbm" value="330604201"/>
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="zjsrtj_month" name="有数据的月份选项" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($zjsrtj_month&&$zjsrtj_month.rows.size()>0)
+				"options":[
+					#foreach($row in $zjsrtj_month.rows)
+	   					{"bm":"$!{row.yue}"}#if($velocityCount != $zjsrtj_month.rows.size()),#end
+	   				#end
+				],
+				"defaultOp":"$!{zjsrtj_month.rows[0].yue}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="zjsrtj_month" fields="ny,yue">
+			<filter name = "czfpbm" value="330604201"/>
+			<filter name = "nian" refParam="year" value="2018"/>
+			<orderBy name = "ny" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="zj_srtj" name="税收情况"  description="" > 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($zjsr_basic&&$zjsr_basic.rows.size()>0)
+					"bnlj":"$!{zjsr_basic.rows[0].bnlj}",
+					"sntq":"$!{zjsr_basic.rows[0].sntq}",
+					"tbzz":"$!{zjsr_basic.rows[0].tbzz}",
+				#else
+					"bnlj":"","sntq":"","tbzz":"",
+				#end
+				#if($zjsr_details&&$zjsr_details.rows.size()>0)
+					"ensTax":[
+						#foreach($row in $zjsr_details.rows)
+		   					{"swdjzh":"$!{row.swdjzh}","mc":"$!{row.mc}","tax":"$!{row.bnlj}"}
+		   					#if($velocityCount != $zjsr_details.rows.size()),#end
+		   				#end
+					],
+					"total": $!{zjsr_details.total}
+				#else
+					"ensTax":[],"total":0
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="zjsr_basic" fields="czfpbm,czfp,bnlj,sntq,tbzz">
+			<filter name = "czfpbm" value="330604201"/>
+			<filter name = "ny" value="201803"/>
+		</vDs>
+		<vDs name="zjsr_details" paging="true" fields="ny,czfpbm,swdjzh,mc,bnlj,pm">
+			<filter name = "czfpbm" value="330604201"/>
+			<filter name = "ny" value="201803"/>
+			<orderBy name = "pm" fldType="integer" dir="asc"/>
+		</vDs>
+	</joutput>
+</pages>
+

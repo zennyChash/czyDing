@@ -44,6 +44,7 @@
 		<cols>
 			<col name="swdjzh" isFilter="1"/>
 			<col name="nian" isFilter="1"/>
+			<col name="yue" isFilter="1"/>
 			<col name="ny" canOrder="1"/>
 		</cols>
 	</src>
@@ -63,7 +64,7 @@
 		]]>
 		</sql>
 		<cols>
-			<col name="ny" fldType="integer" canOrder="1" isFilter="1"/>
+			<col name="ny" canOrder="1" isFilter="1"/>
 			<col name="swdjzh" fldType="text" isFilter="1"/>
 		</cols>
 	</src>

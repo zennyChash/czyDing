@@ -18,6 +18,7 @@ public class TemplatesLoader {
 	private static List dataSrcTemplates;
 	private static TemplatesLoader tLoader;
 	private static Map JSONOutputMap;
+
 	private static List JSONOutputTemplates;
 	private TemplatesLoader(){};
 	/**
@@ -145,6 +146,22 @@ public class TemplatesLoader {
 		JOutput jp=(JOutput)JSONOutputMap.get(jpID);
 		return jp;
 	}
+	public Map getJSONOutputMap() {
+		if(JSONOutputMap==null){
+			JSONOutputMap=new HashMap();
+			JSONOutputTemplates = new ArrayList();
+			loadTemplatesFromFile("JSONOutput",JSONOutputTemplates,JSONOutputMap);
+		}
+		return JSONOutputMap;
+	}
+	public List getJSONOutputTemplates() {
+		if(JSONOutputTemplates==null){
+			JSONOutputMap=new HashMap();
+			JSONOutputTemplates = new ArrayList();
+			loadTemplatesFromFile("JSONOutput",JSONOutputTemplates,JSONOutputMap);
+		}
+		return JSONOutputTemplates;
+	}
 	public DataSrc getDataSrc(String dtID){
 		if(dtID==null||"".equals(dtID))
 			return null;
@@ -155,6 +172,22 @@ public class TemplatesLoader {
 		}
 		DataSrc dts=(DataSrc)dataSrcMap.get(dtID);
 		return dts;
+	}
+	public Map getDataSrcMap() {
+		if(dataSrcMap==null){
+			dataSrcMap=new HashMap();
+			dataSrcTemplates = new ArrayList();
+			loadTemplatesFromFile("dataSrc",dataSrcTemplates,dataSrcMap);
+		}
+		return dataSrcMap;
+	}
+	public List getDataSrcTemplates() {
+		if(dataSrcTemplates==null){
+			dataSrcMap=new HashMap();
+			dataSrcTemplates = new ArrayList();
+			loadTemplatesFromFile("dataSrc",dataSrcTemplates,dataSrcMap);
+		}
+		return dataSrcTemplates;
 	}
 	
 	//获取指定目录下的设计文件，递归

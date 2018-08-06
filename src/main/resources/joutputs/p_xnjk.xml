@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="xnjk_df_ny" name="最大日期" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($xnjk_maxny&&$xnjk_maxny.rows.size()>0)
+				"latestValidMonth":"$!{xnjk_maxny.rows[0].ny}",
+				"format":"Ym" 
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="xnjk_maxny" refDtSrc="xnjk_maxny" fields="ny"/>
+	</joutput>
+	<joutput id="xnjk_year" name="有数据的年" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($xnjk_year&&$xnjk_year.rows.size()>0)
+				"options":[
+					#foreach($row in $xnjk_year.rows)
+	   						{"bm":"$!{row.nian}"}#if($velocityCount != $xnjk_year.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{xnjk_year.rows[0].nian}"
+			#end	
+			}
+		]]>
+		</jTemplate>
+		<vDs name="xnjk_year" fields="nian">
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="xnjk_month" name="有数据的月份选项" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($xnjk_month&&$xnjk_month.rows.size()>0)
+				"options":[
+					#foreach($row in $xnjk_month.rows)
+	   					{"bm":"$!{row.yue}"}#if($velocityCount != $xnjk_month.rows.size()),#end
+	   				#end
+				],
+				"defaultOp":"$!{xnjk_month.rows[0].yue}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="xnjk_month" fields="ny,yue">
+			<filter name = "nian" refParam="year" value="2018"/>
+			<orderBy name = "ny" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="xnjk_detail" name="税收情况"  description="" > 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($xnjk_detail&&$xnjk_detail.rows.size()>0)
+				"pie":[ 
+					#foreach($row in $xnjk_detail.rows)
+	   					{"name":"$!{row.czfp}","value":"$!{row.ttax}","color":"$!{row.xncolor}"}
+	   					#if($velocityCount != $xnjk_detail.rows.size()),#end
+	   				#end
+	   			],
+				"xnjk":[
+					#foreach($row in $xnjk_detail.rows)
+	   					{"id":"$!{row.czfpbm}","mc":"$!{row.czfp}","tax":"$!{row.ttax}",
+	   					"sszb":"$!{row.sszb}","class":"xnjk_$!{row.czfpbm}","color":"$!{row.xncolor}"}
+	   					#if($velocityCount != $xnjk_detail.rows.size()),#end
+	   				#end
+				],
+				"total": $!{xnjk_detail.total}
+				#else
+				"pie":[],"xnjk":[],"total":0
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="xnjk_detail" paging="true" fields="czfpbm,czfp,ttax,sszb,xncolor">
+			<filter name = "ny" value="201803"/>
+			<orderBy name = "czfpbm" dir="asc"/>
+		</vDs>
+	</joutput>
+</pages>
+

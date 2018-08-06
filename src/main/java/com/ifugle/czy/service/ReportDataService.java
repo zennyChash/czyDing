@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ifugle.czy.utils.JResponse;
 import com.ifugle.czy.utils.bean.DeleteUserObj;
 import com.ifugle.czy.utils.bean.QueryUserObj;
 import com.ifugle.czy.utils.bean.RptDataJson;
@@ -297,28 +298,64 @@ public class ReportDataService {
 		info.put("msg", "");
 		return info;
 	}
-	public Map getUserInfo(QueryUserObj qo) {
+	public JResponse getUserInfo(User user,QueryUserObj qo) {
+		JResponse jr =null;
 		Map info =  new HashMap();
 		String userid = qo.getUserid();
 		JSONObject jcdt = qo.parseQueryContent();
 		String qtype = jcdt.getString("qType");
 		if("myFavorite".equals(qtype)){
 			info = getMyFavorite(userid,jcdt.getJSONObject("params"));
+			if(info!=null){
+				jr = new JResponse("0","",info); 
+			}else{
+				jr = new JResponse("9","获取用户收藏信息时发生错误！",null); 
+			}
+		}else if("czfpbm".equals(qtype)){
+			if(user!=null){
+				String uconfig = user.getConfig();
+				try{
+					JSONObject jucg = JSON.parseObject(uconfig);
+					String czfpbm = jucg.getString("czfpbm");
+					if(StringUtils.isEmpty(czfpbm)){
+						jr = new JResponse("9","用户未设置财政分片信息！",null);
+					}else{
+						info = new HashMap();
+						info.put("czfpbm", czfpbm);
+						jr = new JResponse("0","",info); 
+					}
+				}catch(Exception e){
+					log.error(e.toString());
+					jr = new JResponse("9","获取用户所属财政分片信息时发生错误！",null);
+				}
+			}else{
+				log.error("未找到当前用户的信息。");
+				jr = new JResponse("9","未找到当前用户的信息。",null); 
+			}
+		}else{
+			jr = new JResponse("9","未知的用户信息类型："+qtype,null);
 		}
-		return info;
+		return jr;
 	}
+	
 	private Map getMyFavorite(String userid,JSONObject params){
-		Map info =  new HashMap();
-		int from = params.getIntValue("from");
-		int size = params.getIntValue("size");
-		int cc = jdbcTemplate.queryForObject("select count(*) from user_favorite where userid=?", new Object[]{userid},Integer.class);
-		info.put("total", cc);
-		StringBuffer sql = new StringBuffer("select swdjzh,mc from user_favorite where userid=?");
-		StringBuffer rSql = new StringBuffer("select * from (select a.*, rownum r from (");
-		rSql.append(sql);
-		rSql.append(") a where rownum<=?) b where r>?");
-		List fvs = jdbcTemplate.queryForList(rSql.toString(),new Object[]{userid,from+size,from});
-		info.put("rows", fvs);
+		Map info =  null;
+		try{
+			int from = params.getIntValue("from");
+			int size = params.getIntValue("size");
+			int cc = jdbcTemplate.queryForObject("select count(*) from user_favorite where userid=?", new Object[]{userid},Integer.class);
+			info = new HashMap();
+			info.put("total", cc);
+			StringBuffer sql = new StringBuffer("select swdjzh,mc from user_favorite where userid=?");
+			StringBuffer rSql = new StringBuffer("select * from (select a.*, rownum r from (");
+			rSql.append(sql);
+			rSql.append(") a where rownum<=?) b where r>?");
+			List fvs = jdbcTemplate.queryForList(rSql.toString(),new Object[]{userid,from+size,from});
+			info.put("rows", fvs);
+		}catch(Exception e){
+			log.error(e.toString());
+			return null;
+		}
 		return info;
 	}
 }

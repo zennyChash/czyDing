@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="zdsy_df_ny" name="最大有效月份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select max(ny)ny,etype from zdsy group by etype
+		]]>
+		</sql>
+		<cols>
+			<col name="etype" isFilter="1"/>
+		</cols>
+	</src>
+	<src id="zdsy_year" name="有数据的年份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select distinct substr(ny,1,4)nian,etype from zdsy
+		]]>
+		</sql>
+		<cols>
+			<col name="etype" isFilter="1"/>
+			<col name="nian" canOrder="1"/>
+		</cols>
+	</src>
+	<src id="zdsy_month" name="有数据的月份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select distinct substr(ny,1,4)nian,substr(ny,5,2)yue,ny,etype from zdsy
+		]]>
+		</sql>
+		<cols>
+			<col name="etype" isFilter="1"/>
+			<col name="nian" isFilter="1"/>
+			<col name="yue" canOrder="1"/>
+			<col name="ny" canOrder="1"/>
+		</cols>
+	</src>
+	<src id="zdsy_basic" name="重点税源概况" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select a.*,round(bnlj/sum(bnlj) over (partition by ny)*87,2) srzb_t,round(bnlj/sum(bnlj) over (partition by ny)*94,2) srzb_e  from(
+			select ny,etype,count(swdjzh)ecount,sum(bnlj)bnlj,sum(sntq)sntq,
+			decode(sum(sntq),0,0,round((sum(bnlj)-sum(sntq))*100/sum(sntq),2))tbzz
+			from zdsy group by ny,etype
+			order by ny,etype)a
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="etype" canOrder="1" isFilter="1"/>
+			<col name="ecount" fldType="integer"/>
+			<col name="bnlj" fldType="double"/>
+			<col name="sntq" fldType="double" />
+			<col name="tbzz" fldType="double" />
+			<col name="srzb_e" fldType="double" />
+			<col name="srzb_t" fldType="double" />
+		</cols>
+	</src>
+	<src id="zdsy_details" name="重点税源企业税收" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select a.*,round(bnlj/sum(bnlj) over (partition by ny,etype)*100,2) srzb,
+			rank()over(PARTITION BY ny,etype ORDER BY bnlj desc) pm
+			from(
+			select ny,etype,swdjzh,mc,bnlj,sntq,decode(sntq,0,0,round((bnlj-sntq)*100/sntq,2))tbzz
+			from zdsy
+			order by ny,etype,bnlj desc)a
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="etype" canOrder="1" isFilter="1"/>
+			<col name="pm" fldType="integer" canOrder="1"/>
+			<col name="bnlj" fldType="double"/>
+			<col name="sntq" fldType="double" />
+			<col name="tbzz" fldType="double" />
+			<col name="srzb" fldType="double" />
+			<col name="srzb" fldType="double" />
+		</cols>
+	</src>
+</dataSource>
+

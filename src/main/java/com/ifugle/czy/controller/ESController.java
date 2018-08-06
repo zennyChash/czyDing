@@ -1,5 +1,6 @@
 package com.ifugle.czy.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,8 +16,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.ifugle.czy.service.ESDataSourceService;
 import com.ifugle.czy.service.ESQueryDataService;
 import com.ifugle.czy.utils.JResponse;
+import com.ifugle.czy.utils.TemplatesLoader;
 import com.ifugle.czy.utils.bean.DataSourceJson;
 import com.ifugle.czy.utils.bean.RptDataJson;
+import com.ifugle.czy.utils.bean.template.DataSrc;
+import com.ifugle.czy.utils.bean.template.JOutput;
 @Controller
 public class ESController {
 	private static Logger log = Logger.getLogger(ESController.class);
@@ -32,7 +36,12 @@ public class ESController {
 		if(params!=null){
 			String rptID = params.getRptID();
 			JSONObject qParams = params.parseJRptParams();
-			Map data = esDataService.getData(rptID,qParams);
+			Map data = null;
+			try{
+				data = esDataService.getData(rptID,qParams);
+			}catch(Exception e){
+				jr = new JResponse("9","查询数据时发生异常，未能查找到数据。",null);
+			}
 			if(data!=null&&data.containsKey("done")){
 				boolean done = (Boolean)data.get("done");
 				if(done){
@@ -106,6 +115,69 @@ public class ESController {
 		}else{
 			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
 		}
+		return jr;
+	}
+	
+	
+	
+	
+	
+	
+	
+	@RequestMapping(value="/indexAllData2ES",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse indexAllData2ES(@RequestBody DataSourceJson jds){
+		JResponse jr = null;
+		List dts = TemplatesLoader.getTemplatesLoader().getDataSrcTemplates();
+		if(dts!=null){
+			for(int i=0;i<dts.size();i++){
+				DataSrc ds = (DataSrc)dts.get(i);
+				String dsID = ds.getId();
+				JSONObject params = jds.parseJDsParams();
+				boolean reMapping = params.getBoolean("reMapping");
+				boolean deleteOldData = params.getBoolean("deleteOldData");
+				if(StringUtils.isEmpty(dsID)){
+					log.info("未找到数据源的ID:"+dsID);
+				}else{
+					//索引名一律转化为小写
+					String data = esDtSrcServicev.indexData(dsID.toLowerCase(),reMapping,deleteOldData,params);
+					log.info(data);
+				}
+				log.info("*****************");
+			}
+		}
+		jr = new JResponse("0","","{done:true,info:'共生成"+(dts==null?"0":dts.size())+"个数据源索引'}");
+		return jr;
+	}
+	
+	@RequestMapping(value="/testQueryData",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse testQueryESData(@RequestBody RptDataJson params){
+		JResponse jr = null;
+		List jps = TemplatesLoader.getTemplatesLoader().getJSONOutputTemplates();
+		if(jps!=null){
+			for(int i=0;i<jps.size();i++){
+				JOutput joutput = (JOutput)jps.get(i);
+				String rptID = joutput.getId();
+				JSONObject qParams = params.parseJRptParams();
+				Map data = esDataService.getData(rptID,qParams);
+				if(data!=null&&data.containsKey("done")){
+					boolean done = (Boolean)data.get("done");
+					if(done){
+						JSONObject jdata = (JSONObject)data.get("jpData");
+						log.info(rptID+"的输出:"+jdata.toString());
+					}else{
+						String info = (String)data.get("info");
+						log.info(rptID+"取数发生错误:"+info);
+					}
+				}else{
+					jr = new JResponse("9","获取页面数据失败！",null);
+					log.info(rptID+"获取页面数据失败！");
+				}
+				log.info("*****************");
+			}
+		}
+		jr = new JResponse("0","","{done:true,info:'共输出"+(jps==null?"0":jps.size())+"个数据展示结果'}");
 		return jr;
 	}
 }

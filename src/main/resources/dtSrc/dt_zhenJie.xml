@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="zjsrtj_maxny" name="最大有效月份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select max(ny)ny,czfpbm from bb_srqc_cx group by czfpbm
+		]]>
+		</sql>
+		<cols>
+			<col name="czfpbm" canOrder="1" isFilter="1"/>
+		</cols>
+	</src>
+	<src id="zjsrtj_year" name="有数据的年份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select distinct substr(ny,1,4)nian,czfpbm from bb_srqc_cx
+		]]>
+		</sql>
+		<cols>
+			<col name="czfpbm" isFilter="1"/>
+			<col name="nian" canOrder="1"/>
+		</cols>
+	</src>
+	<src id="zjsrtj_month" name="有数据的月份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select distinct substr(ny,1,4)nian,substr(ny,5,2)yue,ny,czfpbm from bb_srqc_cx
+		]]>
+		</sql>
+		<cols>
+			<col name="czfpbm" isFilter="1"/>
+			<col name="nian" isFilter="1"/>
+			<col name="yue" isFilter="1"/>
+			<col name="ny" canOrder="1"/>
+		</cols>
+	</src>
+	<src id="zjsr_basic" name="镇街收入概况" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select ny,czfpbm, czfp_r czfp,sum(bn_zse)bnlj_o,sum(sn_zse)sntq_o,round(sum(bn_zse)/10000,2)bnlj,round(sum(sn_zse)/10000,2)sntq,
+			round((sum(bn_zse)-sum(sn_zse))*100/sum(sn_zse),2)tbzz
+			 from BB_SRQC_CX group by ny,czfpbm,czfp_r order by ny,czfpbm
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="czfpbm" canOrder="1" isFilter="1"/>
+			<col name="bnlj" fldType="double"/>
+			<col name="sntq" fldType="double" />
+			<col name="tbzz" fldType="double" />
+		</cols>
+	</src>
+	<src id="zjsr_details" name="镇街企业税收" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select * from(
+				select a.*,rank()over(PARTITION BY ny,czfpbm ORDER BY bnlj desc) pm from(
+				select ny,czfpbm,swdjzh,mc,sum(bn_zse)bnlj_o,sum(sn_zse)sntq_o,
+				round(sum(bn_zse)/10000,2)bnlj,round(sum(sn_zse)/10000,2)sntq from BB_SRQC_CX group by ny,czfpbm,swdjzh,mc
+				)a)where pm<=100
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="czfpbm" canOrder="1" isFilter="1"/>
+			<col name="swdjzh" isFilter="1"/>
+			<col name="bnlj" fldType="double"/>
+			<col name="pm" fldType="integer" canOrder="1"/>
+		</cols>
+	</src>
+</dataSource>
+

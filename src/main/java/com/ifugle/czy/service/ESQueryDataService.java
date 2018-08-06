@@ -6,12 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.exception.VelocityException;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -135,9 +138,19 @@ public class ESQueryDataService {
 						String ftype = flt.getFtype();
 						String fname = flt.getName();
 						String refParam = StringUtils.isEmpty(flt.getRefParam())?fname:flt.getRefParam();
-						String fv = flt.getValue();
+						String fv = "";
+						//先获取引用参数的值。如无，则使用默认的静态值。
 						if(params.containsKey(refParam)){
 							fv = params.getString(refParam);
+						}else{
+							fv = flt.getValue();
+							context.put(refParam, fv);
+						}
+						if(StringUtils.isEmpty(fv)){
+							result.put("done", false);
+							result.put("info", "缺少参数"+refParam+"的值。");
+							log.equals("构造JOutput信息失败，ID："+jpID+"，缺少参数"+refParam+"的值。");
+							return result;
 						}
 						int dtype = flt.getDataType();
 						if("terms".equalsIgnoreCase(ftype)){
@@ -244,10 +257,12 @@ public class ESQueryDataService {
 					try{
 						size = params.getInteger(sizeFld);
 					}catch(Exception e){}
-					
+					if(size==0){
+						size=10;
+					}
 					sReq.setFrom(from).setSize(size);
 				}else{
-					String ms =Configuration.getConfig().getString("maxQuerySize", "20");
+					String ms =Configuration.getConfig().getString("maxQuerySize", "200");
 					try{
 						sReq.setFrom(0).setSize(Integer.parseInt(ms));
 					}catch(Exception e){
@@ -269,13 +284,28 @@ public class ESQueryDataService {
 			    context.put(dsName, qinfos);
 			}
 		}
-        StringWriter sw = new StringWriter();
-        Velocity.evaluate(context, sw, jp.getId(), tmp);
-        System.out.println(" string : " + sw);
-        String otmp = sw.toString();
-        JSONObject jtmp = JSONObject.parseObject(otmp);
-        result.put("done", true);
-		result.put("jpData", jtmp);
+		try{
+	        StringWriter sw = new StringWriter();
+	        Velocity.evaluate(context, sw, jp.getId(), tmp);
+	        String otmp = replaceBlank(sw.toString());
+	        log.info(otmp);
+	        JSONObject jtmp = JSONObject.parseObject(otmp);
+	        result.put("done", true);
+			result.put("jpData", jtmp);
+		}catch(VelocityException ve){
+			result.put("done", false);
+			result.put("info", "输出模板解析时发生错误。");
+			log.error(ve.toString());
+		}
 		return result;
+	}
+	private String replaceBlank(String str) {
+		String dest = "";
+		if (str!=null) {
+			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
+			Matcher m = p.matcher(str);
+			dest = m.replaceAll("");
+		}
+		return dest;
 	}
 }

@@ -197,8 +197,7 @@ public class QueryDataController {
 			}else if(user!=null){
 				qo.setUserid(user.getUserid());
 			}
-			Map data = rptDataService.getUserInfo(qo);
-			jr = new JResponse("0","",data);
+			jr = rptDataService.getUserInfo(user,qo);
 		}else{
 			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
 		}
