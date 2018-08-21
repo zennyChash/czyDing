@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.ognl.OgnlException;
 
 import com.alibaba.fastjson.JSON;
@@ -76,7 +77,10 @@ public class AuthService {
         String accessToken = null;
         String ticket = null;
         String signature = null;
-        String agentid = cg.getString("AGENT_ID", "163161139");;
+        //2018-08-20 如果一个后台处理来自多个微应用，根据ip对应配置的agentid
+        String ip = getIpAdrress(request);
+        log.info("请求来自IP："+ip);
+        String agentid = cg.getString("AGENT_ID_"+ip, "163161139");
         try {
             accessToken = getAccessToken();
             ticket = getJsapiTicket(accessToken);
@@ -95,6 +99,39 @@ public class AuthService {
                 + timeStamp + "\",\"corpId\":\"" + cg.getString("CORP_ID") + "\",\"agentid\":\"" + agentid + "\"}";
         //System.out.println(configValue);
         return config;
+    }
+    private String getIpAdrress(HttpServletRequest request) {
+        String Xip = request.getHeader("X-Real-IP");
+        String XFor = request.getHeader("X-Forwarded-For");
+        if(StringUtils.isNotEmpty(XFor) && !"unKnown".equalsIgnoreCase(XFor)){
+            //多次反向代理后会有多个ip值，第一个ip才是真实ip
+            int index = XFor.indexOf(",");
+            if(index != -1){
+                return XFor.substring(0,index);
+            }else{
+                return XFor;
+            }
+        }
+        XFor = Xip;
+        if(StringUtils.isNotEmpty(XFor) && !"unKnown".equalsIgnoreCase(XFor)){
+            return XFor;
+        }
+        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
+            XFor = request.getHeader("Proxy-Client-IP");
+        }
+        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
+            XFor = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
+            XFor = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
+            XFor = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (StringUtils.isBlank(XFor) || "unknown".equalsIgnoreCase(XFor)) {
+            XFor = request.getRemoteAddr();
+        }
+        return XFor;
     }
     /**
      * 获取JSTicket, 用于js的签名计算

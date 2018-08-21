@@ -37,6 +37,7 @@
 		<sql>
 		<![CDATA[
 			select ny,hybm,hy,bnlj bnlj_o,round(bnlj/10000) bnlj,sntq sntq_o,round(sntq/10000) sntq,
+			round(bnlj/sum(bnlj) over (partition by ny)*100,2) srzb,
 			case when sntq=0 then 0 else round((bnlj-sntq)/sntq*100,2) end tbzz,r.color hycolor
 			from
 			(
@@ -47,7 +48,6 @@
 			select ny,'Z_X' hybm,'其他行业' hy,sum(zse)bnlj,sum(zse_s)sntq from BB_SRTJ_CX where hybm not in('C','J','K') group by ny
 			)a,renders r where r.rptid='hy_tax_fb' and r.lid = a.hybm
 			order by ny,hybm
-			
 		]]>
 		</sql>
 		<cols>
@@ -58,12 +58,13 @@
 			<col name="sntq" fldType="double" />
 			<col name="sntq_o" fldType="double"/>
 			<col name="srzb" fldType="double" />
+			<col name="tbzz" fldType="double" />
 		</cols>
 	</src>
 	<src id="hy_one_details" name="行业企业税收" description="某行业中排名前若干名的企业的情况" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select ny,swdjzh,mc,hy,hybm,bnlj_o,bnlj,sntq_o,sntq,srzb
+			select ny,swdjzh,mc,hy,hybm,bnlj_o,bnlj,sntq_o,sntq,srzb,pm
 			from(
 				select ny,swdjzh,mc,hy,hybm,bnlj bnlj_o,round(bnlj/10000) bnlj,sntq sntq_o,round(sntq/10000) sntq,round(bnlj/sum(bnlj) over (partition by ny,hybm)*100,2) srzb,
 				rank()over(PARTITION BY ny,hybm ORDER BY bnlj desc) pm
@@ -78,7 +79,7 @@
 					SELECT ny,swdjzh,mc,'Z_X' hybm,'其他行业' hy,sum(bn_zse) bnlj,sum(sn_zse) sntq
 					FROM BB_SRQC_CX where hybm not in('C','J','K')
 					group by ny,swdjzh,mc)
-			)
+			)order by ny,hybm,pm
 		]]>
 		</sql>
 		<cols>
@@ -90,6 +91,7 @@
 			<col name="sntq" fldType="double" canOrder="1"/>
 			<col name="sntq_o" fldType="double" canOrder="1"/>
 			<col name="srzb" fldType="double" canOrder="1"/>
+			<col name="pm" fldType="integer" canOrder="1" />
 		</cols>
 	</src>
 </dataSource>

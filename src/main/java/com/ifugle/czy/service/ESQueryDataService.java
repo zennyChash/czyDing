@@ -21,6 +21,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -61,23 +62,22 @@ public class ESQueryDataService {
 		JSONObject filterBy = jparams.getJSONObject("filterBy");
 		Map result = new HashMap();
 		List<Map> qymcs = new ArrayList<Map>();
+		MatchQueryBuilder qb = QueryBuilders.matchQuery(fld,str);
+		SearchRequestBuilder sReq = esClient.getClient().prepareSearch(rptID).setTypes("_doc");
+		sReq.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+		.setQuery(qb);
 		//如果有filterBy，说明关键字检索的结果还要筛选过。比如街道用户，搜索结果应限制在该用户街道
-		BoolQueryBuilder qb = null;
+		BoolQueryBuilder bflt = null;
 		if(filterBy!=null){
-			qb = QueryBuilders.boolQuery();
+			bflt = QueryBuilders.boolQuery();
 			for (Map.Entry entry : filterBy.entrySet()) {  
 			   String key = (String)entry.getKey();  
 			   String value = (String)entry.getValue();
-			   qb.filter(QueryBuilders.termsQuery(key+".raw", value));
-			}	
+			   bflt.filter(QueryBuilders.termsQuery(key+".raw", value));
+			}
+			sReq.setPostFilter(bflt);
 		}
-		SearchRequestBuilder sReq = esClient.getClient().prepareSearch(rptID).setTypes("_doc");
-		if(qb!=null){
-			sReq.setQuery(qb);
-		}
-		sReq.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-			.setQuery(QueryBuilders.matchQuery(fld,str))
-			.setFrom(from).setSize(size);
+		sReq.setFrom(from).setSize(size);
 		SearchResponse searchResponse =sReq.get();
 	    SearchHits hits = searchResponse.getHits();
 	    long total = hits.getTotalHits();

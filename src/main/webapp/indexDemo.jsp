@@ -8,23 +8,10 @@
 <script type="text/javascript">
 var _config = {};
 Zepto(function($){
-// 			p = JSON.stringify({"rptID":"dzjk_srjd","rptParams":{"hybm":"K","ny":"201806"}});
-// 			$.ajax({
-// 				type: 'post',
-// 				url: 'api/queryData',
-// 				data: p,
-// 				headers: {
-// 			        "Content-Type": "application/json;charset=utf-8"
-// 			    },
-// 				success: function(dt){
-// 					alert("string:"+dt);
-// 				}
-// 			});
-			//"swdjzh":"91330604146165334B","ny":"201805","from":0,"size":10
-			p = JSON.stringify({"rptID":"","rptParams":{}});
+			p = JSON.stringify({"rptID":"nsdh_details","rptParams":{"taxLimit":"1","ny":"201803","from":30,"size":10}});
 			$.ajax({
 				type: 'post',
-				url: 'api/testQueryData',
+				url: 'api/queryData',
 				data: p,
 				headers: {
 			        "Content-Type": "application/json;charset=utf-8"
@@ -33,6 +20,31 @@ Zepto(function($){
 					alert("string:"+dt);
 				}
 			});
+// 			p = JSON.stringify({"rptID":"enbasic","rptParams":{"searchKey":"顺海","filterBy":{"czfpbm":"330604002"},"from":0,"size":10}});
+// 		    $.ajax({
+// 				type: 'post',
+// 				url: 'api/searchForWord',
+// 				data: p,
+// 				headers: {
+// 			        "Content-Type": "application/json;charset=utf-8"
+// 			    },
+// 				success: function(dt){
+// 					alert(dt);
+// 				}
+// 		    });
+			//330604001 "swdjzh":"91330604146165334B","ny":"201805","from":0,"size":10
+// 			p = JSON.stringify({"rptID":"","rptParams":{}});
+// 			$.ajax({
+// 				type: 'post',
+// 				url: 'api/testQueryData',
+// 				data: p,
+// 				headers: {
+// 			        "Content-Type": "application/json;charset=utf-8"
+// 			    },
+// 				success: function(dt){
+// 					alert("string:"+dt);
+// 				}
+// 			});
 			
 })
 

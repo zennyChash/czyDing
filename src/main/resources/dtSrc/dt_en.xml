@@ -9,6 +9,7 @@
 		</sql>
 		<cols>
 			<col name="swdjzh" canOrder="1" isFilter="1"/>
+			<col name="czfpbm" canOrder="1" isFilter="1"/>
 			<col name="pyorder" fldType="integer" canOrder="1" />
 		</cols>
 	</src>

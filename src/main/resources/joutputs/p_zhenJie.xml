@@ -88,7 +88,7 @@
 		<vDs name="zjsr_details" paging="true" fields="ny,czfpbm,swdjzh,mc,bnlj,pm">
 			<filter name = "czfpbm" value="330604201"/>
 			<filter name = "ny" value="201803"/>
-			<orderBy name = "pm" fldType="integer" dir="asc"/>
+			<orderBy name = "pm" dataType="integer" dir="asc"/>
 		</vDs>
 	</joutput>
 </pages>

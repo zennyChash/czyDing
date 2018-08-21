@@ -84,8 +84,8 @@
 			{
 			#if($bd_one&&$bd_one.rows.size()>0)
 				"encount":"$!{bd_one.rows[0].ecount}", 
-				"sszb_t":"$!{bd_one.rows[0].sszb_t}", 
-				"sszb_b":"$!{bd_one.rows[0].sszb_b}", 
+				"sszb_t":"$!{bd_one.rows[0].srzb_t}", 
+				"sszb_b":"$!{bd_one.rows[0].srzb_b}", 
 				"bnlj":"$!{bd_one.rows[0].bnlj}", 
 				"sntq":"$!{bd_one.rows[0].sntq}", 
 				"tbzz":"$!{bd_one.rows[0].tbzz}"
@@ -93,7 +93,7 @@
 			}
 		]]>
 		</jTemplate>
-		<vDs name="bd_one" fields="bid,mc,ecount,sszb_t,sszb_b,bnlj,sntq,tbzz">
+		<vDs name="bd_one" fields="bid,mc,ecount,srzb_t,srzb_b,bnlj,sntq,tbzz">
 			<filter name = "bid" value="1"/>
 			<filter name = "ny" value="201803"/>
 		</vDs>
@@ -117,7 +117,7 @@
 		<vDs name="bd_ens" fields="swdjzh,mc,bnlj,sntq,lyzb" paging="true">
 			<filter name = "bid" value="1"/>
 			<filter name = "ny" value="201803"/>
-			<orderBy name = "pm" dataType="integer" dir="desc"/>
+			<orderBy name = "pm" dataType="integer" dir="asc"/>
 		</vDs>
 	</joutput>
 	<joutput id="building_one_en" name="入驻企业单户信息"  description=""> 

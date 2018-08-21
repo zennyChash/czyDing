@@ -255,7 +255,7 @@
 		<vDs name="zdsy_gs_dt" refDtSrc="zdsy_details" paging="true" fields="ny,swdjzh,mc,bnlj,sntq,tbzz,srzb,pm">
 			<filter name = "etype" value="01"/>
 			<filter name = "ny" value="201803"/>
-			<orderBy name = "pm" fldType="integer" dir="asc"/>
+			<orderBy name = "pm" dataType="integer" dir="asc"/>
 		</vDs>
 	</joutput>
 	<joutput id="zdsy_ss_details" name="上市企业排名情况"  description="" > 
@@ -279,7 +279,7 @@
 		<vDs name="zdsy_ss_dt" refDtSrc="zdsy_details" paging="true" fields="ny,swdjzh,mc,bnlj,sntq,tbzz,srzb,pm">
 			<filter name = "etype" value="02"/>
 			<filter name = "ny" value="201803"/>
-			<orderBy name = "pm" fldType="integer" dir="asc"/>
+			<orderBy name = "pm" dataType="integer" dir="asc"/>
 		</vDs>
 	</joutput>
 	<joutput id="zdsy_jr_details" name="金融企业排名情况"  description="" > 
@@ -303,7 +303,7 @@
 		<vDs name="zdsy_jr_dt" refDtSrc="zdsy_details" paging="true" fields="ny,swdjzh,mc,bnlj,sntq,tbzz,srzb,pm">
 			<filter name = "etype" value="03"/>
 			<filter name = "ny" value="201803"/>
-			<orderBy name = "pm" fldType="integer" dir="asc"/>
+			<orderBy name = "pm" dataType="integer" dir="asc"/>
 		</vDs>
 	</joutput>
 </pages>

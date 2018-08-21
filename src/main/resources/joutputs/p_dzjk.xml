@@ -103,7 +103,7 @@
 							#end 
 						]},
 					#else
-						{"name":"$!{thisYear}","data":[]},
+						{"name":"$!{thisYear}","data":[0,0,0,0,0,0,0,0,0,0,0,0]},
 					#end		
 					#if($dzjkLastYear&&$dzjkLastYear.rows.size()>0)
 						{"name":"$!{lastYear}","data":[	
@@ -120,7 +120,7 @@
 							#end 
 						]}
 	   				#else
-						{"name":"$!{lastYear}","data":[]},
+						{"name":"$!{lastYear}","data":[0,0,0,0,0,0,0,0,0,0,0,0]}
 					#end
 	   			]
 			#else

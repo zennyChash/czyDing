@@ -3,7 +3,7 @@
 	<src id="dzjk_maxnyr" name="最大有效日期" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select max(zwrq_jk)nyr from YSSR
+			select max(ny||ri)nyr from YSSR_HZTJ
 		]]>
 		</sql>
 		<cols>
@@ -13,7 +13,7 @@
 	<src id="dzjk_year" name="有数据的年份" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select distinct substr(zwrq_jk,1,4)nian from YSSR
+			select distinct substr(ny,1,4)nian from YSSR_HZTJ
 		]]>
 		</sql>
 		<cols>
@@ -23,7 +23,7 @@
 	<src id="dzjk_month" name="有数据的月份" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select distinct substr(zwrq_jk,1,4)nian,substr(zwrq_jk,5,2)yue,substr(zwrq_jk,1,6)ny from yssr
+			select distinct substr(ny,1,4)nian,substr(ny,5,2)yue,ny from YSSR_HZTJ
 		]]>
 		</sql>
 		<cols>
@@ -35,7 +35,7 @@
 	<src id="dzjk_day" name="有数据的日期" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select distinct substr(zwrq_jk,1,6)ny,substr(zwrq_jk,7,2)ri,zwrq_jk nyr from yssr
+			select distinct ny,ri from YSSR_HZTJ
 		]]>
 		</sql>
 		<cols>
@@ -124,4 +124,3 @@
 	</src>
 	
 </dataSource>
-
