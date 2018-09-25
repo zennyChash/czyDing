@@ -294,7 +294,7 @@ public class ESQueryDataService {
 			result.put("jpData", jtmp);
 		}catch(VelocityException ve){
 			result.put("done", false);
-			result.put("info", "输出模板解析时发生错误。");
+			result.put("info", "数据源查询成功，但模板解析时发生错误。");
 			log.error(ve.toString());
 		}
 		return result;

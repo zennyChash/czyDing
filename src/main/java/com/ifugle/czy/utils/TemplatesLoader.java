@@ -5,9 +5,16 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.beanutils.BeanComparator;
+import org.apache.commons.collections.ComparatorUtils;
+import org.apache.commons.collections.comparators.ComparableComparator;
+import org.apache.commons.collections.comparators.ComparatorChain;
 
 import com.ifugle.czy.utils.bean.template.DataSrc;
 import com.ifugle.czy.utils.bean.template.JOutput;
@@ -44,12 +51,28 @@ public class TemplatesLoader {
 		dataSrcTemplates = new ArrayList();
 		loadTemplatesFromFile("dataSrc",dataSrcTemplates,dataSrcMap);
 	}
-	
+	public void refreshDataSrcs(){
+		dataSrcMap=new HashMap();
+		dataSrcTemplates = new ArrayList();
+		loadTemplatesFromFile("dataSrc",dataSrcTemplates,dataSrcMap);
+	}
 	public void loadJSONOutputs(){
+		String loadOp=Configuration.getConfig().getString("loadJSONOutputTemplates", "1");
+		//响应输出模板不是每次都需要加载，可以不加载。
+		if("0".equals(loadOp)){
+			return;
+		}
 		JSONOutputMap=new HashMap();
 		JSONOutputTemplates = new ArrayList();
 		loadTemplatesFromFile("JSONOutput",JSONOutputTemplates,JSONOutputMap);
 	}
+	public void refreshJSONOutputs(){
+		JSONOutputMap=new HashMap();
+		JSONOutputTemplates = new ArrayList();
+		loadTemplatesFromFile("JSONOutput",JSONOutputTemplates,JSONOutputMap);
+	}
+	
+	
 	public void loadTemplatesFromFile(String tmpType,List tslst,Map tsmap){
 		String path=Configuration.getConfig().getString(tmpType+"TemplatesPath", "");
 		if(path==null||"".equals(path)){
@@ -88,6 +111,7 @@ public class TemplatesLoader {
 					//文件流转化成string作为参数传递给解析器
 					String xmlPath=(String)pathes.get(i);
 					File tmpFile=new File(xmlPath); 
+					String fname = tmpFile.getName();
 					is=new FileInputStream(tmpFile) ;
 					long contentLength = tmpFile.length();
 					byte[] ba = new byte[(int)contentLength];
@@ -97,19 +121,31 @@ public class TemplatesLoader {
 					//设计内容，解析
 					if("dataSrc".equals(tmpType)){
 						try{
-							loadDataSrcTemplate(tInfo,tslst,tsmap);
+							loadDataSrcTemplate(tInfo,tslst,tsmap,fname);
 						}catch(Exception e){
 							System.out.println();
 						}
 					}else{
 						try{
-							loadJSONOutputTemplate(tInfo,tslst,tsmap);
+							loadJSONOutputTemplate(tInfo,tslst,tsmap,fname);
 						}catch(Exception e){
 							System.out.println();
 						}
 					}
 				}
 				System.out.println(tmpType+"共解析"+tslst.size()+"个模板！");
+				//按所在文件进行排序
+				if(tslst!=null){
+					Comparator infileCmp = ComparableComparator.getInstance();
+					infileCmp = ComparatorUtils.nullHighComparator(infileCmp); // 允许null
+			        // 声明要排序的对象的属性，并指明所使用的排序规则，如果不指明，则用默认排序
+			        ArrayList<Object> sortFields = new ArrayList<Object>();
+			        sortFields.add(new BeanComparator("infile", infileCmp)); // 主排序（第一排序）
+			        // 创建一个排序链
+			        ComparatorChain multiSort = new ComparatorChain(sortFields);
+			        // 开始真正的排序，按照先主，后副的规则
+			        Collections.sort(tslst, multiSort);
+				}
 			}
 		}catch(Exception e){
 			if(is!=null){
@@ -125,15 +161,15 @@ public class TemplatesLoader {
 			}
 		}
 	}
-	private void loadDataSrcTemplate(String tInfo,List tslst,Map tsmap) {
+	private void loadDataSrcTemplate(String tInfo,List tslst,Map tsmap,String fileName) {
 		DataSourceTemplateParser parser=DataSourceTemplateParser.getParser();
-		parser.parseTemplateToDtSrc(tInfo,tslst,tsmap);
+		parser.parseTemplateToDtSrc(tInfo,tslst,tsmap, fileName);
 		return;
 	}
 	
-	private void loadJSONOutputTemplate(String tInfo,List tslst,Map tsmap) {
+	private void loadJSONOutputTemplate(String tInfo,List tslst,Map tsmap,String fileName) {
 		JOutputParser parser=JOutputParser.getParser();
-		parser.parseTemplateToJOutput(tInfo,tslst,tsmap);
+		parser.parseTemplateToJOutput(tInfo,tslst,tsmap, fileName);
 	}
 	public JOutput getJOutput(String jpID){
 		if(jpID==null||"".equals(jpID))

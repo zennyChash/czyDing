@@ -53,6 +53,7 @@
 	<bean id="rptEsService" class="com.ifugle.czy.service.ReportDataEsService"/>
 	<bean id="esDataService" class="com.ifugle.czy.service.ESQueryDataService"/>
 	<bean id="esDtSrcService" class="com.ifugle.czy.service.ESDataSourceService"/>
+	<bean id="csService" class="com.ifugle.czy.service.ConsoleServeice"/>
 	<context:annotation-config />
 	<tx:annotation-driven transaction-manager="txManager" />  
 	<!--<context:spring-configured />

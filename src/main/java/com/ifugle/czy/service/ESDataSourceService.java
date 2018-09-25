@@ -74,12 +74,12 @@ public class ESDataSourceService {
         }
 		return info.toString();
 	}
-	//重新索引数据。如果指定reMapping，就重建整个索引。reMapping为false表示只将数据重索引。
-	public String indexData(String indexName,boolean reMapping,boolean deleteOldData, Map paramVals){
+	//重新索引数据。如果指定reIndex，就重建整个索引。reIndex为false表示只将数据重索引。
+	public String indexData(String indexName,boolean reIndex,boolean deleteOldData, Map paramVals){
 		StringBuffer info= new StringBuffer("{success:");
 		TransportClient client = esClient.getClient();
 		boolean needRemap = false;
-		if(reMapping){
+		if(reIndex){
 			buildNewIndex(indexName);
 			needRemap = true;
 		}else{

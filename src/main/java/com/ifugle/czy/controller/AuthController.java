@@ -21,10 +21,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.ifugle.czy.service.AuthService;
 import com.ifugle.czy.utils.bean.User;
 import com.ifugle.czy.utils.JResponse;
+import com.ifugle.utils.Configuration;
 
 @Controller
 public class AuthController {
 	private static Logger log = Logger.getLogger(AuthController.class);
+	@Autowired
+	private Configuration cg ;
 	@Autowired
 	private AuthService authService;
 	@RequestMapping("/getDingConfig")
@@ -51,8 +54,6 @@ public class AuthController {
 		System.out.println("传入的corpID:"+corpid);
 		String accessToken = authService.getAccessToken();
 		User user = authService.getUserCzyConfig(accessToken,code);
-		System.out.println("最外层的调用中的user:"+user==null?"空":user.getConfig());
-		String uconfig = "";
 		if(user!=null){
 			RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
 			if (requestAttributes != null) {
@@ -61,30 +62,50 @@ public class AuthController {
 			}
 			jr.setRetCode("0");
 			jr.setRetMsg("");
-			uconfig = user.getConfig();
-			if(!StringUtils.isEmpty(uconfig)){
-				JSONObject jucg = null;
-				try{
-					jucg = JSON.parseObject(uconfig);
-					jr.setRetData(jucg);
-				}catch(Exception e){
-					jr.setRetCode("9");
-					jr.setRetMsg("用户业务权限信息的解析出错，请检查配置信息的格式！");
-					jr.setRetData(null);
-				}
-				log.info("数据库中的用户配置串:"+uconfig);
-			}else{
-				jr.setRetCode("9");
-				jr.setRetMsg("当前用户还未进行业务权限的配置！");
-				jr.setRetData(null);
-			}
+			JSONObject jucfg = new JSONObject();
+			jucfg.put("username", user.getDingname());
+			jucfg.put("postname", user.getPostNames());
+			jucfg.put("czfpbm", StringUtils.isEmpty(user.getCzfpbm())?"":user.getCzfpbm());
+			jucfg.put("corpname", cg.getString("corpname", "未知"));
+			jucfg.put("menus", user.getMenus());
+			jr.setRetData(jucfg);
+			log.info("用户"+ user.getDingname()+"登录权限返回："+JSONObject.toJSONString(jr));
 		}else{
 			jr.setRetCode("9");
 			jr.setRetMsg("指定的用户账户不存在或未配置业务权限！");
 			jr.setRetData(null);
 			System.out.println("出错了！用户不存在！");
 		}
-		log.info("返回的jr.retCode:"+jr.getRetCode()+",jr.regData:"+JSONObject.toJSONString(jr.getRetData())+",jr.regMsg:"+jr.getRetMsg());
+		return jr;
+	}
+	
+	@RequestMapping("/getUserConfigTest")
+	@ResponseBody
+	public JResponse getUserConfigTest(@RequestParam("userid") String userid){
+		JResponse jr = new JResponse();
+		User user = authService.testAuth(userid);
+		if(user!=null){
+			RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+			if (requestAttributes != null) {
+				HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+				request.getSession().setAttribute("user", user);
+			}
+			jr.setRetCode("0");
+			jr.setRetMsg("");
+			JSONObject jucfg = new JSONObject();
+			jucfg.put("username", user.getDingname());
+			jucfg.put("postname", user.getPostNames());
+			jucfg.put("czfpbm", StringUtils.isEmpty(user.getCzfpbm())?"":user.getCzfpbm());
+			jucfg.put("corpname", cg.getString("corpname", "未知"));
+			jucfg.put("menus", user.getMenus());
+			jr.setRetData(jucfg);
+			log.info("用户"+userid+"登录权限返回："+JSONObject.toJSONString(jr));
+		}else{
+			jr.setRetCode("9");
+			jr.setRetMsg("指定的用户账户不存在或未配置业务权限！");
+			jr.setRetData(null);
+			System.out.println("出错了！用户不存在！");
+		}
 		return jr;
 	}
 }

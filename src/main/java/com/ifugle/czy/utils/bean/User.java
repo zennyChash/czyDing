@@ -1,12 +1,40 @@
 package com.ifugle.czy.utils.bean;
 
+import java.util.List;
+
 public class User {
 	private String userid;
 	private String dingname;
 	private String dinginfo;
 	private int qybj;
-	private String config;
-	
+	private String czfpbm;
+	private List menus;
+	private String postIds;
+	private String postNames ;
+	public String getPostIds() {
+		return postIds;
+	}
+	public void setPostIds(String postIds) {
+		this.postIds = postIds;
+	}
+	public String getPostNames() {
+		return postNames;
+	}
+	public void setPostNames(String postNames) {
+		this.postNames = postNames;
+	}
+	public List getMenus() {
+		return menus;
+	}
+	public void setMenus(List menus) {
+		this.menus = menus;
+	}
+	public String getCzfpbm() {
+		return czfpbm;
+	}
+	public void setCzfpbm(String czfpbm) {
+		this.czfpbm = czfpbm;
+	}
 	public String getDinginfo() {
 		return dinginfo;
 	}
@@ -18,12 +46,6 @@ public class User {
 	}
 	public void setQybj(int qybj) {
 		this.qybj = qybj;
-	}
-	public String getConfig() {
-		return config;
-	}
-	public void setConfig(String config) {
-		this.config = config;
 	}
 	public String getUserid() {
 		return userid;

@@ -31,7 +31,7 @@ public class DataSourceTemplateParser {
 		return tmpParser;
 	}
 	
-	public void parseTemplateToDtSrc(String tInfo,List tslst,Map tsmap) {
+	public void parseTemplateToDtSrc(String tInfo,List tslst,Map tsmap,String fileName) {
 		if(StringUtils.isEmpty(tInfo))return;
 		try{
 			SAXReader reader = new SAXReader();
@@ -43,6 +43,7 @@ public class DataSourceTemplateParser {
 				for(Iterator it=root.elementIterator("src");it.hasNext();){
 					Element snode=(Element)it.next();
 					DataSrc ds = new DataSrc();
+					ds.setInfile(fileName);
 					//由于索引都是小写，数据源ID强制转为小写
 				    ds.setId(snode.attributeValue("id").toLowerCase());
 				    ds.setName(snode.attributeValue("name"));

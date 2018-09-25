@@ -313,10 +313,8 @@ public class ReportDataService {
 			}
 		}else if("czfpbm".equals(qtype)){
 			if(user!=null){
-				String uconfig = user.getConfig();
 				try{
-					JSONObject jucg = JSON.parseObject(uconfig);
-					String czfpbm = jucg.getString("czfpbm");
+					String czfpbm = user.getCzfpbm();
 					if(StringUtils.isEmpty(czfpbm)){
 						jr = new JResponse("9","用户未设置财政分片信息！",null);
 					}else{

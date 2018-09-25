@@ -8,18 +8,18 @@
 <script type="text/javascript">
 var _config = {};
 Zepto(function($){
-			p = JSON.stringify({"rptID":"nsdh_details","rptParams":{"taxLimit":"1","ny":"201803","from":30,"size":10}});
-			$.ajax({
-				type: 'post',
-				url: 'api/queryData',
-				data: p,
-				headers: {
-			        "Content-Type": "application/json;charset=utf-8"
-			    },
-				success: function(dt){
-					alert("string:"+dt);
-				}
-			});
+// 			p = JSON.stringify({"rptID":"nsdh_details","rptParams":{"taxLimit":"1","ny":"201803","from":30,"size":10}});
+// 			$.ajax({
+// 				type: 'post',
+// 				url: 'api/queryData',
+// 				data: p,
+// 				headers: {
+// 			        "Content-Type": "application/json;charset=utf-8"
+// 			    },
+// 				success: function(dt){
+// 					alert("string:"+dt);
+// 				}
+// 			});
 // 			p = JSON.stringify({"rptID":"enbasic","rptParams":{"searchKey":"顺海","filterBy":{"czfpbm":"330604002"},"from":0,"size":10}});
 // 		    $.ajax({
 // 				type: 'post',
@@ -45,6 +45,17 @@ Zepto(function($){
 // 					alert("string:"+dt);
 // 				}
 // 			});
+			$.ajax({
+				type: 'post',
+				url: 'api/getUserConfigTest',
+				data: {"userid":"0664293747747028"},
+				headers: {
+			        "Content-Type": "application/x-www-form-urlencoded"
+			    },
+				success: function(dt){
+					alert("string:"+dt);
+				}
+			});
 			
 })
 

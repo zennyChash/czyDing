@@ -2,6 +2,7 @@ package com.ifugle.czy.service;
 
 import java.math.BigDecimal;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,8 @@ public class AuthService {
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate){
 		this.jdbcTemplate = jdbcTemplate;
 	}
-    
+	@Autowired
+	private Configuration cg ;
 //	/**
 //	 * 企业应用后台地址，用户管理后台免登使用
 //	 */
@@ -247,7 +249,6 @@ public class AuthService {
 			log.error("登录钉钉验证失败："+e.toString());
 			e.printStackTrace();
 		}
-		System.out.println("从getUserCzyConfig返回获取到的数据库的USER配置："+u.getConfig());
         return u;
 	}
 	public User getCzyAuth(String accessToken,String userid){
@@ -259,7 +260,7 @@ public class AuthService {
 				return null;
 			}
 			System.out.println("进入了getCzyAuth，获取到了CorpUserDetail："+ud==null?"":ud.getName());
-			List users = jdbcTemplate.queryForList("select userid,dingname,dinginfo,config,qybj from users where userid=?",
+			List users = jdbcTemplate.queryForList("select userid,dingname,dinginfo,qybj,czfpbm from users where userid=?",
 					new Object[]{userid});
 			if(users==null||users.size()==0){//不存在的，先插入一条新的用户记录。
 				//先增加该用户的记录，再记录登录情况。初始登录的用户，未经过业务系统的权限设置，看不到业务菜单。
@@ -277,8 +278,67 @@ public class AuthService {
 				u.setUserid((String)mu.get("userid"));
 				u.setDingname((String)mu.get("dingname"));
 				u.setDinginfo((String)mu.get("dinginfo"));
-				u.setConfig((String)mu.get("config"));
+				u.setCzfpbm((String)mu.get("czfpbm"));
 				u.setQybj(((BigDecimal)mu.get("qybj")).intValue());
+				//查找岗位
+				List posts = jdbcTemplate.queryForList("select userid,to_char(u.postid)postid,postname from user_post u,post p where userid=? and u.postid=p.postid",
+						new Object[]{userid});
+				if(posts!=null&&posts.size()>0){
+					List postids = new ArrayList(),postnames = new ArrayList();
+					for(int i=0;i<posts.size();i++){
+						Map p = (Map)posts.get(i);
+						String pid = (String)p.get("postid");
+						String pname = (String)p.get("postname");
+						postids.add(pid);
+						postnames.add(pname);
+					}
+					String spids = StringUtils.join(postids, ",");
+					String spnames = StringUtils.join(postnames, ",");
+					u.setPostIds(spids);
+					u.setPostNames(spnames);
+				}
+				int cc =jdbcTemplate.queryForObject("select count(*)cc from user_post where userid=?",new Object[]{userid},Integer.class);
+				List menus = null;
+				//查找权限。如果用户还未分配、设置，使用默认权限。
+				StringBuffer sql = new StringBuffer("select distinct m.moduleid,m.name,to_char(m.isleaf)isleaf,m.pid,dorder,");
+				sql.append("nvl(pos,'')pos,to_char(decode(m.qybj,0,9,decode(p.moduleid,null,0,1)))status from ");
+				if(cc==0){
+					String dfMenus = cg.getString("defaultMenus", "");
+					sql.append(" (select moduleid from modules where moduleid in('").append(dfMenus.replace(",", "','")).append("')) p,modules m ");
+					sql.append(" where m.moduleid=p.moduleid(+) order by dorder");
+				}else{
+					sql.append(" (select pm.* from user_post u,post_module pm where u.postid=pm.postid and userid=?) p,modules m ");
+					sql.append(" where m.moduleid=p.moduleid(+) order by dorder");
+					menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{userid});
+				}
+				if(menus!=null&&menus.size()>0){
+					List jms = new ArrayList();
+					for(int i=0;i<menus.size();i++){
+						Map mm = (Map)menus.get(i);
+						if("1".equals(mm.get("isleaf"))){
+							continue;
+						}
+						String mid = (String)mm.get("moduleid");
+						Map jm = new HashMap();//上级
+						jm.put("id", mid);
+						jm.put("name", (String)mm.get("name"));
+						jm.put("pos", (String)mm.get("pos"));
+						List lmenus = new ArrayList();//下级
+						for(int j=0;j<menus.size();j++){
+							Map lmm = (Map)menus.get(j);
+							if(mid.equals((String)lmm.get("pid"))){
+								Map ljm = new HashMap();
+								ljm.put("id", (String)lmm.get("moduleid"));
+								ljm.put("name", (String)lmm.get("name"));
+								ljm.put("status", (String)lmm.get("status"));
+								lmenus.add(ljm);
+							}
+						}
+						jm.put("list", lmenus);
+						jms.add(jm);
+					}
+					u.setMenus(jms);
+				}
 			}
 			//记录登录事件
 			jdbcTemplate.update("insert into user_log(id,userid,etime,eventtype)values(sq_user_log.nextval,?,sysdate,'login')",
@@ -289,6 +349,81 @@ public class AuthService {
 			e.printStackTrace();
 		}
 		System.out.println("getCzyAuth中获得的自定义User："+u);
+		return u;
+	}
+	public User testAuth(String userid){
+		User u = null;
+		List users = jdbcTemplate.queryForList("select userid,dingname,dinginfo,qybj,czfpbm from users where userid=?",
+				new Object[]{userid});
+		
+		u = new User();
+		Map mu =(Map)users.get(0);
+		u.setUserid((String)mu.get("userid"));
+		u.setDingname((String)mu.get("dingname"));
+		u.setDinginfo((String)mu.get("dinginfo"));
+		u.setCzfpbm((String)mu.get("czfpbm"));
+		u.setQybj(((BigDecimal)mu.get("qybj")).intValue());
+		//查找岗位
+		List posts = jdbcTemplate.queryForList("select userid,to_char(u.postid)postid,postname from user_post u,post p where userid=? and u.postid=p.postid",
+				new Object[]{userid});
+		if(posts!=null&&posts.size()>0){
+			List postids = new ArrayList(),postnames = new ArrayList();
+			for(int i=0;i<posts.size();i++){
+				Map p = (Map)posts.get(i);
+				String pid = (String)p.get("postid");
+				String pname = (String)p.get("postname");
+				postids.add(pid);
+				postnames.add(pname);
+			}
+			String spids = StringUtils.join(postids, ",");
+			String spnames = StringUtils.join(postnames, ",");
+			u.setPostIds(spids);
+			u.setPostNames(spnames);
+		}
+		int cc =jdbcTemplate.queryForObject("select count(*)cc from user_post where userid=?",new Object[]{userid},Integer.class);
+		List menus = null;
+		//查找权限。如果用户还未分配、设置，使用默认权限。
+		StringBuffer sql = new StringBuffer("select distinct m.moduleid,m.name,to_char(m.isleaf)isleaf,m.pid,dorder,");
+		sql.append("nvl(pos,'')pos,to_char(decode(m.qybj,0,9,decode(p.moduleid,null,0,1)))status from ");
+		if(cc==0){
+			String dfMenus = cg.getString("defaultMenus", "");
+			sql.append(" (select moduleid from modules where moduleid in('").append(dfMenus.replace(",", "','")).append("')) p,modules m ");
+			sql.append(" where m.moduleid=p.moduleid(+) order by dorder");
+		}else{
+			sql.append(" (select pm.* from user_post u,post_module pm where u.postid=pm.postid and userid=?) p,modules m ");
+			sql.append(" where m.moduleid=p.moduleid(+) order by dorder");
+			menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{userid});
+		}
+		if(menus!=null&&menus.size()>0){
+			List jms = new ArrayList();
+			for(int i=0;i<menus.size();i++){
+				Map mm = (Map)menus.get(i);
+				if("1".equals(mm.get("isleaf"))){
+					continue;
+				}
+				String mid = (String)mm.get("moduleid");
+				Map jm = new HashMap();//上级
+				jm.put("id", mid);
+				jm.put("name", (String)mm.get("name"));
+				jm.put("pos", (String)mm.get("pos"));
+				List lmenus = new ArrayList();//下级
+				for(int j=0;j<menus.size();j++){
+					Map lmm = (Map)menus.get(j);
+					if(mid.equals((String)lmm.get("pid"))){
+						Map ljm = new HashMap();
+						ljm.put("id", (String)lmm.get("moduleid"));
+						ljm.put("name", (String)lmm.get("name"));
+						ljm.put("status", (String)lmm.get("status"));
+						lmenus.add(ljm);
+					}
+				}
+				jm.put("list", lmenus);
+				jms.add(jm);
+			}
+			u.setMenus(jms);
+		}
+		//记录登录事件
+		//jdbcTemplate.update("insert into user_log(id,userid,etime,eventtype)values(sq_user_log.nextval,?,sysdate,'login')",new Object[]{userid});
 		return u;
 	}
 }

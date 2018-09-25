@@ -67,13 +67,13 @@ public class ESController {
 		if(jds!=null){
 			String dsID = jds.getDsID();
 			JSONObject params = jds.parseJDsParams();
-			boolean reMapping = params.getBoolean("reMapping");
+			boolean reIndex = params.getBoolean("reIndex");
 			boolean deleteOldData = params.getBoolean("deleteOldData");
 			if(StringUtils.isEmpty(dsID)){
 				return new JResponse("9","未找到数据源的ID",null);
 			}else{
 				//索引名一律转化为小写
-				String data = esDtSrcServicev.indexData(dsID.toLowerCase(),reMapping,deleteOldData,params);
+				String data = esDtSrcServicev.indexData(dsID.toLowerCase(),reIndex,deleteOldData,params);
 				jr = new JResponse("0","",data);
 			}
 		}else{
@@ -134,13 +134,13 @@ public class ESController {
 				DataSrc ds = (DataSrc)dts.get(i);
 				String dsID = ds.getId();
 				JSONObject params = jds.parseJDsParams();
-				boolean reMapping = params.getBoolean("reMapping");
+				boolean reIndex = params.getBoolean("reIndex");
 				boolean deleteOldData = params.getBoolean("deleteOldData");
 				if(StringUtils.isEmpty(dsID)){
 					log.info("未找到数据源的ID:"+dsID);
 				}else{
 					//索引名一律转化为小写
-					String data = esDtSrcServicev.indexData(dsID.toLowerCase(),reMapping,deleteOldData,params);
+					String data = esDtSrcServicev.indexData(dsID.toLowerCase(),reIndex,deleteOldData,params);
 					log.info(data);
 				}
 				log.info("*****************");

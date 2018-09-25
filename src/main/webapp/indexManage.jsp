@@ -8,7 +8,7 @@
 <script type="text/javascript">
 var _config = {};
 Zepto(function($){
-// 			p = JSON.stringify({"dsID":"en_tax","dsParams":{"reMapping":true,"deleteOldData":true}});
+// 			p = JSON.stringify({"dsID":"en_tax","dsParams":{"reIndex":true,"deleteOldData":true}});
 // 			$.ajax({
 // 				type: 'post',
 // 				url: 'api/indexData2ES',
@@ -20,7 +20,7 @@ Zepto(function($){
 // 					alert("string:"+dt);
 // 				}
 // 			});
-			p = JSON.stringify({"dsID":"","dsParams":{"reMapping":true,"deleteOldData":true}});
+			p = JSON.stringify({"dsID":"","dsParams":{"reIndex":true,"deleteOldData":true}});
 			$.ajax({
 				type: 'post',
 				url: 'api/indexAllData2ES',

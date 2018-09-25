@@ -10,11 +10,17 @@ public class JOutput {
 	private int optionsType=0;//如果是option内容，输出的类型，是输出一个范围（1），还是逐个选项。默认逐个选项（0）
 	private String jTemplate;
 	private List valuedDs;
-	
+	private String infile;
+	public String getInfile() {
+		return infile;
+	}
+
+	public void setInfile(String infile) {
+		this.infile = infile;
+	}
 	public List getValuedDs() {
 		return valuedDs;
 	}
-
 	public int getType() {
 		return type;
 	}

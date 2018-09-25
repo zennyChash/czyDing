@@ -29,7 +29,7 @@ public class JOutputParser {
 		}
 		return tmpParser;
 	}
-	public void parseTemplateToJOutput(String tInfo,List tslst,Map tsmap) {
+	public void parseTemplateToJOutput(String tInfo,List tslst,Map tsmap,String fileName) {
 		if(StringUtils.isEmpty(tInfo))return;
 		try{
 			SAXReader reader = new SAXReader();
@@ -41,6 +41,7 @@ public class JOutputParser {
 				for(Iterator it=root.elementIterator("joutput");it.hasNext();){
 					Element snode=(Element)it.next();
 					JOutput jp = new JOutput();
+					jp.setInfile(fileName);
 					jp.setId(snode.attributeValue("id"));
 					jp.setName(snode.attributeValue("name"));
 					jp.setDesc(snode.attributeValue("description"));
