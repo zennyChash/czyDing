@@ -82,9 +82,9 @@
 					"swdjzh":"$!{dhcx_basic.rows[0].swdjzh}",
 					"mc":"$!{dhcx_basic.rows[0].mc}",
 					"czfp":"$!{dhcx_basic.rows[0].czfp}",
-					"fddbr":"$!{dhcx_basic.rows[0].fddbr}",
 					"dz":"$!{dhcx_basic.rows[0].dz}",
-					"hy":"$!{dhcx_basic.rows[0].hy}"
+					"hy":"$!{dhcx_basic.rows[0].hy}",
+					"ssgx":"5012",
 				#end
 			}
 		]]>
@@ -102,20 +102,13 @@
 		<![CDATA[
 			{
 			#if($en_tax&&$en_tax.rows.size()>0)
+				#set( $qnlj = $!{en_tax.rows[0].sn_zse} * 0.8 )
 				"swdjzh":"$!{en_tax.rows[0].swdjzh}",
 				"mc":"$!{en_tax.rows[0].mc}",
 				"czfp":"$!{en_tax.rows[0].czfp}",
 				"bnlj":"$!{en_tax.rows[0].bn_zse}",
-				"sntq":"$!{en_tax.rows[0].sn_zse}",
-				"tb":"$!{en_tax.rows[0].tbzz}",
-				"tax":[
-					{"szbm":"10101","mc":"增值税","je":"$!{en_tax.rows[0].bn_zz}"},
-					{"szbm":"101011","mc":"营改增","je":"$!{en_tax.rows[0].bn_ygz}"},
-					{"szbm":"10104","mc":"企业所得税","je":"$!{en_tax.rows[0].bn_qysd}"},
-					{"szbm":"10106","mc":"个人所得税","je":"$!{en_tax.rows[0].bn_grsd}"},
-					{"szbm":"10109","mc":"城市维护建设税","je":"$!{en_tax.rows[0].bn_cswhjs}"},
-					{"szbm":"10111","mc":"印花税","je":"$!{en_tax.rows[0].bn_yh}"}
-				]
+				"snlj":"$!{en_tax.rows[0].sn_zse}",
+				"qnlj":"$!{qnlj}"
 			#end
 			}
 		]]>
@@ -127,6 +120,34 @@
 		<vDs name="en_tax" fields="swdjzh,mc,czfp,bn_zse,sn_zse,tbzz,bn_zz,bn_ygz,bn_qysd,bn_grsd,bn_cswhjs,bn_yh">
 			<filter name = "swdjzh" value="91330604146165334B"/>
 			<filter name = "ny" value="201805"/>
+		</vDs>
+	</joutput>
+	<joutput id="dhcx_basic_more" name="单户查询——企业税收信息"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				fields:[{
+					"fieldName":"swdjzh",
+					"value":"$!{dhcx_basic.rows[0].swdjzh}",
+					"fieldLabel":"社会信用代码"
+				},{
+					"fieldName":"kyrq",
+					"value":"$!{dhcx_basic.rows[0].kyrq}",
+					"fieldLabel":"开业日期"
+				},{
+					"fieldName":"fddbr",
+					"value": "$!{dhcx_basic.rows[0].fddbr}",
+					"fieldLabel":"法定代表人"
+				},{
+					"fieldName":"qyzt",
+					"value": "$!{dhcx_basic.rows[0].qyzt}",
+					"fieldLabel" :"企业状态"
+				}]
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dhcx_basic" refDtSrc="enbasic" fields="swdjzh,kyrq,fddbr,qyzt">
+			<filter name = "swdjzh" value="91330604146165334B"/>
 		</vDs>
 	</joutput>
 </pages>

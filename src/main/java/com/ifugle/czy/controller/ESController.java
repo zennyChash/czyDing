@@ -21,6 +21,7 @@ import com.ifugle.czy.utils.bean.DataSourceJson;
 import com.ifugle.czy.utils.bean.RptDataJson;
 import com.ifugle.czy.utils.bean.template.DataSrc;
 import com.ifugle.czy.utils.bean.template.JOutput;
+import com.ifugle.utils.Configuration;
 @Controller
 public class ESController {
 	private static Logger log = Logger.getLogger(ESController.class);
@@ -28,6 +29,8 @@ public class ESController {
 	private ESQueryDataService esDataService;
 	@Autowired
 	private ESDataSourceService esDtSrcServicev;
+	@Autowired
+	private Configuration cg;
 	
 	@RequestMapping(value="/queryData",method = RequestMethod.POST)
 	@ResponseBody
@@ -159,6 +162,7 @@ public class ESController {
 			for(int i=0;i<jps.size();i++){
 				JOutput joutput = (JOutput)jps.get(i);
 				String rptID = joutput.getId();
+				log.info("/**********开始输出:"+rptID+"**********/");
 				JSONObject qParams = params.parseJRptParams();
 				Map data = esDataService.getData(rptID,qParams);
 				if(data!=null&&data.containsKey("done")){
@@ -174,7 +178,7 @@ public class ESController {
 					jr = new JResponse("9","获取页面数据失败！",null);
 					log.info(rptID+"获取页面数据失败！");
 				}
-				log.info("*****************");
+				log.info("===============================");
 			}
 		}
 		jr = new JResponse("0","","{done:true,info:'共输出"+(jps==null?"0":jps.size())+"个数据展示结果'}");

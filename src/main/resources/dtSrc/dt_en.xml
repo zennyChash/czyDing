@@ -52,7 +52,7 @@
 	<src id="en_tax" name="企业税收信息" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select b.*,d.czfpbm,czfp from dj_cz d,(
+			select b.*,d.czfpbm,czfp,bgrq kyrq,fddbr,zt qyz from dj_cz d,(
 			  select swdjzh,mc,ny,sum(bn_zse)bn_zse_o,sum(sn_zse)sn_zse_o,
 			  decode(sum(sn_zse),0,0,round((sum(bn_zse)-sum(sn_zse))*100/sum(sn_zse),2))tbzz,
 			  sum(bn_z_10101)bn_zz_o,sum(bn_z_101011)bn_ygz_o,sum(bn_z_10104)bn_qysd_o,sum(bn_z_10106)bn_grsd_o,

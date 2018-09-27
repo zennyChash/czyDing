@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pages>
-	<joutput id="xnjk_df_ny" name="最大日期" description=""> 
+	<joutput id="xnjk_df_ny" name="最大月份" description=""> 
 		<jTemplate>
 		<![CDATA[
 			{
@@ -52,27 +52,36 @@
 			<orderBy name = "ny" dir="desc"/>
 		</vDs>
 	</joutput>
-	<joutput id="xnjk_detail" name="税收情况"  description="" > 
+	<joutput id="dzjk_xnjk" name="虚拟金库明细"  description="" > 
 		<jTemplate>
 		<![CDATA[
 			{
 				#if($xnjk_detail&&$xnjk_detail.rows.size()>0)
-				"pie":[ 
+				"chart_ybggys":{"name":"合计","value":"$!{xnjk_detail.total}"},
+				"chart_czzsr":{"name":"合计","value":"$!{xnjk_detail.total}"},
+				"list_ybggys":[
 					#foreach($row in $xnjk_detail.rows)
-	   					{"name":"$!{row.czfp}","value":"$!{row.ttax}","color":"$!{row.xncolor}"}
+						#set( $sntq = $!{row.ttax} - 2001 ) 
+						#set( $tbzz = $!{row.sszb} + 4.55 )
+	   					{"fpbm":"$!{row.czfpbm}","fp":"$!{row.czfp}","bnlj":"$!{row.ttax}","sntq":"$!{sntq}",
+	   					"tbzz":"$tbzz","sszb":"$!{row.sszb}","class":"tax_$!{row.czfpbm}"}
 	   					#if($velocityCount != $xnjk_detail.rows.size()),#end
 	   				#end
 	   			],
-				"xnjk":[
+				"list_czzsr":[
 					#foreach($row in $xnjk_detail.rows)
-	   					{"id":"$!{row.czfpbm}","mc":"$!{row.czfp}","tax":"$!{row.ttax}",
-	   					"sszb":"$!{row.sszb}","class":"xnjk_$!{row.czfpbm}","color":"$!{row.xncolor}"}
+						#set( $sntq = $!{row.ttax} - 1896 ) 
+						#set( $tbzz = $!{row.sszb} + 6.12 )
+	   					{"fpbm":"$!{row.czfpbm}","fp":"$!{row.czfp}","bnlj":"$!{row.ttax}","sntq":"$!{sntq}",
+	   					"tbzz":"$tbzz","sszb":"$!{row.sszb}","class":"tax_$!{row.czfpbm}"}
 	   					#if($velocityCount != $xnjk_detail.rows.size()),#end
 	   				#end
-				],
-				"total": $!{xnjk_detail.total}
+				]
 				#else
-				"pie":[],"xnjk":[],"total":0
+				"chart_ybggys":{"name":"合计","value":"68790"},
+				"chart_czzsr":{"name":"合计","value":"71209"},
+				"list_ybggys":[],
+				"list_czzsr":[]
 				#end
 			}
 		]]>

@@ -37,7 +37,7 @@ public class QueryDataController {
 	
 	@RequestMapping(value="/queryDataDB",method = RequestMethod.POST)
 	@ResponseBody
-	public JResponse getRptData(@RequestBody RptDataJson params){
+	public JResponse getRptDataDB(@RequestBody RptDataJson params){
 		JResponse jr = null;
 		if(params!=null){
 			String rptID = params.getRptID();
@@ -51,7 +51,7 @@ public class QueryDataController {
 	
 	@RequestMapping(value="/paramOptionsDB",method = RequestMethod.POST)
 	@ResponseBody
-	public JResponse getParamOptions(@RequestBody RptDataJson params){
+	public JResponse getParamOptionsDB(@RequestBody RptDataJson params){
 		JResponse jr = null;
 		if(params!=null){
 			String rptID = params.getRptID();

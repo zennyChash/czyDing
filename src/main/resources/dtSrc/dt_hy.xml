@@ -64,21 +64,21 @@
 	<src id="hy_one_details" name="行业企业税收" description="某行业中排名前若干名的企业的情况" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select ny,swdjzh,mc,hy,hybm,bnlj_o,bnlj,sntq_o,sntq,srzb,pm
+			select ny,swdjzh,mc,hy,hybm,bnlj_o,bnlj,sntq_o,sntq,srzb,pm,czfpbm,czfp_r
 			from(
-				select ny,swdjzh,mc,hy,hybm,bnlj bnlj_o,round(bnlj/10000) bnlj,sntq sntq_o,round(sntq/10000) sntq,round(bnlj/sum(bnlj) over (partition by ny,hybm)*100,2) srzb,
+				select czfpbm,czfp_r,ny,swdjzh,mc,hy,hybm,bnlj bnlj_o,round(bnlj/10000) bnlj,sntq sntq_o,round(sntq/10000) sntq,round(bnlj/sum(bnlj) over (partition by ny,hybm)*100,2) srzb,
 				rank()over(PARTITION BY ny,hybm ORDER BY bnlj desc) pm
 				from(
-					SELECT ny,swdjzh,mc,hy,hybm,sum(bn_zse) bnlj,sum(sn_zse) sntq
+					SELECT ny,swdjzh,mc,hy,hybm,sum(bn_zse) bnlj,sum(sn_zse) sntq,czfpbm,czfp_r
 					FROM BB_SRQC_CX where hybm in('C','J','K')
-					group by ny,swdjzh,mc,hy,hybm)
+					group by ny,swdjzh,mc,hy,hybm,czfpbm,czfp_r)
 			union
-				select ny,swdjzh,mc,hybm,hy,bnlj bnlj_o,round(bnlj/10000) bnlj,sntq sntq_o,round(sntq/10000) sntq,round(bnlj/sum(bnlj) over (partition by ny)*100,2) srzb,
+				select czfpbm,czfp_r,ny,swdjzh,mc,hybm,hy,bnlj bnlj_o,round(bnlj/10000) bnlj,sntq sntq_o,round(sntq/10000) sntq,round(bnlj/sum(bnlj) over (partition by ny)*100,2) srzb,
 				rank()over(PARTITION BY ny ORDER BY bnlj desc) pm
 				from(
-					SELECT ny,swdjzh,mc,'Z_X' hybm,'其他行业' hy,sum(bn_zse) bnlj,sum(sn_zse) sntq
+					SELECT ny,swdjzh,mc,'Z_X' hybm,'其他行业' hy,sum(bn_zse) bnlj,sum(sn_zse) sntq,czfpbm,czfp_r
 					FROM BB_SRQC_CX where hybm not in('C','J','K')
-					group by ny,swdjzh,mc)
+					group by ny,swdjzh,mc,czfpbm,czfp_r)
 			)order by ny,hybm,pm
 		]]>
 		</sql>

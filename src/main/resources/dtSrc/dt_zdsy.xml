@@ -58,12 +58,12 @@
 	<src id="zdsy_details" name="重点税源企业税收" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select a.*,round(bnlj/sum(bnlj) over (partition by ny,etype)*100,2) srzb,
+			select a.*,b.czfpbm,b.czfp,round(bnlj/sum(bnlj) over (partition by ny,etype)*100,2) srzb,
 			rank()over(PARTITION BY ny,etype ORDER BY bnlj desc) pm
 			from(
 			select ny,etype,swdjzh,mc,bnlj,sntq,decode(sntq,0,0,round((bnlj-sntq)*100/sntq,2))tbzz
 			from zdsy
-			order by ny,etype,bnlj desc)a
+			order by ny,etype,bnlj desc)a,dj_cz b where a.swdjzh=b.swdjzh
 		]]>
 		</sql>
 		<cols>

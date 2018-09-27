@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="zzcx_year" name="有资助的年份" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"options":[{"bm":"2017"},{"bm":"2016"},{"bm":"2015"}],
+	   			"defaultOp":"2017"
+			}
+		]]>
+		</jTemplate>
+	</joutput>
+	<joutput id="dhcx_czfc" name="单户查询——企业获得资助的信息"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"mc":"大中华火锅店",
+				"sssr":"2085",
+				"sssr_sn":"2085",
+				"sssr_qn":"2085",
+				"ssgx":"1840",
+				"ssgx_sn":"1840",
+				"ssgx_qn":"1840",
+				"zzje":"640",
+				"zzje_sn":"640",
+				"zzje_qn":"640",
+			}
+		]]>
+		</jTemplate>
+	</joutput>
+</pages>
+

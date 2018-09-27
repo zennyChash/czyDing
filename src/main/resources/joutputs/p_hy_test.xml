@@ -4,71 +4,41 @@
 		<jTemplate>
 		<![CDATA[
 			{
-			#if($hy_maxny&&$hy_maxny.rows.size()>0)
-				"latestValidMonth":"$!{hy_maxny.rows[0].ny}",
+				"latestValidMonth":"201806",
 				"format":"Ym" 
-			#end
 			}
 		]]>
 		</jTemplate>
-		<vDs name="hy_maxny" refDtSrc="hy_maxny" fields="ny"/>
 	</joutput>
 	<joutput id="hy_year" name="有数据的年" description=""> 
 		<jTemplate>
 		<![CDATA[
 			{
-			#if($hy_year&&$hy_year.rows.size()>0)
-				"options":[
-					#foreach($row in $hy_year.rows)
-	   						{"bm":"$!{row.nian}"}#if($velocityCount != $hy_year.rows.size()),#end
-	   					#end
-				],
-				"defaultOp":"$!{hy_year.rows[0].nian}"
-			#end	
+				"options":[{"bm":"2018"},{"bm":"2017"}],
+				"defaultOp":"2018"
 			}
 		]]>
 		</jTemplate>
-		<vDs name="hy_year" fields="nian">
-			<orderBy name = "nian" dir="desc"/>
-		</vDs>
 	</joutput>
 	<joutput id="hy_month" name="有数据的月份选项" description=""> 
 		<jTemplate>
 		<![CDATA[
 			{
-			#if($hy_month&&$hy_month.rows.size()>0)
-				"options":[
-					#foreach($row in $hy_month.rows)
-	   					{"bm":"$!{row.yue}"}#if($velocityCount != $hy_month.rows.size()),#end
-	   				#end
-				],
-				"defaultOp":"$!{hy_month.rows[0].yue}"
-			#end
+				"options":[{"bm":"06","name":"06"},{"bm":"05"},{"bm":"04"},{"bm":"03"}],
+				"defaultOp":"06"
 			}
 		]]>
 		</jTemplate>
-		<vDs name="hy_month" fields="ny,yue">
-			<filter name = "nian" refParam="year" value="2018"/>
-			<orderBy name = "ny" dir="desc"/>
-		</vDs>
 	</joutput>
 	<joutput id="hy_all" name="行业分布"  description=""> 
 		<jTemplate>
 		<![CDATA[
 			{
-				"chart":[ 
-				#if($hy_tax_fb&&$hy_tax_fb.rows.size()>0)
-					#foreach($row in $hy_tax_fb.rows)
-	   					{"name":"$!{row.hy}","value":"$!{row.bnlj}"}
-	   					#if($velocityCount != $hy_tax_fb.rows.size()),#end
-	   				#end
-				#end
-				],
-				"hyTax":[
+				"hyInfo":[
 				#if($hy_tax_fb&&$hy_tax_fb.rows.size()>0)
 					#foreach($row in $hy_tax_fb.rows)
 	   					{"hybm":"$!{row.hybm}","hy":"$!{row.hy}","bnlj":"$!{row.bnlj}","sntq":"$!{row.sntq}",
-	   					"srzb":"$!{row.srzb}","class":"hy_$!{row.hybm}","color":"$!{row.hycolor}"}
+	   					"srtb":"$!{row.tbzz}","sszb":"$!{row.srzb}","class":"hy_$!{row.hybm}","color":"$!{row.hycolor}"}
 	   					#if($velocityCount != $hy_tax_fb.rows.size()),#end
 	   				#end
 				#end
@@ -109,7 +79,7 @@
 				#if($hyEns&&$hyEns.rows.size()>0)
 				"ens_hy":[
 					#foreach($row in $hyEns.rows)
-	   					{"swdjzh":"$!{row.swdjzh}","mc":"$!{row.mc}","bnlj":"$!{row.bnlj}","sntq":"$!{row.sntq}","hyzb":"$!{row.srzb}"}
+	   					{"swdjzh":"$!{row.swdjzh}","mc":"$!{row.mc}"}
 	   					#if($velocityCount != $hyEns.rows.size()),#end
 	   				#end
 				],
@@ -133,20 +103,20 @@
 			#if($hy_one_en&&$hy_one_en.rows.size()>0)
 				"swdjzh":"$!{hy_one_en.rows[0].swdjzh}",
 				"mc":"$!{hy_one_en.rows[0].mc}",
+				"czfp":"$!{hy_one_en.rows[0].czfp_r}",
 				"bnlj":"$!{hy_one_en.rows[0].bnlj}",
-				"sntq":"$!{hy_one_en.rows[0].sntq}",
-				"hyzb":"$!{hy_one_en.rows[0].srzb}"
+				"sntq":"$!{hy_one_en.rows[0].sntq}"
 			#else
 				"swdjzh":"",
 				"mc":"",
+				"czfp":"",
 				"bnlj":"",  
-				"sntq":"",  
-				"hyzb":"" 
+				"sntq":""
 			#end
 			}
 		]]>
 		</jTemplate>
-		<vDs name="hy_one_en" refDtSrc="hy_one_details" fields="swdjzh,mc,bnlj,sntq,hyzb">
+		<vDs name="hy_one_en" refDtSrc="hy_one_details" fields="swdjzh,mc,bnlj,sntq,hyzb,czfp_r">
 			<filter name = "ny" value="201806"/>
 			<filter name = "swdjzh" value="91330604146165334B"/>
 		</vDs>

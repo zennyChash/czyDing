@@ -292,7 +292,7 @@ public class ESQueryDataService {
 	        JSONObject jtmp = JSONObject.parseObject(otmp);
 	        result.put("done", true);
 			result.put("jpData", jtmp);
-		}catch(VelocityException ve){
+		}catch(Exception ve){
 			result.put("done", false);
 			result.put("info", "数据源查询成功，但模板解析时发生错误。");
 			log.error(ve.toString());
@@ -307,5 +307,24 @@ public class ESQueryDataService {
 			dest = m.replaceAll("");
 		}
 		return dest;
+	}
+	
+	//测试时，xml中的模板只是静态json，不解析，读取出来直接返回。
+	public Map getDataTest(String jpID,JSONObject params){
+		Map result = new HashMap();
+		JSONObject jrpt = null;
+		JOutput jp = TemplatesLoader.getTemplatesLoader().getJOutput(jpID);
+		if(jp==null){
+			result.put("done", false);
+			result.put("info", "未找到页面数据的定义信息。");
+			log.equals("未找到JOutput信息，ID："+jpID);
+			return result;
+		}
+		String tmp=jp.getjTemplate();
+		String otmp = replaceBlank(tmp);
+        JSONObject jtmp = JSONObject.parseObject(otmp);
+        result.put("done", true);
+		result.put("jpData", jtmp);
+		return result;
 	}
 }

@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="dzjk_df_nyr" name="最大日期" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($dzjk_maxnyr&&$dzjk_maxnyr.rows.size()>0)
+				"latestValidMonth":"$!{dzjk_maxnyr.rows[0].nyr}",
+				"format":"Ymd" 
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_maxnyr" refDtSrc="dzjk_maxnyr" fields="nyr"/>
+	</joutput>
+	<joutput id="dzjk_df_ny" name="最大的有数据的月份" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($dzjk_month&&$dzjk_month.rows.size()>0)
+				"latestValidMonth":"$!{dzjk_maxnyr.rows[0].ny}",
+				"format":"Ym" 
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_month" refDtSrc="dzjk_month" fields="ny,yue">
+			<filter name = "nian" refParam="year" value="2018"/>
+			<orderBy name = "ny" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="dzjk_year" name="有数据的年" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($dzjk_year&&$dzjk_year.rows.size()>0)
+				"options":[
+					#foreach($row in $dzjk_year.rows)
+	   						{"bm":"$!{row.nian}","name":"$!{row.nian}"}#if($velocityCount != $dzjk_year.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{dzjk_year.rows[0].nian}"
+			#end	
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_year" refDtSrc="dzjk_year" fields="nian">
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="dzjk_month" name="有数据的月份选项" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($dzjk_month&&$dzjk_month.rows.size()>0)
+				"options":[
+					#foreach($row in $dzjk_month.rows)
+	   						{"bm":"$!{row.yue}","name":"$!{row.yue}"}#if($velocityCount != $dzjk_month.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{dzjk_month.rows[0].yue}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_month" refDtSrc="dzjk_month" fields="ny,yue">
+			<filter name = "nian" refParam="year" value="2018"/>
+			<orderBy name = "ny" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="dzjk_day" name="有数据的日" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($dzjk_day&&$dzjk_day.rows.size()>0)
+				"options":[
+					#foreach($row in $dzjk_day.rows)
+	   						{"bm":"$!{row.ri}","name":"$!{row.ri}"}#if($velocityCount != $dzjk_day.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{dzjk_day.rows[0].ri}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_day" refDtSrc="dzjk_day" fields="nyr,ri">
+			<filter name = "ny" refParam="yearMonth" value="201804"/>
+			<orderBy name = "ri" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="dzjk_srjd" name="收入进度"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($dzjk_srjd&&$dzjk_srjd.rows.size()>0)
+				#set( $nc = 1.8 * $!{dzjk_srjd.rows[0].nlj_jk} ) 
+				#set( $sn = 0.15 * $!{dzjk_srjd.rows[0].nlj_jk} )
+				ggys:{
+					"nlj_jk":"$!{dzjk_srjd.rows[0].nlj_jk}",
+					"wcjd":"$!{dzjk_srjd.rows[0].wcjd}",
+		        	"ysjh":"$!{nc}",
+					"snlj_jk":"$!{sn}",
+					"tbzz":"12.74"
+				},
+				czzsr:{
+					"nlj_jk":"$!{dzjk_srjd.rows[0].nlj_jk}",
+					"wcjd":"$!{dzjk_srjd.rows[0].wcjd}",
+		         	"ysjh":"$!{nc}",
+					"snlj_jk":"$!{sn}",
+					"tbzz":"10.22"
+				}
+			#else
+				ggys:{
+					"nlj_jk":"290",
+					"wcjd":"80",
+		        	"ysjh":"350",
+					"snlj_jk":"285",
+					"tbzz":"8"
+				},
+				czzsr:{
+					"nlj_jk":"290",
+					"wcjd":"80",
+		         	"ysjh":"350",
+					"snlj_jk":"285",
+					"tbzz":"8"
+				}
+			#end
+			}
+		]]>
+		</jTemplate>
+		<!-- 筛选字段的name，和数据源中的field一致，筛选值则使用请求中传递过来的值，refParam是其对应的请求参数名。
+		如果不设置refParam，就从请求中查找“参数名=filter的name”的参数值。
+		如果请求中未获得参数值，则用设计文件中的静态值，即filter中的value属性值；
+		排序字段也类似。-->
+		<vDs name="dzjk_srjd" refDtSrc="dzjk_srjd" fields="nlj_jk,wcjd">
+			<filter name = "zwrq" value="20180430"/>
+		</vDs>
+		<vDs name="dzjk_srzb_jg" refDtSrc="dzjk_srzb_jg" fields="zwrq,jgdm_jk,jg,nlj,chartcolor,selected">
+			<filter name = "zwrq" value="20180430"/>
+		</vDs>
+		<vDs name="dzjkYear" refDtSrc="dzjk_by_years" fields="nian,dyue,nlj">
+			<filter name = "nian" refParam = "thisYear" value="2018"/>
+			<orderBy name = "dyue" dir="asc"/>
+		</vDs>
+		<vDs name="dzjkLastYear" refDtSrc="dzjk_by_years" fields="nian,dyue,nlj">
+			<filter name = "nian" refParam = "lastYear" value="2017"/>
+			<orderBy name = "dyue" dir="asc"/>
+		</vDs>
+	</joutput>
+	<joutput id="dzjk_srqs" name="收入趋势"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"ybggys_line":[{
+					"name":"2018",
+					"data":[234,23432,0,0,0,0,45465,56,5677,0,0,3345]
+				},{
+					"name":"2017",
+					"data":[1234,5432,0,0,0,0,45465,56,5677,0,0,3345]
+				},{
+					"name":"2016",
+					"data":[2234,6432,0,0,0,0,53465,46,7077,6,0,985]
+				}],
+				"czzsr_line":[{
+					"name":"2018",
+					"data":[234,23432,0,0,0,0,45465,56,5677,0,0,3345]
+				},{
+					"name":"2017",
+					"data":[1234,5432,0,0,0,0,45465,56,5677,0,0,3345]
+				},{
+					"name":"2016",
+					"data":[2234,6432,0,0,0,0,53465,46,7077,6,0,985]
+				}],
+				"dfczsr_line":[{
+					"name":"2018",
+					"data":[234,23432,0,0,0,0,45465,56,5677,0,0,3345]
+				},{
+					"name":"2017",
+					"data":[1234,5432,0,0,0,0,45465,56,5677,0,0,3345]
+				},{
+					"name":"2016",
+					"data":[2234,6432,0,0,0,0,53465,46,7077,6,0,985]
+				}]
+			}
+		]]>
+		</jTemplate>
+	</joutput>
+	<joutput id="dzjk_fsz" name="税种分布" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				"info":[
+				#if($dzjk_fsz&&$dzjk_fsz.rows.size()>0)
+					#foreach($row in $dzjk_fsz.rows)
+		   				{"szbm":"$!{row.szbm}","sz":"$!{row.sz}","bnlj":"$!{row.bnlj}",
+		   				"sntq":"$!{row.sntq}","tbzz":"$!{row.tbzz}","sszb":"$!{row.srzb}","class":"tax_$!{row.szbm}"
+		   				}#if($velocityCount != $dzjk_day.rows.size()),#end
+		   			#end
+		   		#end
+				]
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_fsz" fields="zwrq,szbm,sz,bnlj,sntq,tbzz,srzb">
+			<filter name = "zwrq" value="20180430"/>
+			<orderBy name = "szbm" />
+		</vDs>
+	</joutput>
+	<joutput id="dzjk_sryb" name="收入月报" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($xnjk_detail&&$xnjk_detail.rows.size()>0)
+				
+					"total_ybggys":{"name":"全市合计","bnlj":"$!{xnjk_detail.total}","sntq":127789,"tbzz":19.1},
+	 				"total_czzsr":{"name":"全市合计","bnlj":"$!{xnjk_detail.total}","sntq":176520,"tbzz":12.17},
+					"pie_ybggys":[
+						#foreach($row in $xnjk_detail.rows)
+							#set( $sntq = $!{row.ttax} - 2101 ) 
+		   					{"fpbm":"$!{row.czfpbm}","fp":"$!{row.czfp}","bnlj":"$!{row.ttax}","sntq":"$!{sntq}","tbzz":"16.7","sszb":18,"class":"xnjk_$!{row.czfpbm}"}
+		   					#if($velocityCount != $xnjk_detail.rows.size()),#end
+		   				#end
+		   			],
+					"pie_czzsr":[
+						#foreach($row in $xnjk_detail.rows)
+							#set( $sntq = $!{row.ttax} - 1200 ) 
+		   					{"fpbm":"$!{row.czfpbm}","fp":"$!{row.czfp}","bnlj":"$!{row.ttax}","sntq":"$!{sntq}","tbzz":"21.1","sszb":"28.1","class":"xnjk_$!{row.czfpbm}"}
+		   					#if($velocityCount != $xnjk_detail.rows.size()),#end
+		   				#end
+					]
+				#else
+					"total_ybggys":{"name":"全市合计","bnlj":"152200","sntq":"127789","tbzz":"19.1"},
+	 				"total_czzsr":{"name":"全市合计","bnlj":"198000","sntq":"176520","tbzz":"12.17"},
+					"pie_ybggys":[
+					{
+						"fpbm":"0101",
+						"fp":"上城区",
+						"bnlj":"28025",
+						"sntq":"25622",
+						"tbzz":"8.44",
+			            "sszb":"18",
+						"class":"tax_0101"
+					},{
+						"fpbm":"0102",
+						"fp":"西湖区",
+						"bnlj":23544,  
+						"sntq":20126, 
+						"tbzz":15.14 
+						"sszb":16,
+						"class":"tax_0102"  
+					},{
+						"fpbm":"0103",
+						"fp":"拱墅区",
+						"bnlj":22088,  
+						"sntq":19088, 
+						"tbzz":17.64 
+						"sszb":14,
+						"class":"tax_0103"  
+					},{
+						"fpbm":"0104",
+						"fp":"江干区",
+						"bnlj":26488,  
+						"sntq":22426, 
+						"tbzz":20.1 
+						"sszb":16,
+						"class":"tax_0104"  
+					},{
+						"fpbm":"0105",
+						"fp":"滨江区",
+						"bnlj":32844,  
+						"sntq":30426, 
+						"tbzz":8.88 
+						"sszb":21,
+						"class":"tax_0105"  
+					},{
+						"fpbm":"0106",
+						"fp":"下城区",
+						"bnlj":22889,  
+						"sntq":20426, 
+						"tbzz":10.22 
+						"sszb":15,
+						"class":"tax_0106"  
+					}],
+					"pie_czzsr":[
+					{
+						"fpbm":"0101",
+						"fp":"上城区",
+						"bnlj":28025,
+						"sntq":25622,
+						"tbzz":8.44,
+			            "sszb":18,
+						"class":"tax_0101"
+					},{
+						"fpbm":"0102",
+						"fp":"西湖区",
+						"bnlj":26578,  
+						"sntq":23012, 
+						"tbzz":12.66 
+						"sszb":16,
+						"class":"tax_0102"  
+					},{
+						"fpbm":"0103",
+						"fp":"拱墅区",
+						"bnlj":27197,  
+						"sntq":21332, 
+						"tbzz":25.04 
+						"sszb":14,
+						"class":"tax_0103"  
+					},{
+						"fpbm":"0104",
+						"fp":"江干区",
+						"bnlj":28456,  
+						"sntq":23426, 
+						"tbzz":24.1 
+						"sszb":16,
+						"class":"tax_0104"  
+					},{
+						"fpbm":"0105",
+						"fp":"滨江区",
+						"bnlj":35844,  
+						"sntq":32426, 
+						"tbzz":10.18 
+						"sszb":21,
+						"class":"tax_0105"  
+					},{
+						"fpbm":"0106",
+						"fp":"下城区",
+						"bnlj":24909,  
+						"sntq":21426, 
+						"tbzz":15.12 
+						"sszb":15,
+						"class":"tax_0106"  
+					}]
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="xnjk_detail" paging="true" fields="czfpbm,czfp,ttax,sszb,xncolor">
+			<filter name = "ny" value="201803"/>
+			<orderBy name = "czfpbm" dir="asc"/>
+		</vDs>
+	</joutput>
+	<joutput id="dzjk_zcyb" name="支出月报" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($xnjk_detail&&$xnjk_detail.rows.size()>0)
+				
+					"total_ybggys":{"name":"全市合计","bnlj":"$!{xnjk_detail.total}","sntq":127789,”tbzz”:19.1},
+	 				"total_czzsr":{"name":"全市合计","bnlj":"$!{xnjk_detail.total}","sntq":176520,”tbzz”:12.17},
+					"pie_ybggys":[
+						#foreach($row in $xnjk_detail.rows)
+							#set( $sntq = $!{row.ttax} - 2101 ) 
+		   					{"fpbm":"$!{row.czfpbm}","fp":"$!{row.czfp}","bnlj":"$!{row.ttax}","sntq":"$!{sntq}","tbzz":"16.7","sszb":18,"class":"xnjk_$!{row.czfpbm}"}
+		   					#if($velocityCount != $xnjk_detail.rows.size()),#end
+		   				#end
+		   			],
+					"pie_czzsr":[
+						#foreach($row in $xnjk_detail.rows)
+							#set( $sntq = $!{row.ttax} - 1200 ) 
+		   					{"fpbm":"$!{row.czfpbm}","fp":"$!{row.czfp}","bnlj":"$!{row.ttax}","sntq":"$!{sntq}","tbzz":"21.1","sszb":"28.1","class":"xnjk_$!{row.czfpbm}"}
+		   					#if($velocityCount != $xnjk_detail.rows.size()),#end
+		   				#end
+					]
+				#else
+					"total_ybggys":{"name":"全市合计","bnlj":"152200","sntq":"127789","tbzz":"19.1"},
+	 				"total_czzsr":{"name":"全市合计","bnlj":"198000","sntq":"176520","tbzz":"12.17"},
+					"pie_ybggys":[
+					{
+						"fpbm":"0101",
+						"fp":"上城区",
+						"bnlj":"28025",
+						"sntq":"25622",
+						"tbzz":"8.44",
+			            "sszb":"18",
+						"class":"tax_0101"
+					},{
+						"fpbm":"0102",
+						"fp":"西湖区",
+						"bnlj":23544,  
+						"sntq":20126, 
+						"tbzz":15.14 
+						"sszb":16,
+						"class":"tax_0102"  
+					},{
+						"fpbm":"0103",
+						"fp":"拱墅区",
+						"bnlj":22088,  
+						"sntq":19088, 
+						"tbzz":17.64 
+						"sszb":14,
+						"class":"tax_0103"  
+					},{
+						"fpbm":"0104",
+						"fp":"江干区",
+						"bnlj":26488,  
+						"sntq":22426, 
+						"tbzz":20.1 
+						"sszb":16,
+						"class":"tax_0104"  
+					},{
+						"fpbm":"0105",
+						"fp":"滨江区",
+						"bnlj":32844,  
+						"sntq":30426, 
+						"tbzz":8.88 
+						"sszb":21,
+						"class":"tax_0105"  
+					},{
+						"fpbm":"0106",
+						"fp":"下城区",
+						"bnlj":22889,  
+						"sntq":20426, 
+						"tbzz":10.22 
+						"sszb":15,
+						"class":"tax_0106"  
+					}],
+					"pie_czzsr":[
+					{
+						"fpbm":"0101",
+						"fp":"上城区",
+						"bnlj":28025,
+						"sntq":25622,
+						"tbzz":8.44,
+			            "sszb":18,
+						"class":"tax_0101"
+					},{
+						"fpbm":"0102",
+						"fp":"西湖区",
+						"bnlj":26578,  
+						"sntq":23012, 
+						"tbzz":12.66 
+						"sszb":16,
+						"class":"tax_0102"  
+					},{
+						"fpbm":"0103",
+						"fp":"拱墅区",
+						"bnlj":27197,  
+						"sntq":21332, 
+						"tbzz":25.04 
+						"sszb":14,
+						"class":"tax_0103"  
+					},{
+						"fpbm":"0104",
+						"fp":"江干区",
+						"bnlj":28456,  
+						"sntq":23426, 
+						"tbzz":24.1 
+						"sszb":16,
+						"class":"tax_0104"  
+					},{
+						"fpbm":"0105",
+						"fp":"滨江区",
+						"bnlj":35844,  
+						"sntq":32426, 
+						"tbzz":10.18 
+						"sszb":21,
+						"class":"tax_0105"  
+					},{
+						"fpbm":"0106",
+						"fp":"下城区",
+						"bnlj":24909,  
+						"sntq":21426, 
+						"tbzz":15.12 
+						"sszb":15,
+						"class":"tax_0106"  
+					}]
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="xnjk_detail" paging="true" fields="czfpbm,czfp,ttax,sszb,xncolor">
+			<filter name = "ny" value="201803"/>
+			<orderBy name = "czfpbm" dir="asc"/>
+		</vDs>
+	</joutput>
+</pages>
+

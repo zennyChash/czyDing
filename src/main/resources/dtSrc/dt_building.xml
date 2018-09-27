@@ -48,7 +48,7 @@
 	<src id="bd_one" name="单个楼宇信息" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select ny,bid,bmc,ecount,ttax bnlj,lttax sntq,trate tbzz,srzb_b,srzb_t from bdinfo
+			select ny,bid,bmc,dz,ecount,ttax bnlj,lttax sntq,trate tbzz,srzb_b,srzb_t from bdinfo
 		]]>
 		</sql>
 		<cols>
@@ -65,7 +65,7 @@
 	<src id="bd_ens" name="楼宇入驻企业信息" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select ny,bid,bmc,swdjzh,mc,bnlj,sntq,srzb lyzb,pm from bdens
+			select ny,bid,bmc,b.swdjzh,b.mc,bnlj,sntq,srzb lyzb,pm,d.czfpbm,d.czfp  from bdens b,dj_cz d where b.swdjzh=d.swdjzh
 		]]>
 		</sql>
 		<cols>
