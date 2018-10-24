@@ -145,6 +145,28 @@ public class QueryDataController {
 		return jr;
 	}
 	
+	@RequestMapping(value="/saveUserInfoTest",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse saveUserInfoTest(@RequestBody SaveUserObj so){
+		JResponse jr = null;
+		if(so!=null){
+			JSONObject jsave = so.parseSaveContent();
+			if(jsave==null){
+				return new JResponse("9", "未找到要保存的信息！",null);
+			}
+			Map result = rptDataService.saveUserInfo(so);
+			if((boolean)result.get("saved")){
+				jr = new JResponse("0","",result);
+			}else{
+				jr = new JResponse("9",(String)result.get("msg"),null);
+			}
+		}else{
+			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
+		}
+		return jr;
+	}
+	
+	
 	@RequestMapping(value="/deleteUserInfo",method = RequestMethod.POST)
 	@ResponseBody
 	public JResponse deleteUserInfo(@RequestBody DeleteUserObj dobj){

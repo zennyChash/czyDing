@@ -24,6 +24,12 @@ public class InitTemplatesListener implements ServletContextListener{
     	}catch(Exception e){
     		e.printStackTrace();
     	}
+    	//json数据模板
+    	try{
+    		ltmp.loadApiRouters();
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
     } 
     public void contextDestroyed(ServletContextEvent event){ 
     } 

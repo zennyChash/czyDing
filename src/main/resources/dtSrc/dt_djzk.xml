@@ -47,7 +47,7 @@
 	<src id="dzjk_srjd" name="收入进度信息" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select zwrq_jk zwrq,nlj_jk nlj_jk_o,round(nlj_jk/10000,2)nlj_jk,round(nlj_jk/jhs*100) wcjd from(
+			select zwrq_jk zwrq,nlj_jk nlj_jk_o,round(nlj_jk/10000,2)nlj_jk,round(nlj_jk/jhs*100) wcjd,jhs from(
 				select ny||ri zwrq_jk,sum(nlj_jk) nlj_jk,jhs from yssr_hztj r,yssr_tb t 
 				where substr(ny,1,4)=nian group by ny||ri,jhs)
 		]]>
@@ -57,12 +57,13 @@
 			<col name="nlj_jk_o" fldType="double" />
 			<col name="nlj_jk" fldType="double" />
 			<col name="wcjd" fldType="double" />
+			<col name="jhs" fldType="double" />
 		</cols>
 	</src>
 	<src id="dzjk_srzb_jg" name="机构收入占比信息" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select zwrq_jk zwrq,jgdm_jk,jg,round(nlj_jk/10000,2) nlj,round(nlj_jk/sum(nlj_jk) over (partition by zwrq_jk)*100) zb,
+			select zwrq_jk zwrq,jgdm_jk,jg,nlj_jk nlj,round(nlj_jk/sum(nlj_jk) over (partition by zwrq_jk)*100) zb,
 			r.color chartcolor,decode(jgdm_jk,'222222222222',1,0)selected
 			from( select ny||ri zwrq_jk,sum(nlj_jk) nlj_jk,jgdm_jk,jg
 				from yssr_hztj group by jgdm_jk,jg,ny||ri
@@ -95,8 +96,8 @@
 		<sql>
 		<![CDATA[
 			select zwrq_jk zwrq,szbm,sz,bnlj bnlj_o,round(bnlj/10000,2)bnlj,sntq sntq_o,round(sntq/10000,2)sntq,tbzz,
-			round(bnlj/sum(bnlj) over (partition by zwrq_jk)*100,2) srzb from (
-				select zwrq_jk,szbm,sz,sum(bnlj) bnlj,sum(sntq) sntq,
+			round(bnlj/sum(bnlj) over (partition by zwrq_jk)*100,2) srzb,r.color from (
+				select substr(zwrq_jk,1,6)zwrq_jk,szbm,sz,sum(bnlj) bnlj,sum(sntq) sntq,
 				case when sum(sntq)=0 then 0 else  round((sum(bnlj)-sum(sntq))/sum(sntq)*100,1) end tbzz
 				from (
 					SELECT ny||ri zwrq_jk,szbm,sz,sum(nlj_jk) bnlj,0 sntq FROM yssr_hztj
@@ -108,7 +109,7 @@
 					SELECT to_char(i.zwrq_jk),'90000' szbm,'其他税' sz,0 bnlj,sum(nlj_jk) sntq FROM yssr_hztj y,yssr_index i
 					where y.ny||y.ri=i.zwrq_tq and szbm not in ('10101','10104','10106') group by i.zwrq_jk
 				)
-			group by zwrq_jk,szbm,sz)order by zwrq_jk,szbm
+			group by substr(zwrq_jk,1,6),szbm,sz),renders r where r.rptid='dzjk_fsz' and szbm=r.lid(+) order by zwrq_jk,szbm
 		]]>
 		</sql>
 		<cols>

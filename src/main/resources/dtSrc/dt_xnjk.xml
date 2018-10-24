@@ -35,7 +35,7 @@
 	<src id="xnjk_detail" name="虚拟金库明细" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select ny,czfpbm,czfp,ttax,round(ttax/sum(ttax) over (partition by ny)*100,2) sszb,r.color xncolor from xnjk a,renders r
+			select ny,czfpbm,czfp,ttax,round(ttax/sum(ttax) over (partition by ny)*100,2) sszb,r.color from xnjk a,renders r
 			where czfpbm is not null and r.rptid='xnjk_detail' and r.lid = a.czfpbm order by ny,czfpbm
 		]]>
 		</sql>

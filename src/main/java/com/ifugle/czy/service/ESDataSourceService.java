@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,7 +37,9 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.jdbc.support.rowset.SqlRowSetMetaData;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ifugle.czy.utils.DataSourceTemplateParser;
 import com.ifugle.czy.utils.TemplatesLoader;
 import com.ifugle.czy.utils.bean.template.Column;
 import com.ifugle.czy.utils.bean.template.DataSrc;
@@ -76,6 +79,7 @@ public class ESDataSourceService {
 	}
 	//重新索引数据。如果指定reIndex，就重建整个索引。reIndex为false表示只将数据重索引。
 	public String indexData(String indexName,boolean reIndex,boolean deleteOldData, Map paramVals){
+		log.info("脚本执行开始:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()));
 		StringBuffer info= new StringBuffer("{success:");
 		TransportClient client = esClient.getClient();
 		boolean needRemap = false;
@@ -106,6 +110,8 @@ public class ESDataSourceService {
 		try{
 			int cc = indexDbData(indexName,paramVals,needRemap);
 			info.append("true,indexDocs:").append(cc).append("}");
+			log.info("脚本执行结束:"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()));
+			log.info("共处理"+cc+"条记录！");
 		}catch(Exception e){
 			info.append("false,info:'").append("从数据库读取数据生成ES索引时发生错误！数据源："+indexName+"。错误信息："+e.getMessage()+"'}");
 			log.error(e.toString());
@@ -359,7 +365,7 @@ public class ESDataSourceService {
 			buildMappings(ds.getId(),colsMeata);
 		}
 		List lst = jdbcTemplate.queryForList(sql);
-		if(lst!=null){
+		if(lst!=null&&lst.size()>0){
 			Map esCols = ds.getColMap();
 			TransportClient client = esClient.getClient();
 	        BulkRequestBuilder bulkRequest = client.prepareBulk(); 
@@ -383,7 +389,6 @@ public class ESDataSourceService {
 		        } 
 		        bulkRequest.add(client.prepareIndex(ds.getId(),"_doc").setSource(nr));
 	        }
-	        
 	        cc = lst.size();
 	        BulkResponse bulkResponse = bulkRequest.execute().actionGet();  
 	        if (bulkResponse.hasFailures()) {  
@@ -421,5 +426,55 @@ public class ESDataSourceService {
 	        default :
 	        	return "text";
         }
+	}
+	
+	public String[] deleteDtSrcs(String[] dtIds) {
+		String[] results = new String[]{"1",""};
+		StringBuffer bfInfos = new StringBuffer("");
+		try{
+			for(int i=0;i<dtIds.length;i++){
+				String strDel = delelteIndex(dtIds[i].toLowerCase());
+				try{
+					JSONObject odel =JSON.parseObject(strDel);
+					if(!odel.getBoolean("success")){
+						results[0]="5";
+						bfInfos.append("数据源"+dtIds[i]+"删除未成功;\n");
+					}
+				}catch(Exception e){}
+			}
+		}catch(Exception e){
+			results[0]="9";
+			results[1]=e.toString();
+		}
+		TemplatesLoader ltmp=TemplatesLoader.getTemplatesLoader();
+		List allDts = ltmp.getDataSrcTemplates();
+		results[1]=bfInfos.toString();
+		return results; 
+	}
+	
+	public String[] deleteAllDtSrcs() {
+		String[] results = new String[]{"1",""};
+		TemplatesLoader ltmp=TemplatesLoader.getTemplatesLoader();
+		List allDts = ltmp.getDataSrcTemplates();
+		StringBuffer bfInfos = new StringBuffer("");
+		try{
+			for(int i=0;i<allDts.size();i++){
+				DataSrc ds= (DataSrc)allDts.get(i);
+				String dtId = ds.getId().toLowerCase();
+				String strDel = delelteIndex(dtId.toLowerCase());
+				try{
+					JSONObject odel =JSON.parseObject(strDel);
+					if(!odel.getBoolean("success")){
+						results[0]="5";
+						bfInfos.append("数据源"+dtId+"删除未成功;\n");
+					}
+				}catch(Exception e){}
+			}
+		}catch(Exception e){
+			results[0]="9";
+			results[1]=e.toString();
+		}
+		results[1]=bfInfos.toString();
+		return results; 
 	}
 }

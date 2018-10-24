@@ -55,34 +55,134 @@
 	<joutput id="dzjk_xnjk" name="虚拟金库明细"  description="" > 
 		<jTemplate>
 		<![CDATA[
-			{
-				#if($xnjk_detail&&$xnjk_detail.rows.size()>0)
-				"chart_ybggys":{"name":"合计","value":"$!{xnjk_detail.total}"},
-				"chart_czzsr":{"name":"合计","value":"$!{xnjk_detail.total}"},
-				"list_ybggys":[
-					#foreach($row in $xnjk_detail.rows)
-						#set( $sntq = $!{row.ttax} - 2001 ) 
-						#set( $tbzz = $!{row.sszb} + 4.55 )
-	   					{"fpbm":"$!{row.czfpbm}","fp":"$!{row.czfp}","bnlj":"$!{row.ttax}","sntq":"$!{sntq}",
-	   					"tbzz":"$tbzz","sszb":"$!{row.sszb}","class":"tax_$!{row.czfpbm}"}
-	   					#if($velocityCount != $xnjk_detail.rows.size()),#end
-	   				#end
-	   			],
-				"list_czzsr":[
-					#foreach($row in $xnjk_detail.rows)
-						#set( $sntq = $!{row.ttax} - 1896 ) 
-						#set( $tbzz = $!{row.sszb} + 6.12 )
-	   					{"fpbm":"$!{row.czfpbm}","fp":"$!{row.czfp}","bnlj":"$!{row.ttax}","sntq":"$!{sntq}",
-	   					"tbzz":"$tbzz","sszb":"$!{row.sszb}","class":"tax_$!{row.czfpbm}"}
-	   					#if($velocityCount != $xnjk_detail.rows.size()),#end
-	   				#end
-				]
-				#else
-				"chart_ybggys":{"name":"合计","value":"68790"},
-				"chart_czzsr":{"name":"合计","value":"71209"},
-				"list_ybggys":[],
-				"list_czzsr":[]
-				#end
+		{
+				
+					"total_ybggys":{"fpbm":"ALL_00","fp":"全市合计","yss":"626551371","zxjd":"38","zxs":"152200129","sntq":"127789331","tbzz":"19.1"},
+	 				"total_czzsr":{"fpbm":"ALL_00","fp":"全市合计","yss":"686551373","zxjd":"36","zxs":"198000129","sntq":"176520112","tbzz":"12.17"},
+					"pie_ybggys":[
+					{
+						"fpbm":"0101",
+						"fp":"上城区",
+						"yss":"38655137",
+						"zxjd":"35",
+						"zxs":"20025131",
+						"sntq":"19622232",
+						"tbzz":"8.44",
+			            "sszb":"18",
+						"color":"#3BB1EF"
+					},{
+						"fpbm":"0102",
+						"fp":"西湖区",
+						"yss":"38655137",
+						"zxjd":"32",
+						"zxs":23544221,  
+						"sntq":20126331, 
+						"tbzz":15.14,
+						"sszb":16,
+						"color":"#2885FF"  
+					},{
+						"fpbm":"0103",
+						"fp":"拱墅区",
+						"yss":"32655137",
+						"zxjd":"45",
+						"zxs":22088134,  
+						"sntq":19083338, 
+						"tbzz":17.64,
+						"sszb":14,
+						"color":"#827DFF"  
+					},{
+						"fpbm":"0104",
+						"fp":"江干区",
+						"yss":"42655137",
+						"zxjd":"26.5",
+						"zxs":24264881,  
+						"sntq":23322426, 
+						"tbzz":20.1, 
+						"sszb":16,
+						"color":"#AF88F4"  
+					},{
+						"fpbm":"0105",
+						"fp":"滨江区",
+						"yss":"41655137",
+						"zxjd":"25",
+						"zxs":132844212,  
+						"sntq":130422226, 
+						"tbzz":8.88, 
+						"sszb":21,
+						"color":"#DE53FF"  
+					},{
+						"fpbm":"0106",
+						"fp":"下城区",
+						"yss":"38655137",
+						"zxjd":"35",
+						"zxs":32222889,  
+						"sntq":31204261, 
+						"tbzz":10.22, 
+						"sszb":15,
+						"color":"#FF7EFA"  
+					}],
+					"pie_czzsr":[
+					{
+						"fpbm":"0101",
+						"fp":"上城区",
+						"yss":"66655137",
+						"zxjd":"32",
+						"zxs":42280255,
+						"sntq":40325622,
+						"tbzz":8.44,
+			            "sszb":18,
+						"color":"#3BB1EF"
+					},{
+						"fpbm":"0102",
+						"fp":"西湖区",
+						"yss":"78655137",
+						"zxjd":"35",
+						"zxs":35112658,  
+						"sntq":35230122, 
+						"tbzz":12.66, 
+						"sszb":16,
+						"color":"#2885FF"  
+					},{
+						"fpbm":"0103",
+						"fp":"拱墅区",
+						"yss":"58655137",
+						"zxjd":"55",
+						"zxs":42719711,  
+						"sntq":42133244, 
+						"tbzz":25.04, 
+						"sszb":14,
+						"color":"#827DFF"  
+					},{
+						"fpbm":"0104",
+						"fp":"江干区",
+						"yss":"68655137",
+						"zxjd":"62",
+						"zxs":42845216,  
+						"sntq":42342216, 
+						"tbzz":24.1, 
+						"sszb":16,
+						"color":"#AF88F4"  
+					},{
+						"fpbm":"0105",
+						"fp":"滨江区",
+						"yss":"88655137",
+						"zxjd":"68",
+						"zxs":63584224,  
+						"sntq":61324262, 
+						"tbzz":10.18, 
+						"sszb":21,
+						"color":"#DE53FF"  
+					},{
+						"fpbm":"0106",
+						"fp":"下城区",
+						"yss":"68655137",
+						"zxjd":"35",
+						"zxs":41249039,  
+						"sntq":40214246, 
+						"tbzz":15.12, 
+						"sszb":15,
+						"color":"#FF7EFA"  
+					}]
 			}
 		]]>
 		</jTemplate>

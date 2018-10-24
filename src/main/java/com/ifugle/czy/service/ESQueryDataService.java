@@ -115,7 +115,6 @@ public class ESQueryDataService {
 		   String key = (String)entry.getKey();  
 		   context.put(key, entry.getValue());
 		}  
-		String tmp=jp.getjTemplate();
 		List vds = jp.getValuedDs();
 		if(vds!=null){
 			//vds中的ds，逐个查找，加载。
@@ -286,10 +285,11 @@ public class ESQueryDataService {
 		}
 		try{
 	        StringWriter sw = new StringWriter();
+	        String tmp=jp.getjTemplate();
 	        Velocity.evaluate(context, sw, jp.getId(), tmp);
-	        String otmp = replaceBlank(sw.toString());
-	        log.info(otmp);
+	        String otmp = sw.toString();
 	        JSONObject jtmp = JSONObject.parseObject(otmp);
+	        log.info(jtmp.toJSONString());
 	        result.put("done", true);
 			result.put("jpData", jtmp);
 		}catch(Exception ve){
@@ -299,32 +299,14 @@ public class ESQueryDataService {
 		}
 		return result;
 	}
-	private String replaceBlank(String str) {
-		String dest = "";
-		if (str!=null) {
-			Pattern p = Pattern.compile("\\s*|\t|\r|\n");
-			Matcher m = p.matcher(str);
-			dest = m.replaceAll("");
-		}
-		return dest;
-	}
+//	private String replaceBlank(String str) {
+//		String dest = "";
+//		if (str!=null) {
+//			Pattern p = Pattern.compile("\\t|\r|\n");
+//			Matcher m = p.matcher(str);
+//			dest = m.replaceAll("");
+//		}
+//		return dest;
+//	}
 	
-	//测试时，xml中的模板只是静态json，不解析，读取出来直接返回。
-	public Map getDataTest(String jpID,JSONObject params){
-		Map result = new HashMap();
-		JSONObject jrpt = null;
-		JOutput jp = TemplatesLoader.getTemplatesLoader().getJOutput(jpID);
-		if(jp==null){
-			result.put("done", false);
-			result.put("info", "未找到页面数据的定义信息。");
-			log.equals("未找到JOutput信息，ID："+jpID);
-			return result;
-		}
-		String tmp=jp.getjTemplate();
-		String otmp = replaceBlank(tmp);
-        JSONObject jtmp = JSONObject.parseObject(otmp);
-        result.put("done", true);
-		result.put("jpData", jtmp);
-		return result;
-	}
 }

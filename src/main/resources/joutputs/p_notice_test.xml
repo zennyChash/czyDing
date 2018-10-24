@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="summaries_of_notice" name="公告概要、标题"  description="" > 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($notices&&$notices.rows.size()>0)
+				"summaries":[
+				#foreach($row in $notices.rows)
+		   		{"id":"$!{row.id}","title":"$!{row.title}","pdate":"$!{row.pdate}","summary":"$!{row.summary}"}
+		   		#if($velocityCount != $notices.rows.size()),#end
+		   		#end
+				]
+				#else
+				"summaries":[]
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="notices" paging="true" fields="id,title,summary,content,author,pdate">
+			<orderBy name = "pdate" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="content_of_notice" name="公告详情"  description="" > 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($notices&&$notices.rows.size()>0)
+				"id":"$!{notices.rows[0].id}",
+				"content":"$!{notices.rows[0].content}",
+				"pdate":"$!{notices.rows[0].pdate}",
+				"author":"$!{notices.rows[0].author}"
+				#else
+				"id":"",
+				"content":"",
+				"pdate":"",
+				"author":""
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="notices" paging="true" fields="id,title,summary,content,author,pdate">
+			<filter name = "id" value="1"/>
+		</vDs>
+	</joutput>
+</pages>
+

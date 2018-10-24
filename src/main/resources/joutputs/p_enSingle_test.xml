@@ -84,7 +84,7 @@
 					"czfp":"$!{dhcx_basic.rows[0].czfp}",
 					"dz":"$!{dhcx_basic.rows[0].dz}",
 					"hy":"$!{dhcx_basic.rows[0].hy}",
-					"ssgx":"5012",
+					"ssgx":"15012",
 				#end
 			}
 		]]>
@@ -102,12 +102,11 @@
 		<![CDATA[
 			{
 			#if($en_tax&&$en_tax.rows.size()>0)
-				#set( $qnlj = $!{en_tax.rows[0].sn_zse} * 0.8 )
 				"swdjzh":"$!{en_tax.rows[0].swdjzh}",
 				"mc":"$!{en_tax.rows[0].mc}",
 				"czfp":"$!{en_tax.rows[0].czfp}",
-				"bnlj":"$!{en_tax.rows[0].bn_zse}",
-				"snlj":"$!{en_tax.rows[0].sn_zse}",
+				"bnlj":"$!{en_tax.rows[0].bn_zse_o}",
+				"snlj":"$!{en_tax.rows[0].sn_zse_o}",
 				"qnlj":"$!{qnlj}"
 			#end
 			}
@@ -117,7 +116,7 @@
 		如果不设置refParam，就从请求中查找“参数名=filter的name”的参数值。
 		如果请求中未获得参数值，则用设计文件中的静态值，即filter中的value属性值；
 		排序字段也类似。-->
-		<vDs name="en_tax" fields="swdjzh,mc,czfp,bn_zse,sn_zse,tbzz,bn_zz,bn_ygz,bn_qysd,bn_grsd,bn_cswhjs,bn_yh">
+		<vDs name="en_tax" fields="swdjzh,mc,czfp,bn_zse_o,sn_zse_o,tbzz,bn_zz_o,bn_ygz_o,bn_qysd_o,bn_grsd_o,bn_cswhjs_o,bn_yh_o">
 			<filter name = "swdjzh" value="91330604146165334B"/>
 			<filter name = "ny" value="201805"/>
 		</vDs>

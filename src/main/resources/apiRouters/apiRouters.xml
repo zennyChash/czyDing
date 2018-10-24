@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routers>
+	<service id="czfc" name="产业扶持" description="" >
+		<rootURI>
+		<![CDATA[
+			http://localhost:8088/CZFC/api
+		]]>
+		</rootURI>
+		<method name="getApprovalLists">
+			<request mthod="POST" subURI="getApprovalLists2Check" before="com.ifugle.czy.utils.router.czfc">
+				<porperty name="Content-Type" value="application/json;charset=UTF-8"/>
+			</request>
+			<request mthod="POST" subURI="getApprovalListsChecked" before="com.ifugle.czy.routerHelper.PreCheckGetAppLists"/>
+			<response before="com.ifugle.czy.routerHelper.Service2DingUserMapping"/>
+		</method>
+		<method name="appListCheck" >
+			<request mthod="POST" subURI="checkAppByList" before="com.ifugle.czy.routerHelper.Ding2ServiceUserMapping"/>
+			<response before="com.ifugle.czy.routerHelper.Service2DingUserMapping"/>
+		</method>
+		<method name="getAppListDetails" subURI="getAppDetailsInList">
+			<request mthod="POST" subURI="getAppDetailsInList" before="com.ifugle.czy.routerHelper.Ding2ServiceUserMapping"/>
+			<response/>
+		</method>
+		<method name="getAppListCheckInfo" subURI="getCommentsOfAppList">
+			<request mthod="POST" subURI="getCommentsOfAppList" before="com.ifugle.czy.routerHelper.Ding2ServiceUserMapping"/>
+			<response before="com.ifugle.czy.routerHelper.Service2DingUserMapping"/>
+		</method>
+	</service>
+</routers>
+

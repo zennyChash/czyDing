@@ -239,6 +239,8 @@ public class ReportDataService {
 		}
 		if("myFavorite".equals(saveInfo.getString("saveType"))){
 			info = saveMyFavorite(userid,sobj);
+		}else if("myMenus".equals(saveInfo.getString("saveType"))){
+			info = saveMyMenus(userid,sobj);
 		}
 		return info;
 	}
@@ -259,6 +261,24 @@ public class ReportDataService {
 		jdbcTemplate.update("insert into user_log(id,userid,etime,eventtype)values(sq_user_log.nextval,?,sysdate,?)",
 				new Object[]{userid,"add_myFavorite"});
 		
+		info.put("saved", true);
+		info.put("msg", "");
+		return info;
+	}
+	private Map saveMyMenus(String userid,JSONObject sobj){
+		Map info = new HashMap();
+		JSONArray menus=sobj.getJSONArray("menus");
+		jdbcTemplate.update("delete from user_menus where userid=?",new Object[]{userid});
+		if(menus!=null){
+			for(int i=0;i<menus.size();i++){
+				JSONObject menu = menus.getJSONObject(i);
+				String mid = menu.getString("id");
+				jdbcTemplate.update("insert into user_menus(userid,mid,stime)values(?,?,sysdate)",new Object[]{userid,mid});
+			}
+		}
+		//记录调序事件
+		jdbcTemplate.update("insert into user_log(id,userid,etime,eventtype)values(sq_user_log.nextval,?,sysdate,?)",
+				new Object[]{userid,"sort_myMenus"});
 		info.put("saved", true);
 		info.put("msg", "");
 		return info;

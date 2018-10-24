@@ -1,5 +1,6 @@
 package com.ifugle.czy.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -66,6 +67,7 @@ public class AuthController {
 			jucfg.put("username", user.getDingname());
 			jucfg.put("postname", user.getPostNames());
 			jucfg.put("czfpbm", StringUtils.isEmpty(user.getCzfpbm())?"":user.getCzfpbm());
+			jucfg.put("czfp", StringUtils.isEmpty(user.getCzfp())?"":user.getCzfp());
 			jucfg.put("corpname", cg.getString("corpname", "未知"));
 			jucfg.put("menus", user.getMenus());
 			jr.setRetData(jucfg);
@@ -75,6 +77,101 @@ public class AuthController {
 			jr.setRetMsg("指定的用户账户不存在或未配置业务权限！");
 			jr.setRetData(null);
 			System.out.println("出错了！用户不存在！");
+		}
+		return jr;
+	}
+	@RequestMapping("/getMyMenus")
+	@ResponseBody
+	public JResponse getMyMenus(@RequestParam("code") String code, @RequestParam("corpid") String corpid){
+		JResponse jr = new JResponse();
+		System.out.println("传入的code:"+code);
+		System.out.println("传入的corpID:"+corpid);
+		String accessToken = authService.getAccessToken();
+		User user = authService.getUserCzyConfig(accessToken,code);
+		if(user!=null){
+			RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+			if (requestAttributes != null) {
+				HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+				request.getSession().setAttribute("user", user);
+			}
+			jr.setRetCode("0");
+			jr.setRetMsg("");
+			JSONObject jucfg = new JSONObject();
+			jucfg.put("username", user.getDingname());
+			jucfg.put("postname", user.getPostNames());
+			jucfg.put("czfpbm", StringUtils.isEmpty(user.getCzfpbm())?"":user.getCzfpbm());
+			jucfg.put("czfp", StringUtils.isEmpty(user.getCzfp())?"":user.getCzfp());
+			jucfg.put("corpname", cg.getString("corpname", "未知"));
+			jucfg.put("myMenus", user.getMenus());
+			jr.setRetData(jucfg);
+			log.info("用户"+ user.getDingname()+"登录权限返回："+JSONObject.toJSONString(jr));
+		}else{
+			jr.setRetCode("9");
+			jr.setRetMsg("指定的用户账户不存在或未配置业务权限！");
+			jr.setRetData(null);
+			System.out.println("出错了！用户不存在！");
+		}
+		return jr;
+	}
+	@RequestMapping("/getUserMenus")  
+	@ResponseBody
+	public JResponse getUserMenus(@RequestParam Map<String, String> params){
+		JResponse jr = new JResponse();
+		User user = null;
+		RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+		if (requestAttributes != null) {
+			HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+			user = (User)request.getSession().getAttribute("user");
+		}
+		if(user==null){
+			return new JResponse("9", "未知的用户账户！",null);
+		}else{
+			try{
+				List jmenus = authService.getUserMenus(user.getUserid());
+				jr.setRetCode("0");
+				jr.setRetMsg("");
+				JSONObject jucfg = new JSONObject();
+				jucfg.put("menus", jmenus);
+				jr.setRetData(jucfg);
+				log.info("用户"+user.getDingname()+"的应用权限模块："+jr.toString());
+			}catch(Exception e){
+				return new JResponse("9", "获取用户模块列表时发生系统错误！",null);
+			}
+		}
+		return jr;
+	}
+
+
+	
+	
+	
+	@RequestMapping("/getMyMenusTest")
+	@ResponseBody
+	public JResponse getMyMenusTest(@RequestParam("userid") String userid){
+		JResponse jr = new JResponse();
+		User user = authService.getMyMenus(userid,null);
+		if(user!=null){
+			jr.setRetCode("0");
+			jr.setRetMsg("");
+			JSONObject jucfg = new JSONObject();
+			jucfg.put("myMenus", user.getMenus());
+			jr.setRetData(jucfg);
+		}
+		return jr;
+	}
+	@RequestMapping("/getUserMenusTest")  
+	@ResponseBody
+	public JResponse getUserMenusTest(@RequestParam("userid") String userid){
+		JResponse jr = new JResponse();
+		try{
+			List jmenus = authService.getUserMenus(userid);
+			jr.setRetCode("0");
+			jr.setRetMsg("");
+			JSONObject jucfg = new JSONObject();
+			jucfg.put("menus", jmenus);
+			jr.setRetData(jucfg);
+		}catch(Exception e){
+			return new JResponse("9", "获取用户模块列表时发生系统错误！",null);
 		}
 		return jr;
 	}
@@ -96,6 +193,7 @@ public class AuthController {
 			jucfg.put("username", user.getDingname());
 			jucfg.put("postname", user.getPostNames());
 			jucfg.put("czfpbm", StringUtils.isEmpty(user.getCzfpbm())?"":user.getCzfpbm());
+			jucfg.put("czfp", StringUtils.isEmpty(user.getCzfp())?"":user.getCzfp());
 			jucfg.put("corpname", cg.getString("corpname", "未知"));
 			jucfg.put("menus", user.getMenus());
 			jr.setRetData(jucfg);

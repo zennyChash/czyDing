@@ -249,4 +249,62 @@ public class ConsoleScriptController {
 		}
 		return jr;
 	}
+	
+	@RequestMapping(value="/deleteDtSrcs",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse deleteDtSrcs(@RequestParam Map<String, String> params){
+		JResponse jr = new JResponse();
+		if(params!=null){
+			String strIds = params.get("dtIds");
+			if(StringUtils.isEmpty(strIds)){
+				jr.setRetCode("9");
+				jr.setRetMsg("没有指定要删除的数据源！");
+				jr.setRetData("");
+			}else{
+				String[] dtIds = strIds.split(",");
+				String[] infos = esDtSrcService.deleteDtSrcs(dtIds);
+				if(infos!=null&&"1".equals(infos[0])){
+					jr.setRetCode("0");
+					jr.setRetMsg("");
+				}else if(infos!=null&&!StringUtils.isEmpty(infos[1])){
+					jr.setRetCode("9");
+					jr.setRetMsg(infos[1]);
+				}else{
+					jr.setRetCode("9");
+					jr.setRetMsg("删除数据源时发生错误！");
+					jr.setRetData("");
+				}
+			}
+		}else{
+			jr.setRetCode("9");
+			jr.setRetMsg("缺少参数，无法执行！");
+			jr.setRetData("");
+		}
+		return jr;
+	}
+	
+	@RequestMapping(value="/deleteAllDtSrcs",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse deleteAllDtSrcs(@RequestParam Map<String, String> params){
+		JResponse jr = new JResponse();
+		if(params!=null){
+			String[] infos = esDtSrcService.deleteAllDtSrcs();
+			if(infos!=null&&"1".equals(infos[0])){
+				jr.setRetCode("0");
+				jr.setRetMsg("");
+			}else if(infos!=null&&!StringUtils.isEmpty(infos[1])){
+				jr.setRetCode("9");
+				jr.setRetMsg(infos[1]);
+			}else{
+				jr.setRetCode("9");
+				jr.setRetMsg("删除数据源时发生错误！");
+				jr.setRetData("");
+			}
+		}else{
+			jr.setRetCode("9");
+			jr.setRetMsg("缺少参数，无法执行！");
+			jr.setRetData("");
+		}
+		return jr;
+	}
 }

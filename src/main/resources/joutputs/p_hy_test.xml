@@ -14,7 +14,7 @@
 		<jTemplate>
 		<![CDATA[
 			{
-				"options":[{"bm":"2018"},{"bm":"2017"}],
+				"options":[{"bm":"2018"}],
 				"defaultOp":"2018"
 			}
 		]]>
@@ -24,7 +24,7 @@
 		<jTemplate>
 		<![CDATA[
 			{
-				"options":[{"bm":"06","name":"06"},{"bm":"05"},{"bm":"04"},{"bm":"03"}],
+				"options":[{"bm":"06","name":"06"},{"bm":"05"}],
 				"defaultOp":"06"
 			}
 		]]>
@@ -37,7 +37,7 @@
 				"hyInfo":[
 				#if($hy_tax_fb&&$hy_tax_fb.rows.size()>0)
 					#foreach($row in $hy_tax_fb.rows)
-	   					{"hybm":"$!{row.hybm}","hy":"$!{row.hy}","bnlj":"$!{row.bnlj}","sntq":"$!{row.sntq}",
+	   					{"hybm":"$!{row.hybm}","hy":"$!{row.hy}","bnlj":"$!{row.bnlj_o}","sntq":"$!{row.sntq_o}",
 	   					"srtb":"$!{row.tbzz}","sszb":"$!{row.srzb}","class":"hy_$!{row.hybm}","color":"$!{row.hycolor}"}
 	   					#if($velocityCount != $hy_tax_fb.rows.size()),#end
 	   				#end
@@ -46,7 +46,7 @@
 			}
 		]]>
 		</jTemplate>
-		<vDs name="hy_tax_fb" refDtSrc="hy_tax_fb" fields="hybm,hy,bnlj,sntq,srzb,tbzz,hycolor">
+		<vDs name="hy_tax_fb" refDtSrc="hy_tax_fb" fields="hybm,hy,bnlj_o,sntq_o,srzb,tbzz,hycolor">
 			<filter name = "ny" value="201806"/>
 			<orderBy name = "hybm" dir="asc"/>
 		</vDs>
@@ -56,8 +56,8 @@
 		<![CDATA[
 			{
 			#if($hy_one&&$hy_one.rows.size()>0)
-				"bnlj":"$!{hy_one.rows[0].bnlj}",
-				"sntq":"$!{hy_one.rows[0].sntq}",
+				"bnlj":"$!{hy_one.rows[0].bnlj_o}",
+				"sntq":"$!{hy_one.rows[0].sntq_o}",
 				"tbzz":"$!{hy_one.rows[0].tbzz}"
 			#else
 				"bnlj":"",  
@@ -67,7 +67,7 @@
 			}
 		]]>
 		</jTemplate>
-		<vDs name="hy_one" refDtSrc="hy_tax_fb" fields="bnlj,sntq,tbzz">
+		<vDs name="hy_one" refDtSrc="hy_tax_fb" fields="bnlj_o,sntq_o,tbzz">
 			<filter name = "hybm" value="K"/>
 			<filter name = "ny" value="201806"/>
 		</vDs>
@@ -90,7 +90,7 @@
 			}
 		]]>
 		</jTemplate>
-		<vDs name="hyEns" refDtSrc="hy_one_details" paging="true" fields="swdjzh,mc,bnlj,sntq,srzb">
+		<vDs name="hyEns" refDtSrc="hy_one_details" paging="true" fields="swdjzh,mc,bnlj_o,sntq_o,srzb">
 			<filter name = "hybm" value="K"/>
 			<filter name = "ny" value="201806"/>
 			<orderBy name = "bnlj" dataType="double" dir="desc"/>
@@ -104,8 +104,8 @@
 				"swdjzh":"$!{hy_one_en.rows[0].swdjzh}",
 				"mc":"$!{hy_one_en.rows[0].mc}",
 				"czfp":"$!{hy_one_en.rows[0].czfp_r}",
-				"bnlj":"$!{hy_one_en.rows[0].bnlj}",
-				"sntq":"$!{hy_one_en.rows[0].sntq}"
+				"bnlj":"$!{hy_one_en.rows[0].bnlj_o}",
+				"sntq":"$!{hy_one_en.rows[0].sntq_o}"
 			#else
 				"swdjzh":"",
 				"mc":"",
@@ -116,7 +116,7 @@
 			}
 		]]>
 		</jTemplate>
-		<vDs name="hy_one_en" refDtSrc="hy_one_details" fields="swdjzh,mc,bnlj,sntq,hyzb,czfp_r">
+		<vDs name="hy_one_en" refDtSrc="hy_one_details" fields="swdjzh,mc,bnlj_o,sntq_o,hyzb,czfp_r">
 			<filter name = "ny" value="201806"/>
 			<filter name = "swdjzh" value="91330604146165334B"/>
 		</vDs>

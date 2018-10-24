@@ -8,9 +8,17 @@ public class User {
 	private String dinginfo;
 	private int qybj;
 	private String czfpbm;
+	private String czfp;
 	private List menus;
 	private String postIds;
 	private String postNames ;
+	
+	public String getCzfp() {
+		return czfp;
+	}
+	public void setCzfp(String czfp) {
+		this.czfp = czfp;
+	}
 	public String getPostIds() {
 		return postIds;
 	}

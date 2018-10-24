@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="qcqy_details" name="迁出企业" description="迁出企业的情况" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select ny,swdjzh,mc,czfpbm,czfp,bnlj_o,bnlj,sntq_o,sntq,destbm,dest,escdate
+			from qcqy order by ny,escdate desc
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="swdjzh" isFilter="1"/>
+			<col name="bnlj" fldType="double" canOrder="1"/>
+			<col name="bnlj_o" fldType="double" canOrder="1"/>
+			<col name="sntq" fldType="double" canOrder="1"/>
+			<col name="sntq_o" fldType="double" canOrder="1"/>
+			<col name="escdate" canOrder="1" isFilter="1"/>
+		</cols>
+	</src>
+</dataSource>
+

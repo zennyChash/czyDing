@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="notices" name="公告信息" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select to_char(id)id, title, summary, content, author, to_char(pdate,'yyyy-mm-dd hh24:mi:ss')pdate from notice
+		]]>
+		</sql>
+		<cols>
+			<col name="id" canOrder="1" isFilter="1"/>
+			<col name="pdate" canOrder="1" />
+		</cols>
+	</src>
+</dataSource>
+

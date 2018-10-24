@@ -260,8 +260,9 @@ public class AuthService {
 				return null;
 			}
 			System.out.println("进入了getCzyAuth，获取到了CorpUserDetail："+ud==null?"":ud.getName());
-			List users = jdbcTemplate.queryForList("select userid,dingname,dinginfo,qybj,czfpbm from users where userid=?",
-					new Object[]{userid});
+			StringBuffer usql = new StringBuffer("select userid,dingname,dinginfo,u.qybj,czfpbm,b.mc czfp from users u,");
+			usql.append("(select * from bm_cont where table_bm='BM_CZFP')b  where  u.czfpbm=b.bm(+) and u.userid=?");
+			List users = jdbcTemplate.queryForList(usql.toString(),new Object[]{userid});
 			if(users==null||users.size()==0){//不存在的，先插入一条新的用户记录。
 				//先增加该用户的记录，再记录登录情况。初始登录的用户，未经过业务系统的权限设置，看不到业务菜单。
 				//config目前是空，今后可能会增加一些基础的默认配置
@@ -274,75 +275,15 @@ public class AuthService {
 				u.setQybj(1);
 			}else{
 				u = new User();
-				Map mu =(Map)users.get(0);
+				Map mu = (Map)users.get(0);
 				u.setUserid((String)mu.get("userid"));
 				u.setDingname((String)mu.get("dingname"));
 				u.setDinginfo((String)mu.get("dinginfo"));
 				u.setCzfpbm((String)mu.get("czfpbm"));
+				u.setCzfp((String)mu.get("czfp"));
 				u.setQybj(((BigDecimal)mu.get("qybj")).intValue());
-				//查找岗位
-				List posts = jdbcTemplate.queryForList("select userid,to_char(u.postid)postid,postname from user_post u,post p where userid=? and u.postid=p.postid",
-						new Object[]{userid});
-				if(posts!=null&&posts.size()>0){
-					List postids = new ArrayList(),postnames = new ArrayList();
-					for(int i=0;i<posts.size();i++){
-						Map p = (Map)posts.get(i);
-						String pid = (String)p.get("postid");
-						String pname = (String)p.get("postname");
-						postids.add(pid);
-						postnames.add(pname);
-					}
-					String spids = StringUtils.join(postids, ",");
-					String spnames = StringUtils.join(postnames, ",");
-					u.setPostIds(spids);
-					u.setPostNames(spnames);
-				}
-				int cc =jdbcTemplate.queryForObject("select count(*)cc from user_post where userid=?",new Object[]{userid},Integer.class);
-				List menus = null;
-				//查找权限。如果用户还未分配、设置，使用默认权限。
-				StringBuffer sql = new StringBuffer("select distinct m.moduleid,m.name,to_char(m.isleaf)isleaf,m.pid,dorder,");
-				sql.append("nvl(pos,'')pos,to_char(decode(m.qybj,0,9,decode(p.moduleid,null,0,1)))status from ");
-				if(cc==0){
-					String dfMenus = cg.getString("defaultMenus", "");
-					sql.append(" (select moduleid from modules where moduleid in('").append(dfMenus.replace(",", "','")).append("')) p,modules m ");
-					sql.append(" where m.moduleid=p.moduleid(+) order by dorder");
-				}else{
-					sql.append(" (select pm.* from user_post u,post_module pm where u.postid=pm.postid and userid=?) p,modules m ");
-					sql.append(" where m.moduleid=p.moduleid(+) order by dorder");
-					menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{userid});
-				}
-				if(menus!=null&&menus.size()>0){
-					List jms = new ArrayList();
-					for(int i=0;i<menus.size();i++){
-						Map mm = (Map)menus.get(i);
-						if("1".equals(mm.get("isleaf"))){
-							continue;
-						}
-						String mid = (String)mm.get("moduleid");
-						Map jm = new HashMap();//上级
-						jm.put("id", mid);
-						jm.put("name", (String)mm.get("name"));
-						jm.put("pos", (String)mm.get("pos"));
-						List lmenus = new ArrayList();//下级
-						for(int j=0;j<menus.size();j++){
-							Map lmm = (Map)menus.get(j);
-							if(mid.equals((String)lmm.get("pid"))){
-								Map ljm = new HashMap();
-								ljm.put("id", (String)lmm.get("moduleid"));
-								ljm.put("name", (String)lmm.get("name"));
-								ljm.put("status", (String)lmm.get("status"));
-								lmenus.add(ljm);
-							}
-						}
-						jm.put("list", lmenus);
-						jms.add(jm);
-					}
-					u.setMenus(jms);
-				}
+				getMyMenus(userid,u);
 			}
-			//记录登录事件
-			jdbcTemplate.update("insert into user_log(id,userid,etime,eventtype)values(sq_user_log.nextval,?,sysdate,'login')",
-					new Object[]{userid});
 		}catch(Exception e){
 			System.out.println("getCzyAuth中发生错误！");
 			log.error("获取钉钉用户信息失败："+e.toString());
@@ -351,20 +292,14 @@ public class AuthService {
 		System.out.println("getCzyAuth中获得的自定义User："+u);
 		return u;
 	}
-	public User testAuth(String userid){
-		User u = null;
-		List users = jdbcTemplate.queryForList("select userid,dingname,dinginfo,qybj,czfpbm from users where userid=?",
-				new Object[]{userid});
-		
-		u = new User();
-		Map mu =(Map)users.get(0);
-		u.setUserid((String)mu.get("userid"));
-		u.setDingname((String)mu.get("dingname"));
-		u.setDinginfo((String)mu.get("dinginfo"));
-		u.setCzfpbm((String)mu.get("czfpbm"));
-		u.setQybj(((BigDecimal)mu.get("qybj")).intValue());
+	
+	public User getMyMenus(String userid,User u){
+		if(u==null){
+			u=new User();
+		}
 		//查找岗位
-		List posts = jdbcTemplate.queryForList("select userid,to_char(u.postid)postid,postname from user_post u,post p where userid=? and u.postid=p.postid",
+		List posts = jdbcTemplate.queryForList("select userid,to_char(u.postid)postid,postname from user_post u,post p "
+				+ "where userid=? and u.postid=p.postid",
 				new Object[]{userid});
 		if(posts!=null&&posts.size()>0){
 			List postids = new ArrayList(),postnames = new ArrayList();
@@ -383,12 +318,137 @@ public class AuthService {
 		int cc =jdbcTemplate.queryForObject("select count(*)cc from user_post where userid=?",new Object[]{userid},Integer.class);
 		List menus = null;
 		//查找权限。如果用户还未分配、设置，使用默认权限。
+		if(cc==0){
+			StringBuffer sql = new StringBuffer("select * from( select distinct m.moduleid,m.name,to_char(m.isleaf)isleaf,m.pid,dorder,");
+			sql.append("nvl(pos,'')pos,notnull,errmsg from ");
+			String dfMenus = cg.getString("defaultMenus", "");
+			sql.append(" (select moduleid from modules where moduleid in('").append(dfMenus.replace(",", "','")).append("')) p,modules m ");
+			sql.append(" where m.moduleid=p.moduleid and isleaf=1 order by dorder) where rownum<=7");
+			menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{});
+		}else{
+			//设置了权限的，先找用户配置，无用户配置就用权限表的配置
+			int uc =jdbcTemplate.queryForObject("select count(*)uc from user_menus where userid=?",new Object[]{userid},Integer.class);
+			StringBuffer sql = new StringBuffer("select * from( select distinct m.moduleid,m.name,to_char(m.isleaf)isleaf,m.pid,");
+			sql.append("nvl(pos,'')pos,notnull,errmsg ");
+			if(uc==0){
+				sql.append(",m.dorder from (select pm.* from user_post u,post_module pm where u.postid=pm.postid and userid=?) p,modules m ");
+				sql.append(" where m.moduleid=p.moduleid and isleaf=1 order by m.dorder");
+			}else{
+				sql.append(",p.dorder from (select mid moduleid,dorder from user_menus where userid=?) p,modules m ");
+				sql.append(" where m.moduleid=p.moduleid and isleaf=1 order by p.dorder");
+			}
+			sql.append(") where rownum<=7");
+			menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{userid});
+		}
+		if(menus!=null&&menus.size()>0){
+			List jms = new ArrayList();
+			for(int i=0;i<menus.size();i++){
+				Map mm = (Map)menus.get(i);
+				String mid = (String)mm.get("moduleid");
+				Map jm = new HashMap();//上级
+				jm.put("id", mid);
+				jm.put("name", (String)mm.get("name"));
+				jm.put("notNull", StringUtils.isEmpty((String)mm.get("notnull"))?"":(String)mm.get("notnull"));
+				jm.put("errMsg", StringUtils.isEmpty((String)mm.get("errmsg"))?"":(String)mm.get("errmsg"));
+				jms.add(jm);
+			}
+			u.setMenus(jms);
+		}
+		//记录登录事件
+		jdbcTemplate.update("insert into user_log(id,userid,etime,eventtype)values(sq_user_log.nextval,?,sysdate,'login')",
+				new Object[]{userid});
+		return u;
+	}
+	
+	public List getUserMenus(String userid){
+		List jms = new ArrayList();
+		int cc =jdbcTemplate.queryForObject("select count(*)cc from user_post where userid=?",new Object[]{userid},Integer.class);
+		List menus = null;
+		//查找权限。如果用户还未分配、设置，使用默认权限。
 		StringBuffer sql = new StringBuffer("select distinct m.moduleid,m.name,to_char(m.isleaf)isleaf,m.pid,dorder,");
-		sql.append("nvl(pos,'')pos,to_char(decode(m.qybj,0,9,decode(p.moduleid,null,0,1)))status from ");
+		sql.append("nvl(pos,'')pos,to_char(decode(m.qybj,0,9,decode(p.moduleid,null,0,1)))state,notnull,errmsg from ");
 		if(cc==0){
 			String dfMenus = cg.getString("defaultMenus", "");
 			sql.append(" (select moduleid from modules where moduleid in('").append(dfMenus.replace(",", "','")).append("')) p,modules m ");
 			sql.append(" where m.moduleid=p.moduleid(+) order by dorder");
+			menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{});
+		}else{
+			sql.append(" (select pm.* from user_post u,post_module pm where u.postid=pm.postid and userid=?) p,modules m ");
+			sql.append(" where m.moduleid=p.moduleid(+) order by dorder");
+			menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{userid});
+		}
+		if(menus!=null&&menus.size()>0){
+			for(int i=0;i<menus.size();i++){
+				Map mm = (Map)menus.get(i);
+				if("1".equals(mm.get("isleaf"))){
+					continue;
+				}
+				String mid = (String)mm.get("moduleid");
+				Map jm = new HashMap();//上级
+				jm.put("id", mid);
+				jm.put("name", (String)mm.get("name"));
+				jm.put("pos", (String)mm.get("pos"));
+				List lmenus = new ArrayList();//下级
+				for(int j=0;j<menus.size();j++){
+					Map lmm = (Map)menus.get(j);
+					if(mid.equals((String)lmm.get("pid"))){
+						Map ljm = new HashMap();
+						ljm.put("id", (String)lmm.get("moduleid"));
+						ljm.put("name", (String)lmm.get("name"));
+						ljm.put("state", (String)lmm.get("state"));
+						ljm.put("notNull", StringUtils.isEmpty((String)lmm.get("notnull"))?"":(String)lmm.get("notnull"));
+						ljm.put("errMsg", StringUtils.isEmpty((String)lmm.get("errmsg"))?"":(String)lmm.get("errmsg"));
+						lmenus.add(ljm);
+					}
+				}
+				jm.put("list", lmenus);
+				jms.add(jm);
+			}
+		}
+		return jms;
+	}
+	
+	
+	public User testAuth(String userid){
+		User u = null;
+		StringBuffer usql = new StringBuffer("select userid,dingname,dinginfo,u.qybj,czfpbm,b.mc czfp from users u,");
+		usql.append("(select * from bm_cont where table_bm='BM_CZFP')b  where  u.czfpbm=b.bm(+) and u.userid=?");
+		List users = jdbcTemplate.queryForList(usql.toString(),new Object[]{userid});
+		u = new User();
+		Map mu =(Map)users.get(0);
+		u.setUserid((String)mu.get("userid"));
+		u.setDingname((String)mu.get("dingname"));
+		u.setDinginfo((String)mu.get("dinginfo"));
+		u.setCzfpbm((String)mu.get("czfpbm"));
+		u.setCzfp((String)mu.get("czfp"));
+		u.setQybj(((BigDecimal)mu.get("qybj")).intValue());
+		//查找岗位
+		usql = new StringBuffer("select userid,to_char(u.postid)postid,postname from user_post u,post p where userid=? and u.postid=p.postid");
+		List posts = jdbcTemplate.queryForList(usql.toString(),new Object[]{userid});
+		if(posts!=null&&posts.size()>0){
+			List postids = new ArrayList(),postnames = new ArrayList();
+			for(int i=0;i<posts.size();i++){
+				Map p = (Map)posts.get(i);
+				String pid = (String)p.get("postid");
+				String pname = (String)p.get("postname");
+				postids.add(pid);
+				postnames.add(pname);
+			}
+			String spids = StringUtils.join(postids, ",");
+			String spnames = StringUtils.join(postnames, ",");
+			u.setPostIds(spids);
+			u.setPostNames(spnames);
+		}
+		int cc =jdbcTemplate.queryForObject("select count(*)cc from user_post where userid=?",new Object[]{userid},Integer.class);
+		List menus = null;
+		//查找权限。如果用户还未分配、设置，使用默认权限。
+		StringBuffer sql = new StringBuffer("select distinct m.moduleid,m.name,to_char(m.isleaf)isleaf,m.pid,dorder,");
+		sql.append("nvl(pos,'')pos,to_char(decode(m.qybj,0,9,decode(p.moduleid,null,0,1)))state,notnull,errmsg from ");
+		if(cc==0){
+			String dfMenus = cg.getString("defaultMenus", "");
+			sql.append(" (select moduleid from modules where moduleid in('").append(dfMenus.replace(",", "','")).append("')) p,modules m ");
+			sql.append(" where m.moduleid=p.moduleid(+) order by dorder");
+			menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{});
 		}else{
 			sql.append(" (select pm.* from user_post u,post_module pm where u.postid=pm.postid and userid=?) p,modules m ");
 			sql.append(" where m.moduleid=p.moduleid(+) order by dorder");
@@ -413,7 +473,9 @@ public class AuthService {
 						Map ljm = new HashMap();
 						ljm.put("id", (String)lmm.get("moduleid"));
 						ljm.put("name", (String)lmm.get("name"));
-						ljm.put("status", (String)lmm.get("status"));
+						ljm.put("state", (String)lmm.get("state"));
+						ljm.put("notNull", StringUtils.isEmpty((String)lmm.get("notnull"))?"":(String)lmm.get("notnull"));
+						ljm.put("errMsg", StringUtils.isEmpty((String)lmm.get("errmsg"))?"":(String)lmm.get("errmsg"));
 						lmenus.add(ljm);
 					}
 				}

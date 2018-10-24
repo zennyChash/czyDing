@@ -18,14 +18,13 @@
 		<![CDATA[
 			{
 			#if($dzjk_month&&$dzjk_month.rows.size()>0)
-				"latestValidMonth":"$!{dzjk_maxnyr.rows[0].ny}",
+				"latestValidMonth":"$!{dzjk_month.rows[0].ny}",
 				"format":"Ym" 
 			#end
 			}
 		]]>
 		</jTemplate>
 		<vDs name="dzjk_month" refDtSrc="dzjk_month" fields="ny,yue">
-			<filter name = "nian" refParam="year" value="2018"/>
 			<orderBy name = "ny" dir="desc"/>
 		</vDs>
 	</joutput>
@@ -93,35 +92,33 @@
 		<![CDATA[
 			{
 			#if($dzjk_srjd&&$dzjk_srjd.rows.size()>0)
-				#set( $nc = 1.8 * $!{dzjk_srjd.rows[0].nlj_jk} ) 
-				#set( $sn = 0.15 * $!{dzjk_srjd.rows[0].nlj_jk} )
 				ggys:{
-					"nlj_jk":"$!{dzjk_srjd.rows[0].nlj_jk}",
+					"nlj_jk":"$!{dzjk_srjd.rows[0].nlj_jk_o}",
 					"wcjd":"$!{dzjk_srjd.rows[0].wcjd}",
-		        	"ysjh":"$!{nc}",
-					"snlj_jk":"$!{sn}",
+		        	"ysjh":"$!{dzjk_srjd.rows[0].jhs}",
+					"snlj_jk":"1626773780.55",
 					"tbzz":"12.74"
 				},
 				czzsr:{
-					"nlj_jk":"$!{dzjk_srjd.rows[0].nlj_jk}",
+					"nlj_jk":"$!{dzjk_srjd.rows[0].nlj_jk_o}",
 					"wcjd":"$!{dzjk_srjd.rows[0].wcjd}",
-		         	"ysjh":"$!{nc}",
-					"snlj_jk":"$!{sn}",
+		         	"ysjh":"$!{dzjk_srjd.rows[0].jhs}",
+					"snlj_jk":"1686773780.55",
 					"tbzz":"10.22"
 				}
 			#else
 				ggys:{
-					"nlj_jk":"290",
+					"nlj_jk":"1522906724.89",
 					"wcjd":"80",
-		        	"ysjh":"350",
-					"snlj_jk":"285",
+		        	"ysjh":"2350678938",
+					"snlj_jk":"1467845285.34",
 					"tbzz":"8"
 				},
 				czzsr:{
-					"nlj_jk":"290",
+					"nlj_jk":"1522906724.89",
 					"wcjd":"80",
-		         	"ysjh":"350",
-					"snlj_jk":"285",
+		        	"ysjh":"2350678938",
+					"snlj_jk":"1467845285.34",
 					"tbzz":"8"
 				}
 			#end
@@ -132,7 +129,7 @@
 		如果不设置refParam，就从请求中查找“参数名=filter的name”的参数值。
 		如果请求中未获得参数值，则用设计文件中的静态值，即filter中的value属性值；
 		排序字段也类似。-->
-		<vDs name="dzjk_srjd" refDtSrc="dzjk_srjd" fields="nlj_jk,wcjd">
+		<vDs name="dzjk_srjd" refDtSrc="dzjk_srjd" fields="nlj_jk_o,wcjd,jhs">
 			<filter name = "zwrq" value="20180430"/>
 		</vDs>
 		<vDs name="dzjk_srzb_jg" refDtSrc="dzjk_srzb_jg" fields="zwrq,jgdm_jk,jg,nlj,chartcolor,selected">
@@ -153,34 +150,34 @@
 			{
 				"ybggys_line":[{
 					"name":"2018",
-					"data":[234,23432,0,0,0,0,45465,56,5677,0,0,3345]
+					"data":[2349812781.12,2543225432.18,0,0,0,0,4546545465.56,3565612234,5677567712,0,0,4334543345]
 				},{
 					"name":"2017",
-					"data":[1234,5432,0,0,0,0,45465,56,5677,0,0,3345]
+					"data":[1234123412,3543235432,2899875671,0,0,2231212665,4546545465,5156112278,5677123456,4422331256,0,5533455334]
 				},{
 					"name":"2016",
-					"data":[2234,6432,0,0,0,0,53465,46,7077,6,0,985]
+					"data":[1022342234,2164322234,0,0,0,0,3312353465,4146121224,3707737077,1222344236,0,3985112356]
 				}],
 				"czzsr_line":[{
 					"name":"2018",
-					"data":[234,23432,0,0,0,0,45465,56,5677,0,0,3345]
+					"data":[3349812781.12,3543225432.18,0,0,0,0,5046545465.56,5565612234,4677567712,0,0,5334543345]
 				},{
 					"name":"2017",
-					"data":[1234,5432,0,0,0,0,45465,56,5677,0,0,3345]
+					"data":[1234123412,3543235432,2899875671,0,0,2231212665,4546545465,5156112278,5677123456,4422331256,0,5533455334]
 				},{
 					"name":"2016",
-					"data":[2234,6432,0,0,0,0,53465,46,7077,6,0,985]
+					"data":[1022342234,2164322234,0,0,0,0,3312353465,4146121224,3707737077,1222344236,0,3985112356]
 				}],
 				"dfczsr_line":[{
 					"name":"2018",
-					"data":[234,23432,0,0,0,0,45465,56,5677,0,0,3345]
+					"data":[2049812741.12,2443225432.18,0,0,0,0,3346545465.56,3265612234,4677567712,0,0,4034543345]
 				},{
 					"name":"2017",
-					"data":[1234,5432,0,0,0,0,45465,56,5677,0,0,3345]
+					"data":[1234123412,3543235432,2899875671,0,0,2231212665,4546545465,5156112278,5677123456,4422331256,0,5533455334]
 				},{
 					"name":"2016",
-					"data":[2234,6432,0,0,0,0,53465,46,7077,6,0,985]
-				}]
+					"data":[1022342234,2164322234,0,0,0,0,3312353465,4146121224,3707737077,1222344236,0,3985112356]
+				}],
 			}
 		]]>
 		</jTemplate>
@@ -192,8 +189,8 @@
 				"info":[
 				#if($dzjk_fsz&&$dzjk_fsz.rows.size()>0)
 					#foreach($row in $dzjk_fsz.rows)
-		   				{"szbm":"$!{row.szbm}","sz":"$!{row.sz}","bnlj":"$!{row.bnlj}",
-		   				"sntq":"$!{row.sntq}","tbzz":"$!{row.tbzz}","sszb":"$!{row.srzb}","class":"tax_$!{row.szbm}"
+		   				{"szbm":"$!{row.szbm}","sz":"$!{row.sz}","bnlj":"$!{row.bnlj_o}",
+		   				"sntq":"$!{row.sntq_o}","tbzz":"$!{row.tbzz}","sszb":"$!{row.srzb}","color":"$!{row.color}"
 		   				}#if($velocityCount != $dzjk_day.rows.size()),#end
 		   			#end
 		   		#end
@@ -201,8 +198,8 @@
 			}
 		]]>
 		</jTemplate>
-		<vDs name="dzjk_fsz" fields="zwrq,szbm,sz,bnlj,sntq,tbzz,srzb">
-			<filter name = "zwrq" value="20180430"/>
+		<vDs name="dzjk_fsz" fields="zwrq,szbm,sz,bnlj_o,sntq_o,tbzz,srzb,color">
+			<filter name = "zwrq" value="201804"/>
 			<orderBy name = "szbm" />
 		</vDs>
 	</joutput>
@@ -210,269 +207,270 @@
 		<jTemplate>
 		<![CDATA[
 			{
-				#if($xnjk_detail&&$xnjk_detail.rows.size()>0)
 				
-					"total_ybggys":{"name":"全市合计","bnlj":"$!{xnjk_detail.total}","sntq":127789,"tbzz":19.1},
-	 				"total_czzsr":{"name":"全市合计","bnlj":"$!{xnjk_detail.total}","sntq":176520,"tbzz":12.17},
-					"pie_ybggys":[
-						#foreach($row in $xnjk_detail.rows)
-							#set( $sntq = $!{row.ttax} - 2101 ) 
-		   					{"fpbm":"$!{row.czfpbm}","fp":"$!{row.czfp}","bnlj":"$!{row.ttax}","sntq":"$!{sntq}","tbzz":"16.7","sszb":18,"class":"xnjk_$!{row.czfpbm}"}
-		   					#if($velocityCount != $xnjk_detail.rows.size()),#end
-		   				#end
-		   			],
-					"pie_czzsr":[
-						#foreach($row in $xnjk_detail.rows)
-							#set( $sntq = $!{row.ttax} - 1200 ) 
-		   					{"fpbm":"$!{row.czfpbm}","fp":"$!{row.czfp}","bnlj":"$!{row.ttax}","sntq":"$!{sntq}","tbzz":"21.1","sszb":"28.1","class":"xnjk_$!{row.czfpbm}"}
-		   					#if($velocityCount != $xnjk_detail.rows.size()),#end
-		   				#end
-					]
-				#else
-					"total_ybggys":{"name":"全市合计","bnlj":"152200","sntq":"127789","tbzz":"19.1"},
-	 				"total_czzsr":{"name":"全市合计","bnlj":"198000","sntq":"176520","tbzz":"12.17"},
+					"total_ybggys":{"fpbm":"ALL_00","fp":"全市合计","yss":"626551371","zxjd":"38","zxs":"152200129","sntq":"127789331","tbzz":"19.1"},
+	 				"total_czzsr":{"fpbm":"ALL_00","fp":"全市合计","yss":"686551373","zxjd":"36","zxs":"198000129","sntq":"176520112","tbzz":"12.17"},
 					"pie_ybggys":[
 					{
 						"fpbm":"0101",
 						"fp":"上城区",
-						"bnlj":"28025",
-						"sntq":"25622",
+						"yss":"38655137",
+						"zxjd":"35",
+						"zxs":"20025131",
+						"sntq":"19622232",
 						"tbzz":"8.44",
 			            "sszb":"18",
-						"class":"tax_0101"
+						"color":"#3BB1EF"
 					},{
 						"fpbm":"0102",
 						"fp":"西湖区",
-						"bnlj":23544,  
-						"sntq":20126, 
-						"tbzz":15.14 
+						"yss":"38655137",
+						"zxjd":"32",
+						"zxs":23544221,  
+						"sntq":20126331, 
+						"tbzz":15.14,
 						"sszb":16,
-						"class":"tax_0102"  
+						"color":"#2885FF"  
 					},{
 						"fpbm":"0103",
 						"fp":"拱墅区",
-						"bnlj":22088,  
-						"sntq":19088, 
-						"tbzz":17.64 
+						"yss":"32655137",
+						"zxjd":"45",
+						"zxs":22088134,  
+						"sntq":19083338, 
+						"tbzz":17.64,
 						"sszb":14,
-						"class":"tax_0103"  
+						"color":"#827DFF"  
 					},{
 						"fpbm":"0104",
 						"fp":"江干区",
-						"bnlj":26488,  
-						"sntq":22426, 
-						"tbzz":20.1 
+						"yss":"42655137",
+						"zxjd":"26.5",
+						"zxs":24264881,  
+						"sntq":23322426, 
+						"tbzz":20.1, 
 						"sszb":16,
-						"class":"tax_0104"  
+						"color":"#AF88F4"  
 					},{
 						"fpbm":"0105",
 						"fp":"滨江区",
-						"bnlj":32844,  
-						"sntq":30426, 
-						"tbzz":8.88 
+						"yss":"41655137",
+						"zxjd":"25",
+						"zxs":132844212,  
+						"sntq":130422226, 
+						"tbzz":8.88, 
 						"sszb":21,
-						"class":"tax_0105"  
+						"color":"#DE53FF"  
 					},{
 						"fpbm":"0106",
 						"fp":"下城区",
-						"bnlj":22889,  
-						"sntq":20426, 
-						"tbzz":10.22 
+						"yss":"38655137",
+						"zxjd":"35",
+						"zxs":32222889,  
+						"sntq":31204261, 
+						"tbzz":10.22, 
 						"sszb":15,
-						"class":"tax_0106"  
+						"color":"#FF7EFA"  
 					}],
 					"pie_czzsr":[
 					{
 						"fpbm":"0101",
 						"fp":"上城区",
-						"bnlj":28025,
-						"sntq":25622,
+						"yss":"66655137",
+						"zxjd":"32",
+						"zxs":42280255,
+						"sntq":40325622,
 						"tbzz":8.44,
 			            "sszb":18,
-						"class":"tax_0101"
+						"color":"#3BB1EF"
 					},{
 						"fpbm":"0102",
 						"fp":"西湖区",
-						"bnlj":26578,  
-						"sntq":23012, 
-						"tbzz":12.66 
+						"yss":"78655137",
+						"zxjd":"35",
+						"zxs":35112658,  
+						"sntq":35230122, 
+						"tbzz":12.66, 
 						"sszb":16,
-						"class":"tax_0102"  
+						"color":"#2885FF"  
 					},{
 						"fpbm":"0103",
 						"fp":"拱墅区",
-						"bnlj":27197,  
-						"sntq":21332, 
-						"tbzz":25.04 
+						"yss":"58655137",
+						"zxjd":"55",
+						"zxs":42719711,  
+						"sntq":42133244, 
+						"tbzz":25.04, 
 						"sszb":14,
-						"class":"tax_0103"  
+						"color":"#827DFF"  
 					},{
 						"fpbm":"0104",
 						"fp":"江干区",
-						"bnlj":28456,  
-						"sntq":23426, 
-						"tbzz":24.1 
+						"yss":"68655137",
+						"zxjd":"62",
+						"zxs":42845216,  
+						"sntq":42342216, 
+						"tbzz":24.1, 
 						"sszb":16,
-						"class":"tax_0104"  
+						"color":"#AF88F4"  
 					},{
 						"fpbm":"0105",
 						"fp":"滨江区",
-						"bnlj":35844,  
-						"sntq":32426, 
-						"tbzz":10.18 
+						"yss":"88655137",
+						"zxjd":"68",
+						"zxs":63584224,  
+						"sntq":61324262, 
+						"tbzz":10.18, 
 						"sszb":21,
-						"class":"tax_0105"  
+						"color":"#DE53FF"  
 					},{
 						"fpbm":"0106",
 						"fp":"下城区",
-						"bnlj":24909,  
-						"sntq":21426, 
-						"tbzz":15.12 
+						"yss":"68655137",
+						"zxjd":"35",
+						"zxs":41249039,  
+						"sntq":40214246, 
+						"tbzz":15.12, 
 						"sszb":15,
-						"class":"tax_0106"  
+						"color":"#FF7EFA"  
 					}]
-				#end
 			}
 		]]>
 		</jTemplate>
-		<vDs name="xnjk_detail" paging="true" fields="czfpbm,czfp,ttax,sszb,xncolor">
-			<filter name = "ny" value="201803"/>
-			<orderBy name = "czfpbm" dir="asc"/>
-		</vDs>
 	</joutput>
 	<joutput id="dzjk_zcyb" name="支出月报" description=""> 
 		<jTemplate>
 		<![CDATA[
 			{
-				#if($xnjk_detail&&$xnjk_detail.rows.size()>0)
-				
-					"total_ybggys":{"name":"全市合计","bnlj":"$!{xnjk_detail.total}","sntq":127789,”tbzz”:19.1},
-	 				"total_czzsr":{"name":"全市合计","bnlj":"$!{xnjk_detail.total}","sntq":176520,”tbzz”:12.17},
-					"pie_ybggys":[
-						#foreach($row in $xnjk_detail.rows)
-							#set( $sntq = $!{row.ttax} - 2101 ) 
-		   					{"fpbm":"$!{row.czfpbm}","fp":"$!{row.czfp}","bnlj":"$!{row.ttax}","sntq":"$!{sntq}","tbzz":"16.7","sszb":18,"class":"xnjk_$!{row.czfpbm}"}
-		   					#if($velocityCount != $xnjk_detail.rows.size()),#end
-		   				#end
-		   			],
-					"pie_czzsr":[
-						#foreach($row in $xnjk_detail.rows)
-							#set( $sntq = $!{row.ttax} - 1200 ) 
-		   					{"fpbm":"$!{row.czfpbm}","fp":"$!{row.czfp}","bnlj":"$!{row.ttax}","sntq":"$!{sntq}","tbzz":"21.1","sszb":"28.1","class":"xnjk_$!{row.czfpbm}"}
-		   					#if($velocityCount != $xnjk_detail.rows.size()),#end
-		   				#end
-					]
-				#else
-					"total_ybggys":{"name":"全市合计","bnlj":"152200","sntq":"127789","tbzz":"19.1"},
-	 				"total_czzsr":{"name":"全市合计","bnlj":"198000","sntq":"176520","tbzz":"12.17"},
+					"total_ybggys":{"fpbm":"ALL_00","fp":"全市合计","yss":"626551371","zxjd":"32","zxs":"252200112","sntq":"227789323","tbzz":"19.1"},
+	 				"total_czzsr":{"fpbm":"ALL_00","fp":"全市合计","yss":"686675688","zxjd":"47","zxs":"348000112","sntq":"276520121","tbzz":"12.17"},
 					"pie_ybggys":[
 					{
 						"fpbm":"0101",
 						"fp":"上城区",
-						"bnlj":"28025",
-						"sntq":"25622",
+						"yss":"68655137",
+						"zxjd":"35",
+						"zxs":"28025131",
+						"sntq":"25622232",
 						"tbzz":"8.44",
 			            "sszb":"18",
-						"class":"tax_0101"
+						"color":"#3BB1EF"
 					},{
 						"fpbm":"0102",
 						"fp":"西湖区",
-						"bnlj":23544,  
-						"sntq":20126, 
-						"tbzz":15.14 
+						"yss":"62655137",
+						"zxjd":"32",
+						"zxs":23544221,  
+						"sntq":20126331, 
+						"tbzz":15.14, 
 						"sszb":16,
-						"class":"tax_0102"  
+						"color":"#2885FF"  
 					},{
 						"fpbm":"0103",
 						"fp":"拱墅区",
-						"bnlj":22088,  
-						"sntq":19088, 
-						"tbzz":17.64 
+						"yss":"78655137",
+						"zxjd":"35",
+						"zxs":32088134,  
+						"sntq":29083338, 
+						"tbzz":17.64,
 						"sszb":14,
-						"class":"tax_0103"  
+						"color":"#827DFF"  
 					},{
 						"fpbm":"0104",
 						"fp":"江干区",
-						"bnlj":26488,  
-						"sntq":22426, 
-						"tbzz":20.1 
+						"yss":"68655137",
+						"zxjd":"32",
+						"zxs":24264881,  
+						"sntq":23322426, 
+						"tbzz":20.1, 
 						"sszb":16,
-						"class":"tax_0104"  
+						"color":"#AF88F4"  
 					},{
 						"fpbm":"0105",
 						"fp":"滨江区",
-						"bnlj":32844,  
-						"sntq":30426, 
-						"tbzz":8.88 
+						"yss":"48655137",
+						"zxjd":"29",
+						"zxs":132844212,  
+						"sntq":130422226, 
+						"tbzz":8.88, 
 						"sszb":21,
-						"class":"tax_0105"  
+						"color":"#DE53FF"  
 					},{
 						"fpbm":"0106",
 						"fp":"下城区",
-						"bnlj":22889,  
-						"sntq":20426, 
-						"tbzz":10.22 
+						"yss":"58655137",
+						"zxjd":"61",
+						"zxs":32222889,  
+						"sntq":31204261, 
+						"tbzz":10.22, 
 						"sszb":15,
-						"class":"tax_0106"  
+						"color":"#FF7EFA"  
 					}],
 					"pie_czzsr":[
 					{
 						"fpbm":"0101",
 						"fp":"上城区",
-						"bnlj":28025,
-						"sntq":25622,
+						"yss":"88655137",
+						"zxjd":"59",
+						"zxs":52280255,
+						"sntq":55325622,
 						"tbzz":8.44,
 			            "sszb":18,
-						"class":"tax_0101"
+						"color":"#3BB1EF"
 					},{
 						"fpbm":"0102",
 						"fp":"西湖区",
-						"bnlj":26578,  
-						"sntq":23012, 
-						"tbzz":12.66 
+						"yss":"88655137",
+						"zxjd":"52",
+						"zxs":45112658,  
+						"sntq":45230122, 
+						"tbzz":12.66, 
 						"sszb":16,
-						"class":"tax_0102"  
+						"color":"#2885FF"  
 					},{
 						"fpbm":"0103",
 						"fp":"拱墅区",
-						"bnlj":27197,  
-						"sntq":21332, 
-						"tbzz":25.04 
+						"yss":"68655137",
+						"zxjd":"53",
+						"zxs":42719711,  
+						"sntq":42133244, 
+						"tbzz":25.04, 
 						"sszb":14,
-						"class":"tax_0103"  
+						"color":"#827DFF"  
 					},{
 						"fpbm":"0104",
 						"fp":"江干区",
-						"bnlj":28456,  
-						"sntq":23426, 
-						"tbzz":24.1 
+						"yss":"78655137",
+						"zxjd":"32",
+						"zxs":27845216,  
+						"sntq":22342216, 
+						"tbzz":24.1,
 						"sszb":16,
-						"class":"tax_0104"  
+						"color":"#AF88F4"  
 					},{
 						"fpbm":"0105",
 						"fp":"滨江区",
-						"bnlj":35844,  
-						"sntq":32426, 
-						"tbzz":10.18 
+						"yss":"88655137",
+						"zxjd":"56",
+						"zxs":43584224,  
+						"sntq":41324262, 
+						"tbzz":10.18, 
 						"sszb":21,
-						"class":"tax_0105"  
+						"color":"#DE53FF"  
 					},{
 						"fpbm":"0106",
 						"fp":"下城区",
-						"bnlj":24909,  
-						"sntq":21426, 
-						"tbzz":15.12 
+						"yss":"98655137",
+						"zxjd":"48",
+						"zxs":43249039,  
+						"sntq":40214246, 
+						"tbzz":15.12, 
 						"sszb":15,
-						"class":"tax_0106"  
+						"color":"#FF7EFA"  
 					}]
-				#end
 			}
 		]]>
 		</jTemplate>
-		<vDs name="xnjk_detail" paging="true" fields="czfpbm,czfp,ttax,sszb,xncolor">
-			<filter name = "ny" value="201803"/>
-			<orderBy name = "czfpbm" dir="asc"/>
-		</vDs>
 	</joutput>
 </pages>
 

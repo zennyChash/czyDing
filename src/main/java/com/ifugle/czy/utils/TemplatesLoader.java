@@ -15,18 +15,22 @@ import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.collections.ComparatorUtils;
 import org.apache.commons.collections.comparators.ComparableComparator;
 import org.apache.commons.collections.comparators.ComparatorChain;
+import org.apache.commons.lang3.StringUtils;
 
 import com.ifugle.czy.utils.bean.template.DataSrc;
 import com.ifugle.czy.utils.bean.template.JOutput;
+import com.ifugle.czy.router.bean.AppService;
 import com.ifugle.utils.Configuration;
 
 public class TemplatesLoader {
+	private static TemplatesLoader tLoader;
 	private static Map dataSrcMap;
 	private static List dataSrcTemplates;
-	private static TemplatesLoader tLoader;
 	private static Map JSONOutputMap;
-
 	private static List JSONOutputTemplates;
+	private static Map apiRoutersMap;
+	private static List apiRouters;
+	
 	private TemplatesLoader(){};
 	/**
 	 * 获取模板加载器的实例。
@@ -71,7 +75,14 @@ public class TemplatesLoader {
 		JSONOutputTemplates = new ArrayList();
 		loadTemplatesFromFile("JSONOutput",JSONOutputTemplates,JSONOutputMap);
 	}
-	
+	public void loadApiRouters() {
+		apiRoutersMap=new HashMap();
+		apiRouters = new ArrayList();
+		loadTemplatesFromFile("apiRouters",apiRouters,apiRoutersMap);
+	}
+	public void refreshApiRouters(){
+		loadApiRouters();
+	}
 	
 	public void loadTemplatesFromFile(String tmpType,List tslst,Map tsmap){
 		String path=Configuration.getConfig().getString(tmpType+"TemplatesPath", "");
@@ -125,9 +136,15 @@ public class TemplatesLoader {
 						}catch(Exception e){
 							System.out.println();
 						}
-					}else{
+					}else if("JSONOutput".equals(tmpType)){
 						try{
 							loadJSONOutputTemplate(tInfo,tslst,tsmap,fname);
+						}catch(Exception e){
+							System.out.println();
+						}
+					}else if("apiRouters".equals(tmpType)){
+						try{
+							loadApiRouters(tInfo,tslst,tsmap,fname);
 						}catch(Exception e){
 							System.out.println();
 						}
@@ -171,6 +188,11 @@ public class TemplatesLoader {
 		JOutputParser parser=JOutputParser.getParser();
 		parser.parseTemplateToJOutput(tInfo,tslst,tsmap, fileName);
 	}
+	private void loadApiRouters(String tInfo,List tslst,Map tsmap,String fileName) {
+		ApiRouterParser parser=ApiRouterParser.getParser();
+		parser.parseTemplateToApiRouter(tInfo,tslst,tsmap, fileName);
+	}
+	
 	public JOutput getJOutput(String jpID){
 		if(jpID==null||"".equals(jpID))
 			return null;
@@ -225,7 +247,33 @@ public class TemplatesLoader {
 		}
 		return dataSrcTemplates;
 	}
-	
+	public AppService getApiRouter(String id){
+		if(StringUtils.isEmpty(id))
+			return null;
+		if(apiRoutersMap==null){
+			apiRoutersMap=new HashMap();
+			apiRouters = new ArrayList();
+			loadTemplatesFromFile("apiRouters",apiRouters,apiRoutersMap);
+		}
+		AppService appsvr=(AppService)dataSrcMap.get(id);
+		return appsvr;
+	}
+	public Map getApiRouterMap() {
+		if(apiRoutersMap==null){
+			apiRoutersMap=new HashMap();
+			apiRouters = new ArrayList();
+			loadTemplatesFromFile("apiRouters",apiRouters,apiRoutersMap);
+		}
+		return apiRoutersMap;
+	}
+	public List getApiRouters() {
+		if(apiRouters==null){
+			apiRoutersMap=new HashMap();
+			apiRouters = new ArrayList();
+			loadTemplatesFromFile("apiRouters",apiRouters,apiRoutersMap);
+		}
+		return apiRouters;
+	}
 	//获取指定目录下的设计文件，递归
 	@SuppressWarnings("unchecked")
 	private void getAllFilesPath(File dir,List paths)throws Exception{
