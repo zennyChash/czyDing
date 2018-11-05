@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task id="sp_extract" name="抽取审批状态" description="" >	
+	<!--inBatches：是否分批取。limit：每次取数的记录数-->
+	<extract inBatches="1" limit="100" connectionId="czfc" extractBy ="sql">
+		<sql>
+		<![CDATA[
+			select id,lid,userid,tel,ceil(dbms_random.value(1,200))||msg msg from sp_ding_state where state=0
+		]]>
+		</sql>
+		<save rootDir="c:/extract/{exeDate}" deleteDuplicate="true" rowsPerFile="200" encode="GBK" colSeparator= "|"/>
+		<saveColumns>
+			<col source="ID"/>
+			<col source="LID"/>
+			<col source="USERID"/>
+			<col source="TEL"/>
+			<col source="MSG"/>
+		</saveColumns>
+	</extract>
+</task>
+

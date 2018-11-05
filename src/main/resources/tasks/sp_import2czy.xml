@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task id="czySpStateimport" name="导入" description="" type="1">	
+	<import connectionId="czy" destTable="SP_MSG_STATE">
+		<!--支持文件源xml,excel,txt,默认格式为txt。-->
+		<sourceFile rootDir="c:/extract/{exeDate}" encode="GBK" colSeparator="|" format="txt"/>
+		<importColumns>
+			<col source="ID" dest="ID"/>
+			<col source="LID"/>
+			<col source="USERID"/>
+			<col source="TEL"/>
+			<col source="MSG"/>
+		</importColumns>	
+	</import>
+</task>
+

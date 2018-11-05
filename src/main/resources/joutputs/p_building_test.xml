@@ -19,10 +19,13 @@
 		<jTemplate>
 		<![CDATA[
 			{
+				
 				#if($bd_year&&$bd_year.rows.size()>0)
 				"options":[
 					#foreach($row in $bd_year.rows)
-	   					{"bm":"$!{row.nian}","name":"$!{row.nian}"}#if($velocityCount != $bd_year.rows.size()),#end
+						#set($Double = 0.0)
+						#set( $t = $Double.parseDouble($!{row.nian}) + 666.89 ) 
+	   					{"ddd":"$t","bm":"$!{row.nian}","name":"$!{row.nian}"}#if($velocityCount != $bd_year.rows.size()),#end
 	   				#end
 				],
 				"defaultOp":"$!{bd_year.rows[0].nian}"

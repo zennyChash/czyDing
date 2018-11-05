@@ -74,6 +74,9 @@
 	<listener> 
 		<listener-class>com.ifugle.utils.InitTemplatesListener</listener-class> 
 	</listener>
+	<listener> 
+		<listener-class>com.ifugle.etl.utils.InitTemplatesListener</listener-class> 
+	</listener>
 	<servlet>
         <servlet-name>dispatcher</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>

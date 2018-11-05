@@ -23,6 +23,7 @@ import com.dingtalk.open.client.api.model.corp.JsapiTicket;
 import com.dingtalk.open.client.api.service.corp.CorpConnectionService;
 import com.dingtalk.open.client.api.service.corp.CorpUserService;
 import com.dingtalk.open.client.api.service.corp.JsapiService;
+import com.ifugle.czy.utils.DingHelper;
 import com.ifugle.czy.utils.bean.User;
 import com.ifugle.utils.Configuration;
 
@@ -48,8 +49,6 @@ public class AuthService {
 //	public static final String TICKET_URL = "https://oapi.dingtalk.com/get_jsapi_ticket";
 //	public static final String USER_INFO_URL = "https://oapi.dingtalk.com/user/getuserinfo";
 	
- // 调整到1小时50分钟
-    public static final long cacheTime = 1000 * 60 * 55 * 2;
     /**
      * 计算当前请求的jsapi的签名数据<br/>
      * <p>
@@ -80,13 +79,13 @@ public class AuthService {
         String ticket = null;
         String signature = null;
         //2018-08-20 如果一个后台处理来自多个微应用，根据ip对应配置的agentid
-        String ip = getIpAdrress(request);
-        log.info("请求来自IP："+ip);
-        String agentid = cg.getString("AGENT_ID_"+ip, "163161139");
+        //String ip = getIpAdrress(request);
+        //log.info("请求来自IP："+ip);
+        String agentid = cg.getString("AGENT_ID", "163161139");
         try {
-            accessToken = getAccessToken();
-            ticket = getJsapiTicket(accessToken);
-            signature = sign(ticket, nonceStr, timeStamp, signedUrl);
+            accessToken = DingHelper.getAccessToken();
+            ticket = DingHelper.getJsapiTicket(accessToken);
+            signature =DingHelper.sign(ticket, nonceStr, timeStamp, signedUrl);
         } catch (OgnlException e) {
             e.printStackTrace();
             return config;
@@ -135,86 +134,8 @@ public class AuthService {
         }
         return XFor;
     }
-    /**
-     * 获取JSTicket, 用于js的签名计算
-     * 正常的情况下，jsapi_ticket的有效期为7200秒，所以开发者需要在某个地方设计一个定时器，定期去更新jsapi_ticket
-     */
-    public String getJsapiTicket(String accessToken) throws OgnlException {
-        //JSONObject jsTicketValue = (JSONObject) FileUtils.getValue("jsticket", CORP_ID);
-        long curTime = System.currentTimeMillis();
-        String jsTicket = "";
-
-        //if (jsTicketValue == null || curTime -jsTicketValue.getLong("begin_time") >= cacheTime) {
-            ServiceFactory serviceFactory;
-            try {
-                serviceFactory = ServiceFactory.getInstance();
-                JsapiService jsapiService = serviceFactory.getOpenService(JsapiService.class);
-
-                JsapiTicket JsapiTicket = jsapiService.getJsapiTicket(accessToken, "jsapi");
-                jsTicket = JsapiTicket.getTicket();
-
-                JSONObject jsonTicket = new JSONObject();
-                JSONObject jsontemp = new JSONObject();
-                jsontemp.clear();
-                jsontemp.put("ticket", jsTicket);
-                jsontemp.put("begin_time", curTime);
-                jsonTicket.put(Configuration.getConfig().getString("CORP_ID"), jsontemp);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return jsTicket;
-        //} else {
-            //return jsTicketValue.getString("ticket");
-        //}
-    }
-    public String sign(String ticket, String nonceStr, long timeStamp, String url) {
-        String s = "";
-    	try {
-            s = DingTalkJsApiSingnature.getJsApiSingnature(url, nonceStr, timeStamp, ticket);
-        } catch (Exception ex) {
-        }
-    	return s;
-    }
-    /*
-     * 在此方法中，为了避免频繁获取access_token，
-     * 在距离上一次获取access_token时间在两个小时之内的情况，
-     * 将直接从持久化存储中读取access_token
-     *
-     * 因为access_token和jsapi_ticket的过期时间都是7200秒
-     * 所以在获取access_token的同时也去获取了jsapi_ticket
-     * 注：jsapi_ticket是在前端页面JSAPI做权限验证配置的时候需要使用的
-     * 具体信息请查看开发者文档--权限验证配置
-     */
-    public String getAccessToken(){
-        long curTime = System.currentTimeMillis();
-        String accToken = "";
-        JSONObject jsontemp = new JSONObject();
-        String corp_id = Configuration.getConfig().getString("CORP_ID");
-        String corp_secret = Configuration.getConfig().getString("CORP_SECRET");
-        //如果有缓存的access_token,可以取出来用。
-        //JSONObject accessTokenValue = (JSONObject) FileUtils.getValue("accesstoken", CORP_ID);
-        //if (accessTokenValue == null || curTime - accessTokenValue.getLong("begin_time") >= cacheTime) {
-            try {
-                ServiceFactory serviceFactory = ServiceFactory.getInstance();
-                CorpConnectionService corpConnectionService = serviceFactory.getOpenService(CorpConnectionService.class);
-                accToken = corpConnectionService.getCorpToken(corp_id, corp_secret);
-                // save accessToken
-                JSONObject jsonAccess = new JSONObject();
-                jsontemp.clear();
-                jsontemp.put("access_token", accToken);
-                jsontemp.put("begin_time", curTime);
-                jsonAccess.put(corp_id, jsontemp);
-                //真实项目中最好保存到数据库中
-            } catch (Exception e) {
-                e.printStackTrace();
-                return "";
-            }
-        //} else {
-           // return accessTokenValue.getString("access_token");
-        //}
-
-        return accToken;
-    }
+    
+    
     //获取具体的成员信息
     public CorpUserDetail getUser(String accessToken, String userid) throws Exception {
         CorpUserService corpUserService = ServiceFactory.getInstance().getOpenService(CorpUserService.class);

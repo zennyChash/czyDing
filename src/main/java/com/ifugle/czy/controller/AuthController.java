@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ifugle.czy.service.AuthService;
 import com.ifugle.czy.utils.bean.User;
+import com.ifugle.czy.utils.DingHelper;
 import com.ifugle.czy.utils.JResponse;
 import com.ifugle.utils.Configuration;
 
@@ -53,7 +54,7 @@ public class AuthController {
 		JResponse jr = new JResponse();
 		System.out.println("传入的code:"+code);
 		System.out.println("传入的corpID:"+corpid);
-		String accessToken = authService.getAccessToken();
+		String accessToken = DingHelper.getAccessToken();
 		User user = authService.getUserCzyConfig(accessToken,code);
 		if(user!=null){
 			RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
@@ -86,7 +87,7 @@ public class AuthController {
 		JResponse jr = new JResponse();
 		System.out.println("传入的code:"+code);
 		System.out.println("传入的corpID:"+corpid);
-		String accessToken = authService.getAccessToken();
+		String accessToken = DingHelper.getAccessToken();
 		User user = authService.getUserCzyConfig(accessToken,code);
 		if(user!=null){
 			RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();

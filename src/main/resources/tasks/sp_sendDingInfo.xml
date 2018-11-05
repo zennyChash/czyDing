@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task id="sendDingInfo" name="发送钉消息" description="" type="httpRequest">	
+	<request mode="asyn" method="POST" uri="http://localhost:8080/czy/api/sendCzfcCheckMsgAuto" socketTimeout="20000" connTimeout="20000" before="">
+		<props>
+			<prop name="Content-Type" value="application/json;charset=UTF-8"/>
+		</props>
+		<response before=""/>
+	</request>
+</task>
+

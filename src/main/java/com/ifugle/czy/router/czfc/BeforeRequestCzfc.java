@@ -47,7 +47,9 @@ public class BeforeRequestCzfc implements IBeforeRequest{
 				String sql = "select userid from usermapping where servicename=? and dingid=?";
 				String czfcUserid = jdbcTemplate.queryForObject(sql,new Object[]{serviceName,userid}, String.class);
 				jparams.put("userid", czfcUserid);
-			}catch(Exception e){}
+			}catch(Exception e){
+				System.out.println(e.toString());
+			}
 		}
 		result[1]=jparams.toJSONString();
 		return result;

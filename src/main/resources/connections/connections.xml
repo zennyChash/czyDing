@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--连接，源、目标。目前支持数据库作为源和目标。今后可以扩展，比如源是httpclient请求获取的数据-->
+<connections>
+	<connection>
+		<id>czfc</id>
+		<name>测试取数连接</name>
+		<description>测试一下，取数连接</description>
+		<type>0</type>
+		<charset>GBK</charset>
+		<driver_class>oracle.jdbc.driver.OracleDriver</driver_class>
+		<conurl>jdbc:oracle:thin:@127.0.0.1:1521:orcl</conurl>
+		<username>czfc</username>
+		<password>dn1203</password>
+		<maxWait>10000</maxWait>
+		<initialSize>1</initialSize>
+		<maxIdle>10</maxIdle>
+		<minIdle>1</minIdle>
+		<maxActive>5</maxActive>
+		<removeAbandoned>true</removeAbandoned>
+		<removeAbandonedTimeout>600</removeAbandonedTimeout>
+	</connection>
+	<connection>
+		<id>czy</id>
+		<name>财智云连接</name>
+		<description>测试一下</description>
+		<charset>GBK</charset>
+		<driver_class>oracle.jdbc.driver.OracleDriver</driver_class>
+		<conurl>jdbc:oracle:thin:@127.0.0.1:1521:orcl</conurl>
+		<username>czy</username>
+		<password>dn1203</password>
+		<maxWait>10000</maxWait>
+		<initialSize>1</initialSize>
+		<maxIdle>10</maxIdle>
+		<minIdle>1</minIdle>
+		<maxActive>5</maxActive>
+		<removeAbandoned>true</removeAbandoned>
+		<removeAbandonedTimeout>600</removeAbandonedTimeout>
+	</connection>
+</connections>

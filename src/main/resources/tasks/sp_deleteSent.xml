@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task id="deleteSent" name="删除已发送的记录" description="" type="execute">	
+	<execute connectionId="czy" executeType="sql">
+		<sql>
+		<![CDATA[
+			delete from sp_msg_state 
+		]]>
+		</sql>
+	</execute>
+</task>
+

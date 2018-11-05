@@ -273,7 +273,7 @@ public class ReportDataService {
 			for(int i=0;i<menus.size();i++){
 				JSONObject menu = menus.getJSONObject(i);
 				String mid = menu.getString("id");
-				jdbcTemplate.update("insert into user_menus(userid,mid,stime)values(?,?,sysdate)",new Object[]{userid,mid});
+				jdbcTemplate.update("insert into user_menus(userid,mid,stime,dorder)values(?,?,sysdate,?)",new Object[]{userid,mid,i+1});
 			}
 		}
 		//记录调序事件

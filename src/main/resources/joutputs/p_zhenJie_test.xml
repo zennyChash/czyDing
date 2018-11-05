@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pages>
+	<joutput id="zjcx_qyxx" name="单户查询——企业税收信息"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($en_tax&&$en_tax.rows.size()>0)
+				"swdjzh":"$!{en_tax.rows[0].swdjzh}",
+				"mc":"$!{en_tax.rows[0].mc}",
+				"czfp":"$!{en_tax.rows[0].czfp}",
+				"ssgx":"$!{en_tax.rows[0].zsebn}",
+				"dz":"$!{en_tax.rows[0].dz}",
+				"hy":"$!{en_tax.rows[0].hy}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="en_tax" refDtSrc="zjsr_qyxx" fields="swdjzh,mc,dz,hy,czfp,zsebn">
+			<filter name = "swdjzh" value="91330108742940165J"/>
+			<filter name = "ny" value="201806"/>
+		</vDs>
+	</joutput>
 	<joutput id="zjsrtj_df_ny" name="最大日期" description=""> 
 		<jTemplate>
 		<![CDATA[
@@ -12,7 +32,7 @@
 		]]>
 		</jTemplate>
 		<vDs name="zj_maxny" refDtSrc="zjsrtj_maxny" fields="ny">
-			<filter name = "czfpbm" value="330604201"/>
+			<filter name = "czfpbm" value="330108095"/>
 		</vDs>
 	</joutput>
 	<joutput id="zjsrtj_year" name="有数据的年" description=""> 
@@ -31,7 +51,7 @@
 		]]>
 		</jTemplate>
 		<vDs name="zj_year" refDtSrc="zjsrtj_year" fields="nian">
-			<filter name = "czfpbm" value="330604201"/>
+			<filter name = "czfpbm" value="330108095"/>
 			<orderBy name = "nian" dir="desc"/>
 		</vDs>
 	</joutput>
@@ -51,7 +71,7 @@
 		]]>
 		</jTemplate>
 		<vDs name="zjsrtj_month" fields="ny,yue">
-			<filter name = "czfpbm" value="330604201"/>
+			<filter name = "czfpbm" value="330108095"/>
 			<filter name = "nian" refParam="year" value="2018"/>
 			<orderBy name = "ny" dir="desc"/>
 		</vDs>
@@ -82,12 +102,12 @@
 		]]>
 		</jTemplate>
 		<vDs name="zjsr_basic" fields="czfpbm,czfp,bnlj,sntq,tbzz">
-			<filter name = "czfpbm" value="330604201"/>
-			<filter name = "ny" value="201803"/>
+			<filter name = "czfpbm" value="330108095"/>
+			<filter name = "ny" value="201807"/>
 		</vDs>
 		<vDs name="zjsr_details" paging="true" fields="ny,czfpbm,swdjzh,mc,bnlj,pm">
-			<filter name = "czfpbm" value="330604201"/>
-			<filter name = "ny" value="201803"/>
+			<filter name = "czfpbm" value="3330108095"/>
+			<filter name = "ny" value="201807"/>
 			<orderBy name = "pm" dataType="integer" dir="asc"/>
 		</vDs>
 	</joutput>

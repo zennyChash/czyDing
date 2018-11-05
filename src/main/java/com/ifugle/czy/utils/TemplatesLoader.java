@@ -255,7 +255,7 @@ public class TemplatesLoader {
 			apiRouters = new ArrayList();
 			loadTemplatesFromFile("apiRouters",apiRouters,apiRoutersMap);
 		}
-		AppService appsvr=(AppService)dataSrcMap.get(id);
+		AppService appsvr=(AppService)apiRoutersMap.get(id);
 		return appsvr;
 	}
 	public Map getApiRouterMap() {

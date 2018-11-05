@@ -113,7 +113,7 @@ public class ESQueryDataService {
         //先把外部请求参数也放到velocity中
         for (Map.Entry entry : params.entrySet()) {  
 		   String key = (String)entry.getKey();  
-		   context.put(key, entry.getValue());
+		   context.put(key, (String)entry.getValue());
 		}  
 		List vds = jp.getValuedDs();
 		if(vds!=null){

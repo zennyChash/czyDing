@@ -43,7 +43,7 @@ public class ApiRouterParser {
 				    svr.setId(snode.attributeValue("id").toLowerCase());
 				    svr.setName(snode.attributeValue("name"));
 				    svr.setDesc(snode.attributeValue("description"));
-				    svr.setRootURI(snode.elementText("rootURI"));
+				    svr.setRootURI(snode.attributeValue("rootURI"));
 				    if(snode.elementIterator("method")!=null){
 						List methods=new ArrayList();
 						Map methodsMap = new HashMap();
@@ -59,7 +59,10 @@ public class ApiRouterParser {
 									ProxyRequest preq = new ProxyRequest();
 									preq.setSubURI(rnode.attributeValue("subURI"));
 									preq.setDoBefore(rnode.attributeValue("before"));
-									preq.setMethod(rnode.attributeValue("mthod"));
+									preq.setReturnProperty(rnode.attributeValue("returnProperty"));
+									preq.setMethod(rnode.attributeValue("method"));
+									preq.setSocketTimeout(rnode.attributeValue("socketTimeout"));
+									preq.setConnTimeout(rnode.attributeValue("connTimeout"));
 									if(rnode.elementIterator("property")!=null){
 										Map properties = new HashMap();
 										for(Iterator pit=snode.elementIterator("property");pit.hasNext();){

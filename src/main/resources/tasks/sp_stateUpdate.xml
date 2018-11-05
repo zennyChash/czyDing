@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task id="updateCzfc" name="更新审批状态的钉钉发送状态" description="" type="execute">	
+	<execute connectionId="czfc" executeType="sql">
+		<sql>
+		<![CDATA[
+			update sp_ding_state set state=1
+		]]>
+		</sql>
+	</execute>
+</task>
+

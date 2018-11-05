@@ -54,7 +54,15 @@
 	<bean id="esDataService" class="com.ifugle.czy.service.ESQueryDataService"/>
 	<bean id="esDtSrcService" class="com.ifugle.czy.service.ESDataSourceService"/>
 	<bean id="csService" class="com.ifugle.czy.service.ConsoleServeice"/>
-	<bean id="rtService " class="com.ifugle.czy.service.RouterService"/>
+	<bean id="rtService" class="com.ifugle.czy.service.RouterService"/>
+	<bean id="czfcService" class="com.ifugle.czy.service.CzfcService"/>
+	<bean id="czyReqProcess" class="com.ifugle.czy.router.czfc.BeforeRequestCzfc"/> 
+	<bean id="czyResponseProcess" class="com.ifugle.czy.router.czfc.BeforeResponseCzfc"/> 
+	<bean id="connFactory" class="com.ifugle.etl.conncet.service.ConnectionFactory"/>
+	<bean id="mnService" class="com.ifugle.etl.utils.service.ManageService"/>
+	<bean id="dbExp" class="com.ifugle.etl.task.extract.service.DBExtractService"/>
+	<bean id="dbImp" class="com.ifugle.etl.task.imp.service.DBImportService"/>
+	<bean id="mngService" class="com.ifugle.etl.utils.service.ManageService"/>
 	<context:annotation-config />
 	<tx:annotation-driven transaction-manager="txManager" />  
 	<!--<context:spring-configured />

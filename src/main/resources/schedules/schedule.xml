@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schedule id="sdu_g" name="测试调度" description="" >	
+	<job id="spStateQuery" mc="检查审批情况">
+		<params>
+			<param name="exeDate" dataType="1" mc="提取审批状态的时间">$DATE</param>
+		</params>
+		<task id="sp_extract" onSuccess="deleteSent"/>
+		<task id="deleteSent" onSuccess="czySpStateimport"/>
+		<task id="czySpStateimport" onSuccess="sendDingInfo"/>
+		<!--<task id="updateCzfc" onSuccess="sendDingInfo"/>-->
+		<task id="sendDingInfo"/>
+		<trigger type="0" repeat="1" intervalUnit="s" interval="10">
+			<!--<startTime><![CDATA[now]]></startTime>-->
+			<startTime><![CDATA[2018-11-05 15:26:15]]></startTime>
+		</trigger>
+	</job>
+</schedule> 
+
