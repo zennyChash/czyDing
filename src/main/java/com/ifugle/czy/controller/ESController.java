@@ -43,7 +43,9 @@ public class ESController {
 			try{
 				data = esDataService.getData(rptID,qParams);
 			}catch(Exception e){
+				log.info("queryData异常。rptID："+rptID+"异常:"+e.toString());
 				jr = new JResponse("9","查询数据时发生异常，未能查找到数据。",null);
+				return jr;
 			}
 			if(data!=null&&data.containsKey("done")){
 				boolean done = (Boolean)data.get("done");

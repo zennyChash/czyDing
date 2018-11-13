@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource>
+	<src id="zjcx_enbasic" name="企业基本登记信息" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select a.*,rownum pyorder from(select swdjzh,mc,czfpbm,czfp,fddbr,dz,hybm,hy,ztbm,zt from CZY_DHCX_DJXX
+			order by NLSSORT(mc,'NLS_SORT=SCHINESE_PINYIN_M'))a
+		]]>
+		</sql>
+		<cols>
+			<col name="swdjzh" canOrder="1" isFilter="1"/>
+			<col name="mc" canOrder="1" isFilter="1"/>
+			<col name="czfpbm" canOrder="1" isFilter="1"/>
+			<col name="pyorder" fldType="integer" canOrder="1" />
+		</cols>
+	</src>
 	<src id="zjsrtj_maxny" name="最大有效月份" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select max(ny)ny,czfpbm from bb_srqc_cx group by czfpbm
+			select max(ny)ny,czfpbm from bb_srtj_cx group by czfpbm
 		]]>
 		</sql>
 		<cols>
@@ -13,7 +27,7 @@
 	<src id="zjsrtj_year" name="有数据的年份" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select distinct substr(ny,1,4)nian,czfpbm from bb_srqc_cx
+			select distinct substr(ny,1,4) nian,czfpbm from bb_srtj_cx
 		]]>
 		</sql>
 		<cols>
@@ -24,7 +38,7 @@
 	<src id="zjsrtj_month" name="有数据的月份" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select distinct substr(ny,1,4)nian,substr(ny,5,2)yue,ny,czfpbm from bb_srqc_cx
+			select distinct substr(ny,1,4) nian,substr(ny,5,2) yue,ny,czfpbm from bb_srtj_cx
 		]]>
 		</sql>
 		<cols>
@@ -34,12 +48,27 @@
 			<col name="ny" canOrder="1"/>
 		</cols>
 	</src>
+	<src id="zjsr_qyxx" name="企业税收信息" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+        select ny,swdjzh,mc,czfp,dz,hymc hy,zsebn from CZY_BB_SRQC_CX where ny<=201812 and ny>201806
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="swdjzh" fldType="text" isFilter="1"/>
+			<col name="zsebn" fldType="double"/>
+		</cols>
+	</src>
 	<src id="zjsr_basic" name="镇街收入概况" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select ny,czfpbm, czfp_r czfp,sum(bn_zse)bnlj_o,sum(sn_zse)sntq_o,round(sum(bn_zse)/10000,2)bnlj,round(sum(sn_zse)/10000,2)sntq,
-			round((sum(bn_zse)-sum(sn_zse))*100/sum(sn_zse),2)tbzz
-			 from BB_SRQC_CX group by ny,czfpbm,czfp_r order by ny,czfpbm
+select ny,czfpbm,czfp,sum(zse) bnlj,sum(zse_s) sntq,
+decode(sum(zse_s),0,0,round((sum(zse)-sum(zse_s))*100/sum(zse_s),2)) tbzz
+from bb_srtj_cx
+where lxbm=1
+and szbm in ('10101','10102','10103','10104','10106','10107','10109','10110','10111','10112','10113','10114','10116','10118','10119','10121')
+group by ny,czfp,czfpbm
 		]]>
 		</sql>
 		<cols>
@@ -53,11 +82,17 @@
 	<src id="zjsr_details" name="镇街企业税收" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select * from(
-				select a.*,rank()over(PARTITION BY ny,czfpbm ORDER BY bnlj desc) pm from(
-				select ny,czfpbm,swdjzh,mc,sum(bn_zse)bnlj_o,sum(sn_zse)sntq_o,
-				round(sum(bn_zse)/10000,2)bnlj,round(sum(sn_zse)/10000,2)sntq from BB_SRQC_CX group by ny,czfpbm,swdjzh,mc
-				)a)where pm<=100
+select * from
+(
+select r.*,rank()over(PARTITION BY ny,czfpbm ORDER BY bnlj desc) pm
+from
+(
+SELECT ny,czfpbm,swdjzh,mc,dz,sum(zsebn) bnlj,sum(zsesn) sntq
+FROM CZY_BB_SRQC_CX
+group by ny,czfpbm,swdjzh,mc,dz
+) r
+)
+where pm<=100
 		]]>
 		</sql>
 		<cols>
@@ -65,6 +100,7 @@
 			<col name="czfpbm" canOrder="1" isFilter="1"/>
 			<col name="swdjzh" isFilter="1"/>
 			<col name="bnlj" fldType="double"/>
+			<col name="sntq" fldType="double"/>
 			<col name="pm" fldType="integer" canOrder="1"/>
 		</cols>
 	</src>

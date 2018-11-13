@@ -1,5 +1,6 @@
 package com.ifugle.czy.router.czfc;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,13 @@ public class BeforeResponseCzfc implements IBeforeResponse{
 			JSONObject res = responses.getJSONObject("_RETURNED");
 			if(res!=null){
 				Map um = getUserMapping(serviceName);
-				transformUser(res,um);
+				transformUserOfRows(res,um);
+			}
+		}else if("getMsgAfterCheck".equals(reqMethod)){
+			JSONObject res = responses.getJSONObject("_RETURNED");
+			if(res!=null){
+				Map um = getUserMapping(serviceName);
+				transformUserString(res,um);
 			}
 		}
 		for(String key :responses.keySet()){
@@ -73,7 +80,7 @@ public class BeforeResponseCzfc implements IBeforeResponse{
 		}catch(Exception e){}
 		return um;
 	}
-	private void transformUser(JSONObject jr,Map um){
+	private void transformUserOfRows(JSONObject jr,Map um){
 		JSONArray rows = (JSONArray)jr.getJSONArray("rows");
 		if(rows!=null&&rows.size()>0){
 			for(int j=0;j<rows.size();j++){
@@ -85,6 +92,22 @@ public class BeforeResponseCzfc implements IBeforeResponse{
 					row.put("uname", fn.getMc());
 				}
 			}
+		}
+	}
+	private void transformUserString(JSONObject jr,Map um){
+		String strUsers = jr.getString("users");
+		if(!StringUtils.isEmpty(strUsers)){
+			String[] users = strUsers.split(",");
+			ArrayList newUsers = new ArrayList();
+			for(int i=0;i<users.length;i++){
+				String u = users[i];
+				if(um!=null&&um.containsKey(u)){
+					SimpleValue fn = (SimpleValue)um.get(u);
+					newUsers.add(fn.getBm());
+				}
+			}
+			String strNeweUsers = StringUtils.join(newUsers, ",");
+			jr.put("users", strNeweUsers);
 		}
 	}
 }

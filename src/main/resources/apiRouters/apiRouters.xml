@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <routers>
-	<service id="czfc" name="产业扶持" description="" rootURI="http://localhost:8088/czy/api">
+	<service id="czfc" name="产业扶持" description="" rootURI="http://localhost:8088/CZFC/api">
 		<method name="getApprovalLists">
 			<request returnProperty="" method="POST" subURI="getApprovalLists2Check" socketTimeout="20000" connTimeout="20000"  before="czyReqProcess">
 				<property name="Content-Type" value="application/json;charset=UTF-8"/>
@@ -22,6 +22,10 @@
 		</method>
 		<method name="getSingleAppList" >
 			<request returnProperty="applist" method="POST" subURI="getApprovalListById" socketTimeout="20000" connTimeout="20000"/>
+			<response before="czyResponseProcess"/>
+		</method>
+		<method name="getMsgAfterCheck" >
+			<request method="POST" subURI="getMsgInfoAppList" socketTimeout="20000" connTimeout="20000"/>
 			<response before="czyResponseProcess"/>
 		</method>
 	</service>

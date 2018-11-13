@@ -36,27 +36,28 @@
 	<src id="hy_tax_fb" name="行业分布" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select ny,hybm,hy,bnlj bnlj_o,round(bnlj/10000) bnlj,sntq sntq_o,round(sntq/10000) sntq,
-			round(bnlj/sum(bnlj) over (partition by ny)*100,2) srzb,
-			case when sntq=0 then 0 else round((bnlj-sntq)/sntq*100,2) end tbzz,r.color hycolor
-			from
-			(
-			SELECT ny,hybm,hy,sum(zse) bnlj,sum(zse_S) sntq
-			FROM BB_SRTJ_CX where hybm in('C','J','K')
-			group by ny,hybm,hy
-			union
-			select ny,'Z_X' hybm,'其他行业' hy,sum(zse)bnlj,sum(zse_s)sntq from BB_SRTJ_CX where hybm not in('C','J','K') group by ny
-			)a,renders r where r.rptid='hy_tax_fb' and r.lid = a.hybm
-			order by ny,hybm
+select ny,hybm,hymc,bnlj,sntq,
+round(bnlj/sum(bnlj) over (partition by ny)*100,2) srzb,case when sntq=0 then 0 else round((bnlj-sntq)/sntq*100,2) end tbzz,
+r.color hycolor
+from (
+SELECT ny,
+case when hd.bm in('C','J','K') then hd.bm else 'Z_X' end  hybm,
+case when hd.bm in('C','J','K') then hd.mc else '其他行业' end hymc,
+sum(zse) bnlj,sum(zse_s) sntq
+FROM BB_SRTJ_CX r,bm_hy h,bm_hy_dl hd
+WHERE szbm in ('10101','10102','10103','10104','10106','10107','10109','10110','10111','10112','10113','10114','10116','10118','10119','10121')
+and r.hybm=h.bm and h.dlbm=hd.bm and r.lxbm=1
+group by ny,case when hd.bm in('C','J','K') then hd.bm else 'Z_X' end,case when hd.bm in('C','J','K') then hd.mc else '其他行业' end
+) a,czy_renders r
+where r.rptid='hy_tax_fb' and r.lid = a.hybm
+order by ny,hybm
 		]]>
 		</sql>
 		<cols>
 			<col name="ny" canOrder="1" isFilter="1"/>
 			<col name="hybm" canOrder="1" isFilter="1"/>
 			<col name="bnlj" fldType="double"/>
-			<col name="bnlj_o" fldType="double"/>
 			<col name="sntq" fldType="double" />
-			<col name="sntq_o" fldType="double"/>
 			<col name="srzb" fldType="double" />
 			<col name="tbzz" fldType="double" />
 		</cols>
@@ -64,22 +65,7 @@
 	<src id="hy_one_details" name="行业企业税收" description="某行业中排名前若干名的企业的情况" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select ny,swdjzh,mc,hy,hybm,bnlj_o,bnlj,sntq_o,sntq,srzb,pm,czfpbm,czfp_r
-			from(
-				select czfpbm,czfp_r,ny,swdjzh,mc,hy,hybm,bnlj bnlj_o,round(bnlj/10000) bnlj,sntq sntq_o,round(sntq/10000) sntq,round(bnlj/sum(bnlj) over (partition by ny,hybm)*100,2) srzb,
-				rank()over(PARTITION BY ny,hybm ORDER BY bnlj desc) pm
-				from(
-					SELECT ny,swdjzh,mc,hy,hybm,sum(bn_zse) bnlj,sum(sn_zse) sntq,czfpbm,czfp_r
-					FROM BB_SRQC_CX where hybm in('C','J','K')
-					group by ny,swdjzh,mc,hy,hybm,czfpbm,czfp_r)
-			union
-				select czfpbm,czfp_r,ny,swdjzh,mc,hybm,hy,bnlj bnlj_o,round(bnlj/10000) bnlj,sntq sntq_o,round(sntq/10000) sntq,round(bnlj/sum(bnlj) over (partition by ny)*100,2) srzb,
-				rank()over(PARTITION BY ny ORDER BY bnlj desc) pm
-				from(
-					SELECT ny,swdjzh,mc,'Z_X' hybm,'其他行业' hy,sum(bn_zse) bnlj,sum(sn_zse) sntq,czfpbm,czfp_r
-					FROM BB_SRQC_CX where hybm not in('C','J','K')
-					group by ny,swdjzh,mc,czfpbm,czfp_r)
-			)order by ny,hybm,pm
+       SELECT * FROM czy_hyfb_qycx where ny>201412 and ny<=201512 
 		]]>
 		</sql>
 		<cols>
@@ -87,9 +73,7 @@
 			<col name="hybm" canOrder="1" isFilter="1"/>
 			<col name="swdjzh" isFilter="1"/>
 			<col name="bnlj" fldType="double" canOrder="1"/>
-			<col name="bnlj_o" fldType="double" canOrder="1"/>
 			<col name="sntq" fldType="double" canOrder="1"/>
-			<col name="sntq_o" fldType="double" canOrder="1"/>
 			<col name="srzb" fldType="double" canOrder="1"/>
 			<col name="pm" fldType="integer" canOrder="1" />
 		</cols>

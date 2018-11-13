@@ -92,31 +92,7 @@ Zepto(function($){
 // 					alert("string:"+dt);
 // 				}
 // 			});
-// 			p = JSON.stringify({"reqService":"czfc","reqMethod":"getAppListCheckInfo","svParams":{"userid":"manager431","lid":"882"}});
-// 			$.ajax({
-// 				type: 'post',
-// 				url: 'api/remoteService',
-// 				data: p,
-// 				headers: {
-// 					"Content-Type": "application/json;charset=utf-8"
-// 			    },
-// 				success: function(dt){
-// 					alert("string:"+dt);
-// 				}
-// 			});
-// 			p = JSON.stringify({"reqService":"czfc","reqMethod":"getAppListDetails","svParams":{"userid":"manager431","sort":"","dir":"","start":0,"limit":10,"params":{"lid":"843"}}});
-// 			$.ajax({
-// 				type: 'post',
-// 				url: 'api/remoteService',
-// 				data: p,
-// 				headers: {
-// 					"Content-Type": "application/json;charset=utf-8"
-// 			    },
-// 				success: function(dt){
-// 					alert("string:"+dt);
-// 				}
-// 			});
-			p = JSON.stringify({"reqService":"czfc","reqMethod":"appListCheck","svParams":{"userid":"manager431","doType":"1","lid":"804","remark":"xxxx"}});
+			p = JSON.stringify({"reqService":"czfc","reqMethod":"getAppListCheckInfo","svParams":{"userid":"manager431","lid":"882"}});
 			$.ajax({
 				type: 'post',
 				url: 'api/remoteService',
@@ -128,7 +104,31 @@ Zepto(function($){
 					alert("string:"+dt);
 				}
 			});
-// 			p = JSON.stringify({"reqService":"czfc","reqMethod":"getApprovalLists","svParams":{"userid":"manager431","state":"1","sort":"","dir":"","start":0,"limit":10,"params":{}}});
+// 			p = JSON.stringify({"reqService":"czfc","reqMethod":"getAppListDetails","svParams":{"userid":"manager431","sort":"","dir":"","start":0,"limit":10,"params":{"lid":"841"}}});
+// 			$.ajax({
+// 				type: 'post',
+// 				url: 'api/remoteService',
+// 				data: p,
+// 				headers: {
+// 					"Content-Type": "application/json;charset=utf-8"
+// 			    },
+// 				success: function(dt){
+// 					alert("string:"+dt);
+// 				}
+// 			});
+// 			p = JSON.stringify({"reqService":"czfc","reqMethod":"appListCheck","svParams":{"userid":"manager431","doType":"0","lid":"841","remark":"xxxx"}});
+// 			$.ajax({
+// 				type: 'post',
+// 				url: 'api/remoteService',
+// 				data: p,
+// 				headers: {
+// 					"Content-Type": "application/json;charset=utf-8"
+// 			    },
+// 				success: function(dt){
+// 					alert("string:"+dt);
+// 				}
+// 			});
+// 			p = JSON.stringify({"reqService":"czfc","reqMethod":"getApprovalLists","svParams":{"userid":"manager431","state":"0","sort":"","dir":"","start":0,"limit":10,"params":{}}});
 // 			$.ajax({
 // 				type: 'post',
 // 				url: 'api/remoteService',

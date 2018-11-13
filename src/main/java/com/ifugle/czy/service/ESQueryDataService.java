@@ -55,8 +55,22 @@ public class ESQueryDataService {
 		String str="",fld = "",fldsToGet="";
 		int from =0,size=10;
 		str = jparams.getString("searchKey");
-		from = jparams.getIntValue("from");
-		size = jparams.getIntValue("size");
+		try{
+			from = jparams.getIntValue("from");
+		}catch(Exception e){
+			try{
+				from = Integer.parseInt(jparams.getString("from"));
+			}catch(Exception ex){
+			}
+		}
+		try{
+			size = jparams.getIntValue("size");
+		}catch(Exception e){
+			try{
+				size = Integer.parseInt(jparams.getString("size"));
+			}catch(Exception ex){
+			}
+		}
 		fld = jparams.getString("field")==null?"mc":jparams.getString("field");
 		fldsToGet = jparams.getString("fldsToGet")==null?"swdjzh,mc":jparams.getString("fldsToGet");
 		JSONObject filterBy = jparams.getJSONObject("filterBy");
@@ -112,8 +126,20 @@ public class ESQueryDataService {
         VelocityContext context = new VelocityContext(); 
         //先把外部请求参数也放到velocity中
         for (Map.Entry entry : params.entrySet()) {  
-		   String key = (String)entry.getKey();  
-		   context.put(key, (String)entry.getValue());
+		   String key = (String)entry.getKey();
+		   Object ov = entry.getValue();
+		   if(ov.getClass()==Integer.class){
+			   context.put(key, (Integer)entry.getValue());
+		   }else if(ov.getClass()==Double.class){
+			   context.put(key, (Double)entry.getValue());
+		   }else{
+			   try{
+				   context.put(key, (String)entry.getValue());
+			   }catch(Exception e){
+				   log.error("解析参数值时发生错误，rptID："+jpID+",参数："+key);
+				   context.put(key, "");
+			   }
+		   }
 		}  
 		List vds = jp.getValuedDs();
 		if(vds!=null){

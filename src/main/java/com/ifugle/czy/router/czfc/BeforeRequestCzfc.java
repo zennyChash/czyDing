@@ -23,10 +23,13 @@ public class BeforeRequestCzfc implements IBeforeRequest{
 		try{
 			jparams = JSON.parseObject(svParams);
 		}catch(Exception e){}
-		
+		if(jparams==null){
+			jparams = new JSONObject();
+		}
 		/* 取审批单列表，在财智云前端是同一个请求，以参数state区分取数类型而已。
 		 * 产业扶持中实际对应两个不同请求。因此路由表中，对应两个业务请求，拦截处理
 		 * 分析参数，不同state，要路由到不同的请求，或者取消掉不需要的那个请求（取已审批时，不需要请求未审批，反之亦然）。
+		 * 取审批历史记录时，全取，不提供当前环节。所以增加一个足够大的cStep参数
 		 */
 		if("getApprovalLists".equals(reqMethod)){
 			if(jparams!=null){
@@ -37,10 +40,10 @@ public class BeforeRequestCzfc implements IBeforeRequest{
 					return new String[]{"9",""};
 				}
 			}
+		}else if("getAppListCheckInfo".equals(reqMethod)){
+			jparams.put("cStep", 10);
 		}
-		if(jparams==null){
-			jparams = new JSONObject();
-		}
+		
 		//转换并增加用户参数
 		if(!StringUtils.isEmpty(userid)){
 			try{

@@ -3,18 +3,93 @@
 	<src id="qcqy_details" name="迁出企业" description="迁出企业的情况" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select ny,swdjzh,mc,czfpbm,czfp,bnlj_o,bnlj,sntq_o,sntq,destbm,dest,escdate
-			from qcqy order by ny,escdate desc
+select r.ny,r.swdjzh,r.mc,r.czfp,sum(r.zsebn) bnlj,sum(r.zsesn) sntq,d.qrqrrq qcrq,d.qcd,rank()over(partition by ny order by sum(r.zsebn) desc) pm
+from
+CZY_BB_SRQC_CX r,
+(
+select d.swdjzh,qcd,qrqrrq from  DJ_QRQC q,dj_Cz d where q.djxh=d.qynm and  qrqclx=1 and wdly=0
+union
+select d.swdjzh,qcd,qrqrrq from  DJ_QRQC q,dj_Cz d where q.djxh=d.dzdah and q.swdjzh not in (select swdjzh from DJ_QRQC where qrqclx=1 and wdly=0) and  qrqclx=1 and wdly=1
+) d
+where r.swdjzh=d.swdjzh
+group by r.ny,r.swdjzh,r.mc,r.czfp,d.qcd,d.qrqrrq
 		]]>
 		</sql>
 		<cols>
 			<col name="ny" canOrder="1" isFilter="1"/>
 			<col name="swdjzh" isFilter="1"/>
 			<col name="bnlj" fldType="double" canOrder="1"/>
-			<col name="bnlj_o" fldType="double" canOrder="1"/>
 			<col name="sntq" fldType="double" canOrder="1"/>
-			<col name="sntq_o" fldType="double" canOrder="1"/>
-			<col name="escdate" canOrder="1" isFilter="1"/>
+			<col name="qcd" canOrder="1" isFilter="1"/>
+			<col name="qcrq" canOrder="1"/>
+		</cols>
+	</src>
+	<src id="qcqy_maxny" name="最大有效月份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+select max(ny) ny from
+(
+select r.ny,r.swdjzh,r.mc,r.czfp,sum(r.zsebn) bnlj,sum(r.zsesn) sntq,d.qrqrrq qcrq,d.qcd,rank()over(partition by ny order by sum(r.zsebn) desc) pm
+from
+CZY_BB_SRQC_CX r,
+(
+select d.swdjzh,qcd,qrqrrq from  DJ_QRQC q,dj_Cz d where q.djxh=d.qynm and  qrqclx=1 and wdly=0
+union
+select d.swdjzh,qcd,qrqrrq from  DJ_QRQC q,dj_Cz d where q.djxh=d.dzdah and q.swdjzh not in (select swdjzh from DJ_QRQC where qrqclx=1 and wdly=0) and  qrqclx=1 and wdly=1
+) d
+where r.swdjzh=d.swdjzh
+group by r.ny,r.swdjzh,r.mc,r.czfp,d.qcd,d.qrqrrq
+)
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" isFilter="1"/>
+		</cols>
+	</src>
+	<src id="qcqy_year" name=" 有数据的年份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select distinct substr(ny,1,4)nian from 
+			(
+select r.ny,r.swdjzh,r.mc,r.czfp,sum(r.zsebn) bnlj,sum(r.zsesn) sntq,d.qrqrrq qcrq,d.qcd,rank()over(partition by ny order by sum(r.zsebn) desc) pm
+from
+CZY_BB_SRQC_CX r,
+(
+select d.swdjzh,qcd,qrqrrq from  DJ_QRQC q,dj_Cz d where q.djxh=d.qynm and  qrqclx=1 and wdly=0
+union
+select d.swdjzh,qcd,qrqrrq from  DJ_QRQC q,dj_Cz d where q.djxh=d.dzdah and q.swdjzh not in (select swdjzh from DJ_QRQC where qrqclx=1 and wdly=0) and  qrqclx=1 and wdly=1
+) d
+where r.swdjzh=d.swdjzh
+group by r.ny,r.swdjzh,r.mc,r.czfp,d.qcd,d.qrqrrq
+)
+		]]>
+		</sql>
+		<cols>
+			<col name="nian" canOrder="1"/>
+		</cols>
+	</src>
+	<src id="qcqy_month" name="有数据的月份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select distinct substr(ny,1,4)nian,substr(ny,5,2)yue,ny from  
+			(
+select r.ny,r.swdjzh,r.mc,r.czfp,sum(r.zsebn) bnlj,sum(r.zsesn) sntq,d.qrqrrq qcrq,d.qcd,rank()over(partition by ny order by sum(r.zsebn) desc) pm
+from
+CZY_BB_SRQC_CX r,
+(
+select d.swdjzh,qcd,qrqrrq from  DJ_QRQC q,dj_Cz d where q.djxh=d.qynm and  qrqclx=1 and wdly=0
+union
+select d.swdjzh,qcd,qrqrrq from  DJ_QRQC q,dj_Cz d where q.djxh=d.dzdah and q.swdjzh not in (select swdjzh from DJ_QRQC where qrqclx=1 and wdly=0) and  qrqclx=1 and wdly=1
+) d
+where r.swdjzh=d.swdjzh
+group by r.ny,r.swdjzh,r.mc,r.czfp,d.qcd,d.qrqrrq
+)
+		]]>
+		</sql>
+		<cols>
+			<col name="nian" isFilter="1"/>
+			<col name="yue" isFilter="1"/>
+			<col name="ny" canOrder="1"/>
 		</cols>
 	</src>
 </dataSource>

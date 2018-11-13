@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schedule id="sdu_g" name="测试调度" description="" >	
-	<job id="spStateQuery" mc="检查审批情况">
+	<job id="spStateQuery" mc="检查审批情况" disabled="1">
 		<params>
 			<param name="exeDate" dataType="1" mc="提取审批状态的时间">$DATE</param>
 		</params>

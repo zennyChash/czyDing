@@ -1,14 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <dataSource>
 	<src id="enbasic" name="企业基本登记信息" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select a.*,rownum pyorder from(select swdjzh,mc,czfpbm,czfp,fddbr,dz,hybm,hy from dj_cz
+			select a.*,rownum pyorder from(select swdjzh,mc,czfpbm,czfp,fddbr,dz,hybm,hy,ztbm,zt from CZY_DHCX_DJXX
 			order by NLSSORT(mc,'NLS_SORT=SCHINESE_PINYIN_M'))a
 		]]>
 		</sql>
 		<cols>
 			<col name="swdjzh" canOrder="1" isFilter="1"/>
+			<col name="mc" canOrder="1" isFilter="1"/>
 			<col name="czfpbm" canOrder="1" isFilter="1"/>
 			<col name="pyorder" fldType="integer" canOrder="1" />
 		</cols>
@@ -16,7 +17,7 @@
 	<src id="en_maxny" name="最大有效月份" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select swdjzh,max(ny)ny from BB_SRQC_CX group by swdjzh
+			select swdjzh,max(ny)ny from CZY_DHCX_MAXNY group by swdjzh
 		]]>
 		</sql>
 		<cols>
@@ -26,8 +27,7 @@
 	<src id="en_year" name="企业有数据的年份" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select distinct swdjzh,nian from(
-				select swdjzh,substr(ny,1,4)nian from BB_SRQC_CX)order by swdjzh
+			select swdjzh,nian from CZY_DHCX_NIAN
 		]]>
 		</sql>
 		<cols>
@@ -38,8 +38,7 @@
 	<src id="en_month" name="有数据的月份" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select swdjzh,substr(ny,1,4)nian,substr(ny,5,7)yue,ny from(
-			select distinct swdjzh,ny from BB_SRQC_CX )order by swdjzh,nian desc,yue desc
+			select swdjzh,nian,yue,nian||yue ny from CZY_DHCX_NY 
 		]]>
 		</sql>
 		<cols>
@@ -52,21 +51,15 @@
 	<src id="en_tax" name="企业税收信息" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select b.*,d.czfpbm,czfp,bgrq kyrq,fddbr,zt qyz from dj_cz d,(
-			  select swdjzh,mc,ny,sum(bn_zse)bn_zse_o,sum(sn_zse)sn_zse_o,
-			  decode(sum(sn_zse),0,0,round((sum(bn_zse)-sum(sn_zse))*100/sum(sn_zse),2))tbzz,
-			  sum(bn_z_10101)bn_zz_o,sum(bn_z_101011)bn_ygz_o,sum(bn_z_10104)bn_qysd_o,sum(bn_z_10106)bn_grsd_o,
-			  sum(bn_z_10109)bn_cswhjs_o,sum(bn_z_10111)bn_yh_o,
-			  round(sum(bn_zse)/10000,2)bn_zse,round(sum(sn_zse)/10000,2)sn_zse,
-			  round(sum(bn_z_10101)/10000,2)bn_zz,round(sum(bn_z_101011)/10000,2)bn_ygz,round(sum(bn_z_10104)/10000,2)bn_qysd,
-			  round(sum(bn_z_10106)/10000,2)bn_grsd,round(sum(bn_z_10109)/10000,2)bn_cswhjs,round(sum(bn_z_10111)/10000,2)bn_yh
-			   from bb_srqc_cx group by swdjzh,mc,ny)b
-			where b.swdjzh=d.swdjzh(+)
+        select ny,swdjzh,mc,czfp,zsebn,zsesn,zseqn from CZY_BB_SRQC_CX 
 		]]>
 		</sql>
 		<cols>
 			<col name="ny" canOrder="1" isFilter="1"/>
 			<col name="swdjzh" fldType="text" isFilter="1"/>
+			<col name="zsebn" fldType="double"/>
+			<col name="zsesn" fldType="double"/>
+			<col name="zseqn" ffldType="double"/>
 		</cols>
 	</src>
 </dataSource>
