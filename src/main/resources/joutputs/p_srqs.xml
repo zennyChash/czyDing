@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="srqs_df_year" name="最大年份" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($dzjk_year&&$dzjk_year.rows.size()>0)
+				"latestValidMonth":"$!{dzjk_year.rows[0].nian}",
+				"format":"Ymd" 
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_year" refDtSrc="dzjk_year" fields="nian">
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="srqs_year" name="有数据的年" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($dzjk_year&&$dzjk_year.rows.size()>0)
+				"options":[
+					#foreach($row in $dzjk_year.rows)
+	   						{"bm":"$!{row.nian}","name":"$!{row.nian}"}#if($velocityCount != $dzjk_year.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{dzjk_year.rows[0].nian}"
+			#end	
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_year" refDtSrc="dzjk_year" fields="nian">
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="srqs" name="收入趋势"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{		
+			#if($dzjk_by_years&&$dzjk_by_years.rows.size()>0)
+				"ybggys_line":[{
+					"name":"$!{dzjk_by_years.rows[0].nian}",
+					"data":["$!{dzjk_by_years.rows[0].yiyue}","$!{dzjk_by_years.rows[0].eryue}","$!{dzjk_by_years.rows[0].sayue}","$!{dzjk_by_years.rows[0].siyue}","$!{dzjk_by_years.rows[0].wuyue}","$!{dzjk_by_years.rows[0].liyue}","$!{dzjk_by_years.rows[0].qiyue}","$!{dzjk_by_years.rows[0].bayue}","$!{dzjk_by_years.rows[0].jiyue}","$!{dzjk_by_years.rows[0].shyue}","$!{dzjk_by_years.rows[0].syyue}","$!{dzjk_by_years.rows[0].seyue}"]
+				},{
+					"name":"$!{dzjk_by_years.rows[1].nian}",
+					"data":["$!{dzjk_by_years.rows[1].yiyue}","$!{dzjk_by_years.rows[1].eryue}","$!{dzjk_by_years.rows[1].sayue}","$!{dzjk_by_years.rows[1].siyue}","$!{dzjk_by_years.rows[1].wuyue}","$!{dzjk_by_years.rows[1].liyue}","$!{dzjk_by_years.rows[1].qiyue}","$!{dzjk_by_years.rows[1].bayue}","$!{dzjk_by_years.rows[1].jiyue}","$!{dzjk_by_years.rows[1].shyue}","$!{dzjk_by_years.rows[1].syyue}","$!{dzjk_by_years.rows[1].seyue}"]
+				},{
+					"name":"$!{dzjk_by_years.rows[2].nian}",
+					"data":["$!{dzjk_by_years.rows[2].yiyue}","$!{dzjk_by_years.rows[2].eryue}","$!{dzjk_by_years.rows[2].sayue}","$!{dzjk_by_years.rows[2].siyue}","$!{dzjk_by_years.rows[2].wuyue}","$!{dzjk_by_years.rows[2].liyue}","$!{dzjk_by_years.rows[2].qiyue}","$!{dzjk_by_years.rows[2].bayue}","$!{dzjk_by_years.rows[2].jiyue}","$!{dzjk_by_years.rows[2].shyue}","$!{dzjk_by_years.rows[2].syyue}","$!{dzjk_by_years.rows[2].seyue}"]
+				}],
+				"dfczsr_line":[{
+					"name":"$!{dzjk_by_years.rows[3].nian}",
+					"data":["$!{dzjk_by_years.rows[3].yiyue}","$!{dzjk_by_years.rows[3].eryue}","$!{dzjk_by_years.rows[3].sayue}","$!{dzjk_by_years.rows[3].siyue}","$!{dzjk_by_years.rows[3].wuyue}","$!{dzjk_by_years.rows[3].liyue}","$!{dzjk_by_years.rows[3].qiyue}","$!{dzjk_by_years.rows[3].bayue}","$!{dzjk_by_years.rows[3].jiyue}","$!{dzjk_by_years.rows[3].shyue}","$!{dzjk_by_years.rows[3].syyue}","$!{dzjk_by_years.rows[3].seyue}"]
+				},{
+					"name":"$!{dzjk_by_years.rows[4].nian}",
+					"data":["$!{dzjk_by_years.rows[4].yiyue}","$!{dzjk_by_years.rows[4].eryue}","$!{dzjk_by_years.rows[4].sayue}","$!{dzjk_by_years.rows[4].siyue}","$!{dzjk_by_years.rows[4].wuyue}","$!{dzjk_by_years.rows[4].liyue}","$!{dzjk_by_years.rows[4].qiyue}","$!{dzjk_by_years.rows[4].bayue}","$!{dzjk_by_years.rows[4].jiyue}","$!{dzjk_by_years.rows[4].shyue}","$!{dzjk_by_years.rows[4].syyue}","$!{dzjk_by_years.rows[4].seyue}"]
+				},{
+					"name":"$!{dzjk_by_years.rows[5].nian}",
+					"data":["$!{dzjk_by_years.rows[5].yiyue}","$!{dzjk_by_years.rows[5].eryue}","$!{dzjk_by_years.rows[5].sayue}","$!{dzjk_by_years.rows[5].siyue}","$!{dzjk_by_years.rows[5].wuyue}","$!{dzjk_by_years.rows[5].liyue}","$!{dzjk_by_years.rows[5].qiyue}","$!{dzjk_by_years.rows[5].bayue}","$!{dzjk_by_years.rows[5].jiyue}","$!{dzjk_by_years.rows[5].shyue}","$!{dzjk_by_years.rows[5].syyue}","$!{dzjk_by_years.rows[5].seyue}"]
+				}],
+				"czzsr_line":[{
+					"name":"$!{dzjk_by_years.rows[6].nian}",
+					"data":["$!{dzjk_by_years.rows[6].yiyue}","$!{dzjk_by_years.rows[6].eryue}","$!{dzjk_by_years.rows[6].sayue}","$!{dzjk_by_years.rows[6].siyue}","$!{dzjk_by_years.rows[6].wuyue}","$!{dzjk_by_years.rows[6].liyue}","$!{dzjk_by_years.rows[6].qiyue}","$!{dzjk_by_years.rows[6].bayue}","$!{dzjk_by_years.rows[6].jiyue}","$!{dzjk_by_years.rows[6].shyue}","$!{dzjk_by_years.rows[6].syyue}","$!{dzjk_by_years.rows[6].seyue}"]
+				},{
+					"name":"$!{dzjk_by_years.rows[7].nian}",
+					"data":["$!{dzjk_by_years.rows[7].yiyue}","$!{dzjk_by_years.rows[7].eryue}","$!{dzjk_by_years.rows[7].sayue}","$!{dzjk_by_years.rows[7].siyue}","$!{dzjk_by_years.rows[7].wuyue}","$!{dzjk_by_years.rows[7].liyue}","$!{dzjk_by_years.rows[7].qiyue}","$!{dzjk_by_years.rows[7].bayue}","$!{dzjk_by_years.rows[7].jiyue}","$!{dzjk_by_years.rows[7].shyue}","$!{dzjk_by_years.rows[7].syyue}","$!{dzjk_by_years.rows[7].seyue}"]
+				},{
+					"name":"$!{dzjk_by_years.rows[8].nian}",
+					"data":["$!{dzjk_by_years.rows[8].yiyue}","$!{dzjk_by_years.rows[8].eryue}","$!{dzjk_by_years.rows[8].sayue}","$!{dzjk_by_years.rows[8].siyue}","$!{dzjk_by_years.rows[8].wuyue}","$!{dzjk_by_years.rows[8].liyue}","$!{dzjk_by_years.rows[8].qiyue}","$!{dzjk_by_years.rows[8].bayue}","$!{dzjk_by_years.rows[8].jiyue}","$!{dzjk_by_years.rows[8].shyue}","$!{dzjk_by_years.rows[8].syyue}","$!{dzjk_by_years.rows[8].seyue}"]
+				}]
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_by_years" refDtSrc="dzjk_by_years" fields="nian,kj,yiyue,eryue,sayue,siyue,wuyue,liyue,qiyue,bayue,jiyue,shyue,syyue,seyue">
+			<filter name = "nian_parm" refParam="thisYear" value="2018"/>
+			<orderBy name = "kj" dir="desc"/>
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+</pages>

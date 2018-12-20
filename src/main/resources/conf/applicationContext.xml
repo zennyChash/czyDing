@@ -29,15 +29,25 @@
 		<property name="maxWait" value="30000" />
 		<property name="validationQuery" value="select 1 from dual" />
 	</bean>
-	<!--(实际生产环境)-->
-	<!-- JNDI DataSource for JEE environments -->
-	<!--
-		  <jee:jndi-lookup id="dataSource" jndi-name="ncmDS"/>
-		  --> 
-	<!--java:comp/env/jdbc/ncmDS -->
+	<bean id="dataSourceDT" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${dt.jdbc.driverClassName}" />
+		<property name="url" value="${dt.jdbc.url}" />
+		<property name="username" value="${dt.jdbc.username}" />
+		<property name="password" value="${dt.jdbc.password}" />
+		<property name="testOnBorrow" value="true" />
+		<property name="maxActive" value="20" />
+		<property name="initialSize" value="3" />
+		<property name="maxIdle" value="2" />
+		<property name="maxWait" value="30000" />
+		<property name="validationQuery" value="select 1 from dual" />
+	</bean>
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" p:dataSource-ref="dataSource" />
+	<bean id="jdbcTemplateDt" class="org.springframework.jdbc.core.JdbcTemplate" p:dataSource-ref="dataSourceDT" />
 	<bean id="namedParameterJdbcTemplate"  class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">  
 		 <constructor-arg ref="dataSource"/>
+	</bean>
+	<bean id="namedParameterJdbcTemplateDt"  class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">  
+		 <constructor-arg ref="dataSourceDT"/>
 	</bean>
 	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource"/>

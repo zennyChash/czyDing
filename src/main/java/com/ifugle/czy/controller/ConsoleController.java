@@ -3,6 +3,8 @@ package com.ifugle.czy.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,16 +14,53 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ifugle.czy.service.ConsoleServeice;
 import com.ifugle.czy.utils.JResponse;
 import com.ifugle.czy.utils.SubmitResult;
+import com.ifugle.czy.utils.bean.User;
 
 @Controller
 public class ConsoleController {
 	private static Logger log = Logger.getLogger(ConsoleController.class);
 	@Autowired
 	private ConsoleServeice csService;
+	
+	@RequestMapping(value="/consoleLogin",method = RequestMethod.POST)
+	@ResponseBody 
+	public JResponse consoleLogin(@RequestParam Map<String, String> params){
+		JResponse jr = new JResponse();
+		String code="";
+		if(params!=null){
+			code = params.get("code");
+		}
+		if(StringUtils.isEmpty(code)){
+			jr.setRetCode("9");
+			jr.setRetMsg("未通过钉钉管理员验证！");
+			jr.setRetData("");
+			return jr;
+		}
+		RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+		HttpServletRequest request = null;
+		if (requestAttributes != null) {
+			request = ((ServletRequestAttributes) requestAttributes).getRequest();
+		}
+		JSONObject js = csService.consoleLogin(code,request);
+		String errcode = (js!=null&&js.containsKey("errcode"))?js.getString("errcode"):"";
+		if("0".equals(errcode)){
+			jr.setRetCode("0");
+			jr.setRetMsg("");
+		}else{
+			jr.setRetCode("9");
+			jr.setRetMsg("钉钉管理员验证失败！");
+			jr.setRetData("");
+		}
+		return jr;
+	}
 	
 	@RequestMapping(value="/authConsolLog",method = RequestMethod.POST)
 	@ResponseBody
@@ -73,6 +112,49 @@ public class ConsoleController {
 		}
 		return infos;
 	}
+	@RequestMapping(value="/getUsersFromDingTalk",method = RequestMethod.GET)
+	@ResponseBody
+	public Map getUsersFromDingTalk(@RequestParam Map<String, String> params){
+		Map infos = new HashMap();
+		if(params!=null){
+			String sStart = params.get("start");
+			String sLimit = params.get("limit");
+			int start =0,limit=0;
+			try{
+				start = Integer.parseInt(sStart);
+			}catch(Exception e){}
+			try{
+				limit = Integer.parseInt(sLimit);
+			}catch(Exception e){}
+			infos = csService.getUsersFromDingTalk(start,limit);
+		}
+		return infos;
+	}
+	@RequestMapping(value="/addUserFromDingTalk",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse addUserFromDingTalk(@RequestParam Map<String, String> params){
+		JResponse jr = new JResponse();
+		if(params!=null){
+			String strDingUsers = params.get("dingUsers");
+			if(StringUtils.isEmpty(strDingUsers)){
+				jr.setRetCode("9");
+				jr.setRetMsg("缺少要添加的用户信息！");
+				jr.setRetData("");
+			}else{
+				boolean done = csService.addUserFromDingTalk(strDingUsers);
+				if(done){
+					jr.setRetCode("0");
+					jr.setRetMsg("");
+				}else{
+					jr.setRetCode("9");
+					jr.setRetMsg("保存用户信息失败！");
+					jr.setRetData("");
+				}
+			}
+		}
+		return jr;
+	}
+	
 	@RequestMapping(value="/getPosts",method = RequestMethod.GET)
 	@ResponseBody
 	public Map getPosts(@RequestParam Map<String, String> params){
@@ -98,6 +180,30 @@ public class ConsoleController {
 				}else{
 					jr.setRetCode("9");
 					jr.setRetMsg("保存用户的角色信息失败！");
+					jr.setRetData("");
+				}
+			}
+		}
+		return jr;
+	}
+	@RequestMapping(value="/removeUsers",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse removeUsers(@RequestParam Map<String, String> params){
+		JResponse jr = new JResponse();
+		if(params!=null){
+			String strUids = params.get("userids");
+			if(StringUtils.isEmpty(strUids)){
+				jr.setRetCode("9");
+				jr.setRetMsg("缺少要操作的用户ID！");
+				jr.setRetData("");
+			}else{
+				boolean done = csService.removeUsers(strUids);
+				if(done){
+					jr.setRetCode("0");
+					jr.setRetMsg("");
+				}else{
+					jr.setRetCode("9");
+					jr.setRetMsg("删除用户信息失败！");
 					jr.setRetData("");
 				}
 			}
@@ -264,6 +370,57 @@ public class ConsoleController {
 			}else{
 				jr.setRetCode("9");
 				jr.setRetMsg("保存用户的角色信息失败！");
+				jr.setRetData("");
+			}
+		}
+		return jr;
+	}
+	
+	@RequestMapping(value="/getRemoteServices",method = RequestMethod.GET)
+	@ResponseBody
+	public Map getRemoteServices(@RequestParam Map<String, String> params){
+		Map infos = csService.getRemoteServices();
+		return infos;
+	}
+	@RequestMapping(value="/getRemoteServiceUsers",method = RequestMethod.GET)
+	@ResponseBody
+	public Map getRemoteServiceUsers(@RequestParam Map<String, String> params){
+		Map infos = new HashMap();
+		if(params!=null){
+			String qparams = params.get("qparams");
+			String sStart = params.get("start");
+			String sLimit = params.get("limit");
+			int start =0,limit=0;
+			try{
+				start = Integer.parseInt(sStart);
+			}catch(Exception e){}
+			try{
+				limit = Integer.parseInt(sLimit);
+			}catch(Exception e){}
+			infos = csService.getRemoteServiceUsers(qparams,start,limit);
+		}
+		return infos;
+	}
+	@RequestMapping(value="/toggleMapUser",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse toggleMapUser(@RequestParam Map<String, String> params){
+		JResponse jr = new JResponse();
+		if(params!=null){
+			String strMapType = params.get("mapType");
+			int mapType = 0;
+			try{
+				mapType = Integer.parseInt(strMapType);
+			}catch(Exception e){}
+			String dingid = params.get("dingid");
+			String svc = params.get("svc");
+			String userid = params.get("userid");
+			boolean done = csService.toggleMapUser(mapType,dingid,svc,userid);
+			if(done){
+				jr.setRetCode("0");
+				jr.setRetMsg("");
+			}else{
+				jr.setRetCode("9");
+				jr.setRetMsg("设置钉钉用户和业务系统用户的对应关系时发生错误！");
 				jr.setRetData("");
 			}
 		}

@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,17 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.dingtalk.open.client.api.model.corp.CorpUser;
+import com.dingtalk.open.client.api.model.corp.CorpUserList;
+import com.dingtalk.open.client.api.model.corp.Department;
+import com.dingtalk.open.client.api.model.corp.MessageBody;
+import com.dingtalk.open.client.api.model.corp.MessageType;
+import com.ifugle.czy.ding.message.LightAppMessageDelivery;
+import com.ifugle.czy.ding.message.MessageHelper;
+import com.ifugle.czy.utils.DingHelper;
 import com.ifugle.czy.utils.TemplatesLoader;
 import com.ifugle.czy.utils.bean.*;
 import com.ifugle.czy.utils.bean.template.DataSrc;
@@ -27,6 +39,7 @@ public class ConsoleServeice {
 	private static final RowCallbackHandler TreeNodeMapper = null;
 	private static Logger log = Logger.getLogger(ConsoleServeice.class);
 	protected JdbcTemplate jdbcTemplate;
+	
 	@Autowired
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate){
 		this.jdbcTemplate = jdbcTemplate;
@@ -399,5 +412,214 @@ public class ConsoleServeice {
 			log.error("获取输出模板的参数时发生错误！"+e.toString());
 		}
 		return flds;
+	}
+	public Map sendDingMsg(String msg,String strUsers) {
+		Map infos = new HashMap();
+		String[] users = strUsers.split(",");
+		for(int i=0;i<users.length;i++){
+			String dingid = users[i];
+			//发钉钉消息
+			String accessToken = DingHelper.getAccessToken();
+			String agentid= cg.getString("AGENT_ID", "163161139");
+			String touser = dingid,toparty="";
+			//组织文本消息
+			MessageBody.TextBody textBody = new MessageBody.TextBody();
+            textBody.setContent(msg);
+            //装配deliver
+			LightAppMessageDelivery delivery = new LightAppMessageDelivery(touser,toparty,agentid);
+			delivery.withMessage(MessageType.TEXT, textBody);
+			try{
+				MessageHelper.send(accessToken, delivery);
+				log.info("发送微应用消息"+"，接收者:"+dingid);
+			}catch(Exception e){
+				
+			}
+		}
+		infos.put("info", "钉钉消息已发送给下一环节负责人！");
+		return infos;
+	}
+	public JSONObject consoleLogin(String code,HttpServletRequest request) {
+		JSONObject js = null;
+		try {
+			String ssoToken = DingHelper.getSsoToken();
+			log.info("管理控制台，获取ssoToken："+ssoToken);
+			request.getSession().setAttribute("console_accessToken", ssoToken);
+			js = DingHelper.getAgentUserInfo(ssoToken, code);
+			log.info("管理控制台免登后返回的信息："+js.toJSONString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		return js;
+	}
+	public Map getUsersFromDingTalk(int start, int limit) {
+		Map infos = new HashMap();
+		String accessToken = DingHelper.getAccessToken();
+		log.info("准备获取钉钉用户："+accessToken);
+		try{
+	        List<Department> departments = new ArrayList<Department>();
+	        // 1表示部门根目录，如果获取accessToken的corpSecret设置了部门范围，需要更改成对应部门的id
+	        // 可以通过https://oapi.dingtalk.com/auth/scopes?access_token=ACCESS_TOKEN 查询部门id列表
+	        departments = DingHelper.listDepartments(accessToken, "");
+	        log.info("共"+departments.size()+"个部门。");
+	        List users = new ArrayList();
+	        int cc = 0;
+	        //按部门循环获取用户
+	        for (int i = 0; i < departments.size(); i++) {
+	        	log.info("部门ID"+departments.get(i).getId());
+	            CorpUserList corpUserList =  DingHelper.getDepartmentUser(accessToken, Long.valueOf(departments.get(i).getId())
+	                        ,0L,100, null);
+	            if (corpUserList.getUserlist().size() == 0) {
+	                continue;
+	            }
+	            for (int j = 0; j < corpUserList.getUserlist().size(); j++) {
+	            	CorpUser user = (CorpUser)corpUserList.getUserlist().get(j);
+	            	JSONObject juser = (JSONObject)JSONObject.toJSON(user);
+	                users.add(juser);
+	                log.info(JSON.toJSONString(juser));
+	            }
+	        }
+	        Map czyUserMap=null;
+			List czyUsers = jdbcTemplate.queryForList("select userid,dingname from users u",new Object[]{});
+			if(czyUsers!=null&&czyUsers.size()>0){
+				czyUserMap= new HashMap();
+				for(int i=0;i<czyUsers.size();i++){
+					Map row = (Map)czyUsers.get(i);
+					czyUserMap.put(row.get(("userid")), 1);
+				}
+			}
+			//剔除已经存在于czy的用户
+			List resultUsers = new ArrayList();
+			if(czyUserMap==null||czyUserMap.size()==0){
+				resultUsers = users;
+			}else{
+				for(int i=0;i<users.size();i++){
+					JSONObject juser = (JSONObject)users.get(i);
+					if(czyUserMap.containsKey(juser.getString("userid"))){
+						continue;
+					}
+					resultUsers.add(juser);
+				}
+			}
+	        cc = resultUsers.size();
+	        infos.put("totalCount", cc);
+	        int end = ((start+limit)<cc)?(start+limit):cc;
+	        List page = resultUsers.subList(start, end);
+			infos.put("rows", page);
+	    } catch (Exception e) {
+	    	infos.put("totalCount", 0);
+			infos.put("rows", null);
+	        e.printStackTrace();
+		}
+		return infos;
+	}
+	public boolean addUserFromDingTalk(String strDingUsers) {
+		try{
+			JSONArray jusers = JSON.parseArray(strDingUsers);
+			if(jusers==null||jusers.size()==0){
+				return true;
+			}
+			StringBuffer sql = new StringBuffer("insert into users(userid,dingname,dinginfo,qybj)values(?,?,?,1)");
+			for(int i=0;i<jusers.size();i++){
+				JSONObject ju = jusers.getJSONObject(i);
+				String userid = ju.getString("userid");
+				String uname = ju.getString("name");
+				String dingInfo = ju.toJSONString();
+				jdbcTemplate.update("delete from users where userid=?",new Object[]{userid});
+				jdbcTemplate.update(sql.toString(),new Object[]{userid,uname,dingInfo});
+			}
+		}catch(Exception e){
+			log.error(e.toString());
+		}
+		return true;
+	}
+	public boolean removeUsers(String strUids) {
+		try{
+			String[] users = strUids.split(",");
+			if(users==null||users.length==0){
+				return true;
+			}
+			for(int i=0;i<users.length;i++){
+				String userid = users[i];
+				jdbcTemplate.update("delete from user_favorite where userid=?",new Object[]{userid});
+				jdbcTemplate.update("delete from usermapping where userid=?",new Object[]{userid});
+				jdbcTemplate.update("delete from user_menus where userid=?",new Object[]{userid});
+				jdbcTemplate.update("delete from user_post where userid=?",new Object[]{userid});
+				jdbcTemplate.update("delete from users where userid=?",new Object[]{userid});
+			}
+		}catch(Exception e){
+			log.error(e.toString());
+		}
+		return true;
+	}
+	public Map getRemoteServiceUsers(String qparams, int start, int limit) {
+		Map infos = new HashMap();
+		try{
+			StringBuffer sql =new StringBuffer("select * from(");
+			sql.append("select u.servicename,u.userid,u.uname,m.dingid,m.dingname,decode(m.userid,null,0,1)mapped ");
+			sql.append(" from remoteusers u,usermapping m where u.servicename = m.servicename(+) and u.userid=m.userid(+)");
+			sql.append(") where (mapped=0 ");
+			if(qparams!=null){
+				JSONObject jp=  JSONObject.parseObject(qparams);
+				if(jp!=null&&jp.entrySet()!=null){
+					sql.append(" or dingid='").append(jp.getString("dingid")).append("')");
+					if(jp.containsKey("servicename")&&!StringUtils.isEmpty(jp.getString("servicename"))){
+						sql.append(" and servicename='").append(jp.getString("servicename")).append("'");
+					}
+					if(jp.containsKey("userid")&&!StringUtils.isEmpty(jp.getString("userid"))){
+						sql.append(" and userid like '%").append(jp.getString("userid")).append("%'");
+					}
+					if(jp.containsKey("uname")&&!StringUtils.isEmpty(jp.getString("uname"))){
+						sql.append(" and uname like '%").append(jp.getString("uname")).append("%'");
+					}
+				}else{
+					sql.append(")");
+				}
+			}else{
+				sql.append(")");
+			}
+			sql.append(" order by mapped desc,servicename,userid,dingid");
+			StringBuffer csql = new StringBuffer("select count(*) from (");
+			csql.append(sql).append(")");
+			int cu = jdbcTemplate.queryForObject(csql.toString(), new Object[]{},Integer.class);
+			infos.put("totalCount", cu);
+			StringBuffer rSql = new StringBuffer("SELECT * FROM (SELECT A.*, rownum r FROM (");
+			rSql.append(sql);
+			rSql.append(") A WHERE rownum<=");
+			rSql.append((start+limit));
+			rSql.append(") B WHERE r>");
+			rSql.append(start);
+			List users = jdbcTemplate.queryForList(rSql.toString(),new Object[]{});
+			infos.put("rows", users);
+		}catch(Exception e){
+			log.error("获取远程服务系统用户信息是发生错误："+e.toString());
+		}
+		return infos;
+	}
+	public Map getRemoteServices() {
+		Map infos = new HashMap();
+		try{
+			StringBuffer sql =new StringBuffer("select distinct servicename bm,servicename mc from remoteusers");
+			List posts = jdbcTemplate.queryForList(sql.toString(),new Object[]{});
+			infos.put("rows", posts);
+		}catch(Exception e){
+			log.error("获取岗位列表时发生错误："+e.toString());
+		}
+		return infos;
+	}
+	public boolean toggleMapUser(int mapType,String dingid, String svc, String userid) {
+		try{
+			StringBuffer sql = new StringBuffer("delete from usermapping where servicename=? and userid=? and dingid=?");
+			if(mapType==1){
+				//先删除原先对应关系
+				jdbcTemplate.update("delete from usermapping where servicename=? and dingid=?",new Object[]{svc,dingid});
+				sql = new StringBuffer("insert into usermapping(id,dingid,dingname,servicename,userid) ");
+				sql.append("select sq_usermapping_id.nextval,userid,dingname,?,? from users where userid=?");
+			}
+			jdbcTemplate.update(sql.toString(),new Object[]{svc,userid,dingid});
+		}catch(Exception e){
+			log.error(e.toString());
+		}
+		return true;
 	}
 }

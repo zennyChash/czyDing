@@ -3,7 +3,7 @@
 	<src id="buildingbasic" name="楼宇基本情况" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select a.*,rownum pyorder from(select bid,mc,dz from CZY_LYSS_LYLB
+			select a.*,rownum pyorder from(select bid,mc,dz,x,y from CZY_LYSS_LYLB
 			order by NLSSORT(mc,'NLS_SORT=SCHINESE_PINYIN_M'))a
 		]]>
 		</sql>

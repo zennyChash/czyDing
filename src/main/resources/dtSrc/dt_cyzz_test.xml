@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="czfc_year" name="企业有数据的年份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			SELECT distinct ny nian,swdjzh FROM BB_QGX
+		]]>
+		</sql>
+		<cols>
+			<col name="swdjzh" isFilter="1"/>
+			<col name="nian" canOrder="1"/>
+		</cols>
+	</src>
+	<src id="czfc_tax" name="资助企业税收信息" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+        select ny nian,swdjzh,mc,
+        nvl(sum(sssr),0) sssr,nvl(sum(sssr_sn),0) sssr_sn,nvl(sum(sssr_qn),0) sssr_qn,
+        nvl(sum(ssgx),0) ssgx,nvl(sum(ssgx_sn),0) ssgx_sn,nvl(sum(ssgx_qn),0) ssgx_qn,
+        nvl(sum(zzje),0) zzje,nvl(sum(zzje_sn),0) zzje_sn,nvl(sum(zzje_qn),0) zzje_qn
+        from
+        (
+        select to_number(ny) ny,swdjzh,mc,hj sssr,0 sssr_sn,0 sssr_qn,ssgx ssgx,0 ssgx_sn,0 ssgx_qn,zz zzje,0 zzje_sn,0 zzje_qn from BB_QGX
+        union all
+        select ny+1,swdjzh,mc,0 sssr,hj sssr_sn,0 sssr_qn,0 ssgx,ssgx ssgx_sn,0 ssgx_qn,0 zzje, zz zzje_sn,0 zzje_qn from bb_qgx
+        union all
+        select ny+2,swdjzh,mc,0 sssr,0 sssr_sn,hj sssr_qn,0 ssgx,0 ssgx_sn,ssgx ssgx_qn,0 zzje,0 zzje_sn,zz zzje_qn from bb_qgx
+        )
+        where ny between 2014 and 2017
+        group by  ny,swdjzh,mc
+		]]>
+		</sql>
+		<cols>
+			<col name="nian" canOrder="1" isFilter="1"/>
+			<col name="swdjzh" fldType="text" isFilter="1"/>
+			<col name="sssr" fldType="double"/>
+			<col name="sssr_sn" fldType="double"/>
+			<col name="sssr_qn" ffldType="double"/>
+			<col name="ssgx" fldType="double"/>
+			<col name="ssgx_sn" fldType="double"/>
+			<col name="ssgx_qn" ffldType="double"/>
+			<col name="zzje" fldType="double"/>
+			<col name="zzje_sn" fldType="double"/>
+			<col name="zzje_qn" ffldType="double"/>
+		</cols>
+	</src>
+</dataSource>
+

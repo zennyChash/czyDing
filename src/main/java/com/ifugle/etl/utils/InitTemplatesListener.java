@@ -4,6 +4,8 @@ import java.util.List;
 import javax.servlet.ServletContextEvent; 
 import javax.servlet.ServletContextListener; 
 
+import org.quartz.Scheduler;
+
 import com.ifugle.etl.schedule.service.SchedulService;
 
 public class InitTemplatesListener implements ServletContextListener{ 
@@ -33,7 +35,16 @@ public class InitTemplatesListener implements ServletContextListener{
     } 
 
     public void contextDestroyed(ServletContextEvent event){ 
-    	
+    	SchedulService sdsvc = SchedulService.getSchedulService();
+        Scheduler sd = sdsvc.getScheduler();
+        if(sd != null) {
+        	sdsvc.shutdown();
+        }
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     } 
 } 
 

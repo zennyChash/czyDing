@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="zdsy_gs_df_ym" name="规上最大日期" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($gs_df_ny&&$gs_df_ny.rows.size()>0)
+				"latestValidMonth":"$!{gs_df_ny.rows[0].ny}",
+				"format":"Ym" 
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="gs_df_ny" refDtSrc="zdsy_df_ny" fields="ny">
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_ss_df_ym" name="上市最大日期" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($ss_df_ny&&$ss_df_ny.rows.size()>0)
+				"latestValidMonth":"$!{ss_df_ny.rows[0].ny}",
+				"format":"Ym" 
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="ss_df_ny" refDtSrc="zdsy_df_ny" fields="ny">
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_jr_df_ym" name=" 金融最大日期" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($jr_df_ny&&$jr_df_ny.rows.size()>0)
+				"latestValidMonth":"$!{jr_df_ny.rows[0].ny}",
+				"format":"Ym" 
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="jr_df_ny" refDtSrc="zdsy_df_ny" fields="ny">
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_rc_df_ym" name="纳税大户最大日期" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($jr_df_ny&&$jr_df_ny.rows.size()>0)
+				"latestValidMonth":"$!{jr_df_ny.rows[0].ny}",
+				"format":"Ym" 
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="jr_df_ny" refDtSrc="zdsy_df_ny" fields="ny">
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_gs_year" name="规上有数据的年" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($gs_year&&$gs_year.rows.size()>0)
+				"options":[
+					#foreach($row in $gs_year.rows)
+	   						{"bm":"$!{row.nian}"}#if($velocityCount != $gs_year.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{gs_year.rows[0].nian}"
+			#end	
+			}
+		]]>
+		</jTemplate>
+		<vDs name="gs_year" refDtSrc="zdsy_year" fields="nian">
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_ss_year" name="上市有数据的年" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($ss_year&&$ss_year.rows.size()>0)
+				"options":[
+					#foreach($row in $ss_year.rows)
+	   						{"bm":"$!{row.nian}"}#if($velocityCount != $ss_year.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{ss_year.rows[0].nian}"
+			#end	
+			}
+		]]>
+		</jTemplate>
+		<vDs name="ss_year" refDtSrc="zdsy_year" fields="nian">
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_jr_year" name="金融有数据的年" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($jr_year&&$jr_year.rows.size()>0)
+				"options":[
+					#foreach($row in $jr_year.rows)
+	   						{"bm":"$!{row.nian}"}#if($velocityCount != $jr_year.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{jr_year.rows[0].nian}"
+			#end	
+			}
+		]]>
+		</jTemplate>
+		<vDs name="jr_year" refDtSrc="zdsy_year" fields="nian">
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_rc_year" name="纳税大户有数据的年" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($jr_year&&$jr_year.rows.size()>0)
+				"options":[
+					#foreach($row in $jr_year.rows)
+	   						{"bm":"$!{row.nian}"}#if($velocityCount != $jr_year.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{jr_year.rows[0].nian}"
+			#end	
+			}
+		]]>
+		</jTemplate>
+		<vDs name="jr_year" refDtSrc="zdsy_year" fields="nian">
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_gs_month" name="有数据的月份选项" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($gs_month&&$gs_month.rows.size()>0)
+				"options":[
+					#foreach($row in $gs_month.rows)
+	   					{"bm":"$!{row.yue}"}#if($velocityCount != $gs_month.rows.size()),#end
+	   				#end
+				],
+				"defaultOp":"$!{gs_month.rows[0].yue}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="gs_month" refDtSrc="zdsy_month" fields="ny,yue">
+			<filter name = "nian" refParam="year" value="2018"/>
+			<orderBy name = "ny" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_ss_month" name="上市有数据的月份选项" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($ss_month&&$ss_month.rows.size()>0)
+				"options":[
+					#foreach($row in $ss_month.rows)
+	   					{"bm":"$!{row.yue}"}#if($velocityCount != $ss_month.rows.size()),#end
+	   				#end
+				],
+				"defaultOp":"$!{ss_month.rows[0].yue}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="ss_month" refDtSrc="zdsy_month" fields="ny,yue">
+			<filter name = "nian" refParam="year" value="2018"/>
+			<orderBy name = "ny" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_jr_month" name="金融有数据的月份选项" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($jr_month&&$jr_month.rows.size()>0)
+				"options":[
+					#foreach($row in $jr_month.rows)
+	   					{"bm":"$!{row.yue}"}#if($velocityCount != $jr_month.rows.size()),#end
+	   				#end
+				],
+				"defaultOp":"$!{jr_month.rows[0].yue}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="jr_month" refDtSrc="zdsy_month" fields="ny,yue">
+			<filter name = "nian" refParam="year" value="2018"/>
+			<orderBy name = "ny" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_rc_month" name="纳税大户有数据的月份选项" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($jr_month&&$jr_month.rows.size()>0)
+				"options":[
+					#foreach($row in $jr_month.rows)
+	   					{"bm":"$!{row.yue}"}#if($velocityCount != $jr_month.rows.size()),#end
+	   				#end
+				],
+				"defaultOp":"$!{jr_month.rows[0].yue}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="jr_month" refDtSrc="zdsy_month" fields="ny,yue">
+			<filter name = "nian" refParam="year" value="2018"/>
+			<orderBy name = "ny" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_gs" name="规上概况"  description="" > 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($zdsy_gs&&$zdsy_gs.rows.size()>0)
+					"total":"$!{zdsy_gs.rows[0].ecount}",
+					"bnlj":"$!{zdsy_gs.rows[0].bnlj}",
+					"sntq":"$!{zdsy_gs.rows[0].sntq}",
+					"sszb":"$!{zdsy_gs.rows[0].bnzb}",
+					"snsszb":"$!{zdsy_gs.rows[0].snzb}"
+				#else
+					"total":"","sszb":"","snsszb":"","bnlj":"","sntq":""
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="zdsy_gs" refDtSrc="zdsy_gs" fields="ecount,bnzb,snzb,bnlj,sntq,tbzz">
+			<filter name = "ny" value="201803"/>
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_ss" name="上市概况"  description="" > 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($zdsy_ss&&$zdsy_ss.rows.size()>0)
+					"total":"$!{zdsy_ss.rows[0].ecount}",
+					"sszb":"$!{zdsy_ss.rows[0].bnzb}",
+					"snsszb":"$!{zdsy_ss.rows[0].snzb}",
+					"bnlj":"$!{zdsy_ss.rows[0].bnlj}",
+					"sntq":"$!{zdsy_ss.rows[0].sntq}"
+				#else
+					"total":"","sszb":"","snsszb":"","bnlj":"","sntq":""
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="zdsy_ss" refDtSrc="zdsy_ss" fields="ecount,bnzb,snzb,bnlj,sntq,tbzz">
+			<filter name = "ny" value="201803"/>
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_jr" name="金融概况"  description="" > 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($zdsy_jr&&$zdsy_jr.rows.size()>0)
+					"total":"$!{zdsy_jr.rows[0].ecount}",
+					"sszb":"$!{zdsy_jr.rows[0].bnzb}",
+					"snsszb":"$!{zdsy_jr.rows[0].snzb}",
+					"bnlj":"$!{zdsy_jr.rows[0].bnlj}",
+					"sntq":"$!{zdsy_jr.rows[0].sntq}"
+				#else
+					"total":"","sszb":"","snsszb":"","bnlj":"","sntq":""
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="zdsy_jr" refDtSrc="zdsy_jr" fields="ecount,bnzb,snzb,bnlj,sntq,tbzz">
+			<filter name = "ny" value="201803"/>
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_rc" name="纳税大户概况"  description="" > 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($zdsy_rc&&$zdsy_rc.rows.size()>0)
+					"total":"$!{zdsy_rc.rows[0].ecount}",
+					"sszb":"$!{zdsy_rc.rows[0].bnzb}",
+					"snsszb":"$!{zdsy_rc.rows[0].snzb}",
+					"bnlj":"$!{zdsy_rc.rows[0].bnlj}",
+					"sntq":"$!{zdsy_rc.rows[0].sntq}"
+				#else
+					"total":"","sszb":"","snsszb":"","bnlj":"","sntq":""
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="zdsy_rc" refDtSrc="zdsy_rc" fields="ecount,bnzb,snzb,bnlj,sntq,tbzz">
+			<filter name = "ny" value="201803"/>
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_gs_entax" name="规上企业排名情况"  description="" > 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($zdsy_gs_dt&&$zdsy_gs_dt.rows.size()>0)
+					"zdsy":[
+						#foreach($row in $zdsy_gs_dt.rows)
+		   					{"swdjzh":"$!{row.swdjzh}","mc":"$!{row.mc}","bnlj":"$!{row.bnlj}","sntq":"$!{row.sntq}","czfp":"$!{row.czfp}"}
+		   					#if($velocityCount != $zdsy_gs_dt.rows.size()),#end
+		   				#end
+					],
+					"total": $!{zdsy_gs_dt.total}
+				#else
+					"zdsy":[],"total":0
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="zdsy_gs_dt" refDtSrc="zdsy_gs_dt" paging="true" fields="ny,swdjzh,mc,czfp,bnlj,sntq,tbzz,srzb,pm">
+			<filter name = "ny" value="201803"/>
+			<orderBy name = "pm" dataType="integer" dir="asc"/>
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_ss_entax" name="上市企业排名情况"  description="" > 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($zdsy_ss_dt&&$zdsy_ss_dt.rows.size()>0)
+					"zdsy":[
+						#foreach($row in $zdsy_ss_dt.rows)
+		   					{"swdjzh":"$!{row.swdjzh}","mc":"$!{row.mc}","bnlj":"$!{row.bnlj}","sntq":"$!{row.sntq}","czfp":"$!{row.czfp}"}
+		   					#if($velocityCount != $zdsy_ss_dt.rows.size()),#end
+		   				#end
+					],
+					"total": $!{zdsy_ss_dt.total}
+				#else
+					"zdsy":[],"total":0
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="zdsy_ss_dt" refDtSrc="zdsy_ss_dt" paging="true" fields="ny,swdjzh,mc,czfp,bnlj,sntq,tbzz,srzb,pm">
+			<filter name = "ny" value="201803"/>
+			<orderBy name = "pm" dataType="integer" dir="asc"/>
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_jr_entax" name="金融企业排名情况"  description="" > 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($zdsy_jr_dt&&$zdsy_jr_dt.rows.size()>0)
+					"zdsy":[
+						#foreach($row in $zdsy_jr_dt.rows)
+		   					{"swdjzh":"$!{row.swdjzh}","mc":"$!{row.mc}","bnlj":"$!{row.bnlj}","sntq":"$!{row.sntq}","czfp":"$!{row.czfp}"}
+		   					#if($velocityCount != $zdsy_jr_dt.size()),#end
+		   				#end
+					],
+					"total": $!{zdsy_jr_dt.total}
+				#else
+					"zdsy":[],"total":0
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="zdsy_jr_dt" refDtSrc="zdsy_jr_dt" paging="true" fields="ny,swdjzh,mc,czfp,bnlj,sntq,tbzz,srzb,pm">
+			<filter name = "ny" value="201803"/>
+			<orderBy name = "pm" dataType="integer" dir="asc"/>
+		</vDs>
+	</joutput>
+	<joutput id="zdsy_rc_entax" name="纳税大户企业排名情况"  description="" > 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($zdsy_rc_dt&&$zdsy_rc_dt.rows.size()>0)
+					"zdsy":[
+						#foreach($row in $zdsy_rc_dt.rows)
+		   					{"swdjzh":"$!{row.swdjzh}","mc":"$!{row.mc}","bnlj":"$!{row.bnlj}","sntq":"$!{row.sntq}","czfp":"$!{row.czfp}"}
+		   					#if($velocityCount != $zdsy_rc_dt.size()),#end
+		   				#end
+					],
+					"total": $!{zdsy_rc_dt.total}
+				#else
+					"zdsy":[],"total":0
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="zdsy_rc_dt" refDtSrc="zdsy_rc_dt" paging="true" fields="ny,swdjzh,mc,czfp,czfp,bnlj,sntq,tbzz,srzb,pm">
+			<filter name = "ny" value="201803"/>
+			<orderBy name = "pm" dataType="integer" dir="asc"/>
+		</vDs>
+	</joutput>
+</pages>
+

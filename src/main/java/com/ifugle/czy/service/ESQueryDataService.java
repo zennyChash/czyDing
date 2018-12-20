@@ -31,8 +31,10 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ifugle.czy.utils.JResponse;
 import com.ifugle.czy.utils.TemplatesLoader;
 import com.ifugle.czy.utils.bean.RptDataJson;
 import com.ifugle.czy.utils.bean.template.FilterField;
@@ -334,5 +336,179 @@ public class ESQueryDataService {
 //		}
 //		return dest;
 //	}
+
+	public Map showQuery(String jpID, JSONObject params) {
+		Map result = new HashMap();
+		JSONObject jrpt = null;
+		TransportClient client = esClient.getClient();
+		JOutput jp = TemplatesLoader.getTemplatesLoader().getJOutput(jpID);
+		if(jp==null){
+			result.put("done", false);
+			result.put("info", "未找到页面数据的定义信息。");
+			log.equals("未找到JOutput信息，ID："+jpID);
+			return result;
+		}
+		List vds = jp.getValuedDs();
+		if(vds!=null){
+			Map mapQuery = new HashMap();
+			//vds中的ds，逐个查找，加载。
+			//筛选字段的值，在参数params中查找，如果没有，则用设计文件中的值（起默认值的作用）
+			for(int i=0;i<vds.size();i++){
+				ValuedDs vd = (ValuedDs)vds.get(i);
+				String dsName = vd.getName();
+				String dsRef = vd.getRefDtSrc();
+				List flts = vd.getFilterFlds();
+				List orders = vd.getOrderByFlds();
+				SearchRequestBuilder sReq = client.prepareSearch(dsRef).setTypes("_doc");
+				//如果指定了获取的字段，只取指定字段
+				if(!StringUtils.isEmpty(vd.getFields())){
+					sReq.setFetchSource(vd.getFields().split(","),null);
+				}
+				BoolQueryBuilder qb = QueryBuilders.boolQuery();
+				if(flts!=null){
+					for(int j=0;j<flts.size();j++){
+						FilterField flt = (FilterField)flts.get(j);
+						String ftype = flt.getFtype();
+						String fname = flt.getName();
+						String refParam = StringUtils.isEmpty(flt.getRefParam())?fname:flt.getRefParam();
+						String fv = "";
+						//先获取引用参数的值。如无，则使用默认的静态值。
+						if(params.containsKey(refParam)){
+							fv = params.getString(refParam);
+						}else{
+							fv = flt.getValue();
+						}
+						if(StringUtils.isEmpty(fv)){
+							result.put("done", false);
+							result.put("info", "缺少参数"+refParam+"的值。");
+							log.equals("构造JOutput信息失败，ID："+jpID+"，缺少参数"+refParam+"的值。");
+							return result;
+						}
+						int dtype = flt.getDataType();
+						if("terms".equalsIgnoreCase(ftype)){
+							qb.filter(QueryBuilders.termsQuery(fname+".raw", fv));
+						}else if("range".equalsIgnoreCase(ftype)){
+							if(StringUtils.isEmpty(fv)||fv.indexOf(",")<0){
+								continue;
+							}
+							boolean includeLower = false,includeUpper=false;
+							if(fv.startsWith("[")){
+								includeLower = true;
+								fv = fv.substring(1);
+							}else if(fv.startsWith("(")){
+								fv = fv.substring(1);
+							}
+							if(fv.endsWith("]")){
+								includeUpper = true;
+								fv = fv.substring(0, fv.length()-1);
+							}else if(fv.endsWith(")")){
+								fv = fv.substring(0, fv.length()-1);
+							}
+							String[] sranges = fv.split(",");
+							String sfrom = "",sto = "";
+							if(sranges.length==1){
+								if(fv.startsWith(",")){
+									sto = sranges[0];
+								}else{
+									sfrom = sranges[0];
+								}
+							}else{
+								sfrom = sranges[0];
+								sto = sranges[1];
+							}
+							if(dtype==1){
+								RangeQueryBuilder rq = QueryBuilders.rangeQuery(fname);
+								if(!StringUtils.isEmpty(sfrom)){
+									if(includeLower){
+										rq.gte(Integer.parseInt(sfrom));
+									}else{
+										rq.gt(Integer.parseInt(sfrom));
+									}
+								}
+								if(!StringUtils.isEmpty(sto)){
+									if(includeUpper){
+										rq.lte(Integer.parseInt(sto));
+									}else{
+										rq.lt(Integer.parseInt(sto));
+									}
+								}
+								qb.filter(rq);
+							}else if(dtype==2){
+								RangeQueryBuilder rq = QueryBuilders.rangeQuery(fname);
+								if(!StringUtils.isEmpty(sfrom)){
+									if(includeLower){
+										rq.gte(Double.parseDouble(sfrom));
+									}else{
+										rq.gt(Double.parseDouble(sfrom));
+									}
+								}
+								if(!StringUtils.isEmpty(sto)){
+									if(includeUpper){
+										rq.lte(Double.parseDouble(sto));
+									}else{
+										rq.lt(Double.parseDouble(sto));
+									}
+								}
+								qb.filter(rq);
+							}else{
+								RangeQueryBuilder rq = QueryBuilders.rangeQuery(fname+".raw");
+								if(!StringUtils.isEmpty(sfrom)){
+									rq = rq.from(sfrom,includeLower);
+								}
+								if(!StringUtils.isEmpty(sto)){
+									rq = rq.to(sto, includeUpper);
+								}
+								qb.filter(rq);
+							}
+						}else{
+							qb.filter(QueryBuilders.termsQuery(fname+".raw", fv));
+						}
+					}
+				}
+				if(orders!=null){
+					for(int k=0;k<orders.size();k++){
+						OrderField oflt = (OrderField)orders.get(k);
+						SortBuilder sortBuilder = SortBuilders.fieldSort(oflt.getDataType()==0?oflt.getName()+".raw":oflt.getName());
+						if("desc".equalsIgnoreCase(oflt.getDir())){
+							sortBuilder.order(SortOrder.DESC);
+						}else{
+							sortBuilder.order(SortOrder.ASC);
+						}
+						sReq.addSort(sortBuilder);
+					}
+				}
+				sReq.setQuery(qb);
+				//处理查询的分页。外部。和作为查询筛选条件的参数不一样。
+				if(vd.isPaging()){
+					String fromFld = vd.getStartParam();
+					String sizeFld = vd.getSizeParam();
+					int from = 0,size=0;
+					try{
+						from = params.getInteger(fromFld);
+					}catch(Exception e){}
+					try{
+						size = params.getInteger(sizeFld);
+					}catch(Exception e){}
+					if(size==0){
+						size=10;
+					}
+					sReq.setFrom(from).setSize(size);
+				}else{
+					String ms =Configuration.getConfig().getString("maxQuerySize", "200");
+					try{
+						sReq.setFrom(0).setSize(Integer.parseInt(ms));
+					}catch(Exception e){
+						sReq.setFrom(0).setSize(20);
+					}
+				}
+				String strQ=sReq.toString();
+				JSONObject jq = JSON.parseObject(strQ);
+			    mapQuery.put(dsName, jq);
+			}
+			result.put("done", true);
+			result.put("queries", mapQuery);
+		}
+		return result;
+	}
 	
 }

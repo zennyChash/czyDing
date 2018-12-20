@@ -96,7 +96,16 @@ public class SchedulService {
             se.printStackTrace();
         }
 	}
-	
+	public Scheduler getScheduler(){
+		return this.sched;
+	}
+	public void shutdown(){
+		try{
+			sched.shutdown(true);
+		} catch (SchedulerException se) {
+            se.printStackTrace();
+        }	
+	}
 	public Trigger getTrigger(TriggerInfo tinfo,String sdJobId,String groupId){
 		Trigger tg = null;
 		if(tinfo.getType()==0){

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="en_djxx" name="单户查询——企业信息"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($dhcx_basic&&$dhcx_basic.rows.size()>0)
+					"swdjzh":"$!{dhcx_basic.rows[0].swdjzh}",
+					"mc":"$!{dhcx_basic.rows[0].mc}",
+					"czfp":"$!{dhcx_basic.rows[0].czfp}",
+					"dz":"$!{dhcx_basic.rows[0].dz}",
+					"hy":"$!{dhcx_basic.rows[0].hy}"
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dhcx_basic" refDtSrc="enbasic" fields="swdjzh,mc,czfp,fddbr,dz,hy">
+			<filter name = "swdjzh" value="91330108742940165J"/>
+		</vDs>
+	</joutput>
+	<joutput id="en_df_ym" name="单户查询-最大月份" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($en_maxny&&$en_maxny.rows.size()>0)
+				"latestValidMonth":"$!{en_maxny.rows[0].ny}",
+				"format":"Ym" 
+			#end	
+			}
+		]]>
+		</jTemplate>
+		<vDs name="en_maxny" refDtSrc="en_maxny" fields="ny">
+			<filter name = "swdjzh" value="91330108742940165J"/>
+		</vDs>
+	</joutput>
+	<joutput id="en_year" name="单户查询-有数据的年" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($dhcx_year&&$dhcx_year.rows.size()>0)
+				"options":[
+					#foreach($row in $dhcx_year.rows)
+	   					{"bm":"$!{row.nian}","name":"$!{row.nian}"}#if($velocityCount != $dhcx_year.rows.size()),#end
+	   				#end
+				],
+				"defaultOp":"$!{dhcx_year.rows[0].nian}"
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dhcx_year" refDtSrc="en_year" fields="nian">
+			<filter name = "swdjzh" value="91330108742940165J"/>
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="en_month" name="单户查询-有数据的月份选项" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($en_month&&$en_month.rows.size()>0)
+				"options":[
+					#foreach($row in $en_month.rows)
+	   						{"bm":"$!{row.yue}","name":"$!{row.yue}"}#if($velocityCount != $en_month.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{en_month.rows[0].yue}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="en_month" refDtSrc="en_month" fields="ny,yue">
+			<filter name = "swdjzh" value="91330108742940165J"/>
+			<filter name = "nian" refParam="year" value="2018"/>
+			<orderBy name = "yue" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="en_tax" name="单户查询——企业税收信息"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($en_tax&&$en_tax.rows.size()>0)
+				"swdjzh":"$!{en_tax.rows[0].swdjzh}",
+				"mc":"$!{en_tax.rows[0].mc}",
+				"czfp":"$!{en_tax.rows[0].czfp}",
+				"bnlj":"$!{en_tax.rows[0].zsebn}",
+				"snlj":"$!{en_tax.rows[0].zsesn}",
+				"qnlj":"$!{en_tax.rows[0].zseqn}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="en_tax" fields="swdjzh,mc,czfp,zsebn,zsesn,zseqn">
+			<filter name = "swdjzh" value="91330108742940165J"/>
+			<filter name = "ny" value="201806"/>
+		</vDs>
+	</joutput>
+	<joutput id="en_djxx_kz" name="单户查询——更多信息"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				fields:[{
+					"fieldName":"swdjzh",
+					"value":"$!{dhcx_basic.rows[0].swdjzh}",
+					"fieldLabel":"社会信用代码"
+				},{
+					"fieldName":"kyrq",
+					"value":"",
+					"fieldLabel":"开业日期"
+				},{
+					"fieldName":"fddbr",
+					"value": "$!{dhcx_basic.rows[0].fddbr}",
+					"fieldLabel":"法定代表人"
+				},{
+					"fieldName":"zt",
+					"value": "$!{dhcx_basic.rows[0].zt}",
+					"fieldLabel" :"企业状态"
+				}]
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dhcx_basic" refDtSrc="enbasic" fields="swdjzh,fddbr,zt">
+			<filter name = "swdjzh" value="91330108742940165J"/>
+		</vDs>
+	</joutput>
+</pages>
+

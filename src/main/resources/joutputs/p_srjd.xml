@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+		<joutput id="srjd_df_day" name="最大日期" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($dzjk_maxnyr&&$dzjk_maxnyr.rows.size()>0)
+				"latestValidMonth":"$!{dzjk_maxnyr.rows[0].nyr}",
+				"format":"Ymd" 
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_maxnyr" refDtSrc="dzjk_maxnyr" fields="nyr"/>
+	</joutput>
+	<joutput id="srjd_day" name="有数据的日" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($dzjk_day&&$dzjk_day.rows.size()>0)
+				"options":[
+					#foreach($row in $dzjk_day.rows)
+	   						{"bm":"$!{row.ri}","name":"$!{row.ri}"}#if($velocityCount != $dzjk_day.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{dzjk_day.rows[0].ri}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_day" refDtSrc="dzjk_day" fields="ri">
+			<filter name = "ny" refParam="yearMonth" value="201804"/>
+			<orderBy name = "ri" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="srjd" name="收入进度"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($dzjk_srjd&&$dzjk_srjd.rows.size()>0)
+				ggys:{
+					"nlj_jk":"$!{dzjk_srjd.rows[0].bnlj}",
+					"wcjd":"$!{dzjk_srjd.rows[0].wcbl}",
+		        	"ysjh":"$!{dzjk_srjd.rows[0].yss}",
+					"snlj_jk":"$!{dzjk_srjd.rows[0].sntq}",
+					"tbzz":"$!{dzjk_srjd.rows[0].tbzf}"
+				},
+				czzsr:{
+					"nlj_jk":"$!{dzjk_srjd.rows[1].bnlj}",
+					"wcjd":"$!{dzjk_srjd.rows[1].wcbl}",
+		         	"ysjh":"$!{dzjk_srjd.rows[1].yss}",
+					"snlj_jk":"$!{dzjk_srjd.rows[0].sntq}",
+					"tbzz":"$!{dzjk_srjd.rows[0].tbzf}"
+				}
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_srjd" refDtSrc="dzjk_srjd" fields="bnlj,sntq,yss,wcbl,tbzf">
+			<filter name = "zwrq_jk" refParam="zwrq" value="20180428"/>
+			<orderBy name = "kj" dir="desc"/>
+		</vDs>
+	</joutput>
+		<joutput id="srjd_line" name="收入进度3年折线图"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{		
+			#if($dzjk_by_years&&$dzjk_by_years.rows.size()>0)
+				"ggys_line":[{
+					"name":"$!{dzjk_by_years.rows[0].nian}",
+					"data":["$!{dzjk_by_years.rows[0].yiyue}","$!{dzjk_by_years.rows[0].eryue}","$!{dzjk_by_years.rows[0].sayue}","$!{dzjk_by_years.rows[0].siyue}","$!{dzjk_by_years.rows[0].wuyue}","$!{dzjk_by_years.rows[0].liyue}","$!{dzjk_by_years.rows[0].qiyue}","$!{dzjk_by_years.rows[0].bayue}","$!{dzjk_by_years.rows[0].jiyue}","$!{dzjk_by_years.rows[0].shyue}","$!{dzjk_by_years.rows[0].syyue}","$!{dzjk_by_years.rows[0].seyue}"]
+				},{
+					"name":"$!{dzjk_by_years.rows[1].nian}",
+					"data":["$!{dzjk_by_years.rows[1].yiyue}","$!{dzjk_by_years.rows[1].eryue}","$!{dzjk_by_years.rows[1].sayue}","$!{dzjk_by_years.rows[1].siyue}","$!{dzjk_by_years.rows[1].wuyue}","$!{dzjk_by_years.rows[1].liyue}","$!{dzjk_by_years.rows[1].qiyue}","$!{dzjk_by_years.rows[1].bayue}","$!{dzjk_by_years.rows[1].jiyue}","$!{dzjk_by_years.rows[1].shyue}","$!{dzjk_by_years.rows[1].syyue}","$!{dzjk_by_years.rows[1].seyue}"]
+				},{
+					"name":"$!{dzjk_by_years.rows[2].nian}",
+					"data":["$!{dzjk_by_years.rows[2].yiyue}","$!{dzjk_by_years.rows[2].eryue}","$!{dzjk_by_years.rows[2].sayue}","$!{dzjk_by_years.rows[2].siyue}","$!{dzjk_by_years.rows[2].wuyue}","$!{dzjk_by_years.rows[2].liyue}","$!{dzjk_by_years.rows[2].qiyue}","$!{dzjk_by_years.rows[2].bayue}","$!{dzjk_by_years.rows[2].jiyue}","$!{dzjk_by_years.rows[2].shyue}","$!{dzjk_by_years.rows[2].syyue}","$!{dzjk_by_years.rows[2].seyue}"]
+				}],
+				"czzsr_line":[{
+					"name":"$!{dzjk_by_years.rows[3].nian}",
+					"data":["$!{dzjk_by_years.rows[3].yiyue}","$!{dzjk_by_years.rows[3].eryue}","$!{dzjk_by_years.rows[3].sayue}","$!{dzjk_by_years.rows[3].siyue}","$!{dzjk_by_years.rows[3].wuyue}","$!{dzjk_by_years.rows[3].liyue}","$!{dzjk_by_years.rows[3].qiyue}","$!{dzjk_by_years.rows[3].bayue}","$!{dzjk_by_years.rows[3].jiyue}","$!{dzjk_by_years.rows[3].shyue}","$!{dzjk_by_years.rows[3].syyue}","$!{dzjk_by_years.rows[3].seyue}"]
+				},{
+					"name":"$!{dzjk_by_years.rows[4].nian}",
+					"data":["$!{dzjk_by_years.rows[4].yiyue}","$!{dzjk_by_years.rows[4].eryue}","$!{dzjk_by_years.rows[4].sayue}","$!{dzjk_by_years.rows[4].siyue}","$!{dzjk_by_years.rows[4].wuyue}","$!{dzjk_by_years.rows[4].liyue}","$!{dzjk_by_years.rows[4].qiyue}","$!{dzjk_by_years.rows[4].bayue}","$!{dzjk_by_years.rows[4].jiyue}","$!{dzjk_by_years.rows[4].shyue}","$!{dzjk_by_years.rows[4].syyue}","$!{dzjk_by_years.rows[4].seyue}"]
+				},{
+					"name":"$!{dzjk_by_years.rows[5].nian}",
+					"data":["$!{dzjk_by_years.rows[5].yiyue}","$!{dzjk_by_years.rows[5].eryue}","$!{dzjk_by_years.rows[5].sayue}","$!{dzjk_by_years.rows[5].siyue}","$!{dzjk_by_years.rows[5].wuyue}","$!{dzjk_by_years.rows[5].liyue}","$!{dzjk_by_years.rows[5].qiyue}","$!{dzjk_by_years.rows[5].bayue}","$!{dzjk_by_years.rows[5].jiyue}","$!{dzjk_by_years.rows[5].shyue}","$!{dzjk_by_years.rows[5].syyue}","$!{dzjk_by_years.rows[5].seyue}"]
+				}]
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="dzjk_by_years" refDtSrc="dzjk_by_years" fields="nian,kj,yiyue,eryue,sayue,siyue,wuyue,liyue,qiyue,bayue,jiyue,shyue,syyue,seyue">
+			<filter name = "nian_parm" refParam="thisYear" value="2018"/>
+			<orderBy name = "kj" dir="desc"/>
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+</pages>

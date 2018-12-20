@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ifugle.czy.service.ConsoleServeice;
 import com.ifugle.czy.service.ESDataSourceService;
@@ -305,6 +306,77 @@ public class ConsoleScriptController {
 			jr.setRetMsg("缺少参数，无法执行！");
 			jr.setRetData("");
 		}
+		return jr;
+	}
+	/**
+	 * 显示脚本构造的mapping语句，json格式
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping(value="/showMapping",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse showMapping(@RequestParam Map<String, String> params){
+		JResponse jr = null;
+		if(params!=null){
+			String id = params.get("id");
+			if(StringUtils.isEmpty(id)){
+				jr.setRetCode("9");
+				jr.setRetMsg("没有指定数据源ID");
+				jr.setRetData("");
+			}else{
+				String jMapping = null;
+				try{
+					jMapping = esDtSrcService.showMapping(id,null);
+					JSONObject jm = JSON.parseObject(jMapping);
+					jr = new JResponse("0","",jm);
+					log.info(id+"的mapping输出:"+jr.toString());
+				}catch(Exception e){
+					log.error(e.toString());
+					jr = new JResponse("9","获取数据源Mapping信息时发生错误。",null);
+				}
+			}
+		}else{
+			jr = new JResponse("9","获取数据源Mapping信息失败，没有获得正确的请求参数！",null);
+		}
+		return jr;
+	}
+	/**
+	 * 显示查询语句，json格式
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping(value="/showQuery",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse showQuery(@RequestParam Map<String, String> params){
+		JResponse jr = null;
+		if(params!=null){
+			String rptID = params.get("id");
+			String strParams =params.get("rptParams");
+			JSONObject qParams = new JSONObject();
+			if(!StringUtils.isEmpty(strParams)){
+				qParams = JSONObject.parseObject(strParams);
+			}
+			Map result = null;
+			try{
+				result = esDataService.showQuery(rptID,qParams);
+				if(result!=null&&result.containsKey("done")&&((boolean)result.get("done"))){
+					jr = new JResponse("0","",result.get("queries"));
+				}else{
+					jr = new JResponse("9","获取查询语句时发生异常:"+result.get("info"),null);
+				}
+				log.info(rptID+"的查询语句输出:"+jr.toString());
+			}catch(Exception e){
+				jr = new JResponse("9","获取查询语句时发生异常。",null);
+			}
+		}else{
+			jr = new JResponse("9","组织报表查询语句失败，没有获得正确的请求参数！",null);
+		}
+		return jr;
+	}
+	@RequestMapping(value="/testWhiteIPS",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse testWhiteIPS(@RequestParam Map<String, String> params){
+		JResponse jr = new JResponse("0","","");
 		return jr;
 	}
 }

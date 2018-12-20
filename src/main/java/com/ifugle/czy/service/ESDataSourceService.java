@@ -55,10 +55,10 @@ public class ESDataSourceService {
 	public void setEsService(ESClientFactory esClient){
 		this.esClient = esClient;
 	}
-	protected JdbcTemplate jdbcTemplate;
+	protected JdbcTemplate jdbcTemplateDt;
 	@Autowired
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate){
-		this.jdbcTemplate = jdbcTemplate;
+	public void setJdbcTemplateDt(JdbcTemplate jdbcTemplateDt){
+		this.jdbcTemplateDt = jdbcTemplateDt;
 	}
 	//删除索引
 	public String delelteIndex(String indexName){
@@ -235,7 +235,7 @@ public class ESDataSourceService {
 			}
 		}
 		proStmt.append("}");
-		cc=(Integer)jdbcTemplate.execute(proStmt.toString(),new CallableStatementCallback(){
+		cc=(Integer)jdbcTemplateDt.execute(proStmt.toString(),new CallableStatementCallback(){
 			public Object doInCallableStatement(CallableStatement cs)throws SQLException, DataAccessException {
 				if(parasIn!=null&&parasIn.size()>0){
 					for(int i=0;i<parasIn.size();i++){
@@ -352,7 +352,7 @@ public class ESDataSourceService {
 		}
 		sql = parseParamValue(sql,paramVals);
 		if( needRemap){
-			SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql);
+			SqlRowSet rowSet = jdbcTemplateDt.queryForRowSet(sql);
 			SqlRowSetMetaData metaData = rowSet.getMetaData();
 			int columnCount = metaData.getColumnCount();
 			List colsMeata = new ArrayList();
@@ -364,7 +364,7 @@ public class ESDataSourceService {
 			}
 			buildMappings(ds.getId(),colsMeata);
 		}
-		List lst = jdbcTemplate.queryForList(sql);
+		List lst = jdbcTemplateDt.queryForList(sql);
 		if(lst!=null&&lst.size()>0){
 			Map esCols = ds.getColMap();
 			TransportClient client = esClient.getClient();
@@ -476,5 +476,196 @@ public class ESDataSourceService {
 		}
 		results[1]=bfInfos.toString();
 		return results; 
+	}
+	
+	
+	//获取构造出的mapping语句
+	@SuppressWarnings({ "unchecked", "rawtypes"})
+	public String showMapping(String indexName,Map paramVals)throws Exception{
+		String strMapping = "";
+		DataSrc ds = TemplatesLoader.getTemplatesLoader().getDataSrc(indexName);
+	    if(ds==null){
+	    	throw new Exception("未找到ID为"+indexName+"的数据源定义信息！");
+	    }
+	    List colsMata = new ArrayList();
+	    if(ds.getSourceType()==1){
+	    	String sql = ds.getSql();
+			if(StringUtils.isEmpty(sql)){
+				throw new Exception("数据源定了sql取数方式，但未找到sql语句！");
+			}
+			sql = parseParamValue(sql,paramVals);
+			SqlRowSet rowSet = jdbcTemplateDt.queryForRowSet(sql);
+			SqlRowSetMetaData metaData = rowSet.getMetaData();
+			int columnCount = metaData.getColumnCount();
+			for (int i = 1; i <= columnCount; i++) {  
+				Map<String,String> col = new HashMap<String,String>();
+				col.put("cName", metaData.getColumnLabel(i).toLowerCase());
+				col.put("cType", getTypeName(metaData.getColumnType(i)));
+				colsMata.add(col);
+			}
+		}else if(ds.getSourceType()==2){
+			ProcedureBean pro=ds.getProcedure();
+			if(pro==null){
+				log.error("未设置取数存储过程！");
+				throw new Exception("数据源定了存储过程取数方式，但未找到存储过程定义！");
+			}
+			List parasIn=pro.getInParas();
+			StringBuffer proStmt=new StringBuffer("{call ");
+			proStmt.append(pro.getName());
+			//根据输入参数定义的个数设置?
+			if(parasIn!=null&&parasIn.size()>0){
+				proStmt.append("(");
+				for(int i=0;i<parasIn.size();i++){
+					proStmt.append("?");
+					if(i<parasIn.size()-1){
+						proStmt.append(",");
+					}
+				}
+			}
+			//根据输出参数定义继续设置?
+			List parasOut=pro.getOutParas();
+			if(parasOut!=null&&parasOut.size()>0){
+				if(parasIn==null||parasIn.size()==0){
+					proStmt.append("(");
+				}else{
+					proStmt.append(",");
+				}
+				for(int i=0;i<parasOut.size();i++){
+					proStmt.append("?");
+					if(i<parasOut.size()-1){
+						proStmt.append(",");
+					}else{
+						proStmt.append(")");
+					}
+				}
+			}else{
+				if(parasIn!=null&&parasIn.size()>0){
+					proStmt.append(")");
+				}
+			}
+			proStmt.append("}");
+			colsMata= (List)jdbcTemplateDt.execute(proStmt.toString(),new CallableStatementCallback(){
+				public Object doInCallableStatement(CallableStatement cs)throws SQLException, DataAccessException {
+					List cm = new ArrayList();
+					if(parasIn!=null&&parasIn.size()>0){
+						for(int i=0;i<parasIn.size();i++){
+							//过程参数引用方式分直接引用固定值和引用参数两种
+							ProParaIn pi=(ProParaIn)parasIn.get(i);
+							if(pi!=null&&pi.getReferMode()==0){
+								if(pi.getDataType()==1){
+									int ival=0;
+									try{ival=Integer.parseInt(pi.getValue());}
+									catch(Exception e){}
+									cs.setInt(i+1, ival);
+									log.info("参数(整型)"+pi.getReferTo()+":"+ival);
+								}else if(pi.getDataType()==2){
+									double dval=0;
+									try{dval=Double.parseDouble(pi.getValue());}
+									catch(Exception e){}
+									cs.setDouble(i+1, dval);
+									log.info("参数(小数)"+pi.getReferTo()+":"+dval);
+								}else{
+									cs.setString(i+1, pi.getValue());
+									log.info("参数(字符串)"+pi.getReferTo()+":"+pi.getValue());
+								}
+							}else{
+								if(paramVals==null){
+									log.error("缺少参数值。参数："+pi.getReferTo());
+								}
+								//找出输入参数的定义
+								String val=(String)paramVals.get(pi.getReferTo());
+								if(val==null){
+									log.error("缺少参数"+pi.getReferTo()+"的值！");
+								}
+								if(pi.getDataType()==1){
+									int iVal=0;
+									try{
+										iVal=Integer.parseInt(val);
+									}catch(Exception e){}
+									cs.setInt(i+1, iVal);
+									log.info("参数(整型)"+pi.getReferTo()+":"+iVal);
+								}else if(pi.getDataType()==2){
+									double dVal=0;
+									try{
+										dVal=Double.parseDouble(val);
+									}catch(Exception e){}
+									cs.setDouble(i+1, dVal);
+									log.info("参数(小数)"+pi.getReferTo()+":"+dVal);
+								}else{
+									cs.setString(i+1,val);
+									log.info("参数(字符串)"+pi.getReferTo()+":"+val);
+								}
+							}
+						}
+					}
+					//注册输出参数
+					int oStart=parasIn==null?1:parasIn.size()+1;
+					if(parasOut!=null){
+						for(int i=0;i<parasOut.size();i++){
+							ProParaOut po=(ProParaOut)parasOut.get(i);
+							if(po.getDataType()==1||po.getDataType()==2){
+								cs.registerOutParameter(oStart+i, Types.NUMERIC);
+							}else if(po.getDataType()==0){
+								cs.registerOutParameter(oStart+i, Types.VARCHAR);
+							}else if(po.getDataType()==3){
+								cs.registerOutParameter(oStart+i, oracle.jdbc.OracleTypes.CURSOR);
+							}
+						}
+					}
+	                cs.execute();  
+	                ResultSet rs = (ResultSet)cs.getObject(oStart-1+pro.getDataSetIndex()); 
+	                if(rs==null){
+	                	return null;
+	                }
+	                ResultSetMetaData rsmd=rs.getMetaData();
+	        		//获取元信息
+	        		int colNum=rsmd.getColumnCount();
+        			for (int i = 1; i <= colNum; i++) {  
+        				Map<String,String> col = new HashMap<String,String>();
+        				col.put("cName", rsmd.getColumnLabel(i).toLowerCase());
+        				col.put("cType", getTypeName(rsmd.getColumnType(i)));
+        				cm.add(col);
+        			}
+        			return cm;
+				}
+			});
+		}
+	    //根据列的metaData构造mapping语句
+	    XContentBuilder mapping = null;
+	    try{
+		    mapping = XContentFactory.jsonBuilder().startObject()  
+	                .startObject("_doc").startObject("properties");
+		    Map cols = ds.getColMap();
+		    for(int i = 0;i<colsMata.size();i++){
+		    	Map oneCol = (Map)colsMata.get(i);
+		    	String cn = (String)oneCol.get("cName");
+		    	String ctype = (String)oneCol.get("cType");
+		    	//如果在xml中特别定义了col，按col定义，否则，默认按字段属性构造mapping
+		    	if(cols.containsKey(cn)){
+		    		Column col = (Column)cols.get(cn);
+			    	String fldtype = StringUtils.isEmpty(col.getFldType())?"text":col.getFldType();
+			    	mapping.startObject(col.getName()).field("type",fldtype);
+			    	if(col.getIsFilter()==1||col.getCanOrder()==1){
+			    		mapping.startObject("fields").startObject("raw")
+			    		.field("type","keyword").endObject().endObject();
+			    	}
+			    	if(!StringUtils.isEmpty(col.getAnalyzer())){
+			    		mapping.field("analyzer",col.getAnalyzer());
+			    	}
+			    	if(!StringUtils.isEmpty(col.getSearch_analyzer())){
+			    		mapping.field("search_analyzer",col.getSearch_analyzer());
+			    	}
+		    	}else{
+		    		mapping.startObject(cn).field("type",ctype);
+		    	}
+		    	mapping.endObject();
+		    }
+		    mapping.endObject().endObject().endObject();
+		    PutMappingRequest map = Requests.putMappingRequest(indexName).type("_doc").source(mapping);
+		    strMapping = map.source();
+	    }catch(Exception e){
+	    	log.error(e.toString());
+	    }
+		return strMapping;
 	}
 }

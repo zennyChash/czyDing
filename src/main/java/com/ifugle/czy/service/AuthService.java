@@ -59,7 +59,13 @@ public class AuthService {
      */
     public Map getConfig(HttpServletRequest request) {
     	Map config = new HashMap();
-        String urlString = request.getRequestURL().toString();
+        String urlString = request.getHeader("Referer");
+        String urlStringBak = request.getRequestURL().toString();
+        System.out.print("---------------------------");
+        System.out.print("referer:"+urlString);
+        System.out.print("**************************");
+        System.out.print("urlString:"+urlStringBak);
+        System.out.print("---------------------------");
         String queryString = request.getQueryString();
         String queryStringEncode = null;
         Configuration cg = Configuration.getConfig();

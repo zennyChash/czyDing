@@ -92,10 +92,23 @@ Zepto(function($){
 // 					alert("string:"+dt);
 // 				}
 // 			});
-			p = JSON.stringify({"reqService":"czfc","reqMethod":"getAppListCheckInfo","svParams":{"userid":"manager431","lid":"882"}});
+
+// 			p = JSON.stringify({"reqService":"czfc","reqMethod":"getMsgAfterCheck","svParams":{"userid":"manager431","lid":"882"}});
+// 			$.ajax({
+// 				type: 'post',
+// 				url: 'api/remoteService',
+// 				data: p,
+// 				headers: {
+// 					"Content-Type": "application/json;charset=utf-8"
+// 			    },
+// 				success: function(dt){
+// 					alert("string:"+dt);
+// 				}
+// 			});
+			p = JSON.stringify({"msg":"测试一下啦！神锋无影！","users":"manager431"});
 			$.ajax({
 				type: 'post',
-				url: 'api/remoteService',
+				url: 'api/sendDingMsg',
 				data: p,
 				headers: {
 					"Content-Type": "application/json;charset=utf-8"
@@ -104,6 +117,20 @@ Zepto(function($){
 					alert("string:"+dt);
 				}
 			});
+			
+// 			p = JSON.stringify({"reqService":"czfc","reqMethod":"getAppListCheckInfo","svParams":{"userid":"manager431","lid":"882"}});
+// 			$.ajax({
+// 				type: 'post',
+// 				url: 'api/remoteService',
+// 				data: p,
+// 				headers: {
+// 					"Content-Type": "application/json;charset=utf-8"
+// 			    },
+// 				success: function(dt){
+// 					alert("string:"+dt);
+// 				}
+// 			});
+			
 // 			p = JSON.stringify({"reqService":"czfc","reqMethod":"getAppListDetails","svParams":{"userid":"manager431","sort":"","dir":"","start":0,"limit":10,"params":{"lid":"841"}}});
 // 			$.ajax({
 // 				type: 'post',

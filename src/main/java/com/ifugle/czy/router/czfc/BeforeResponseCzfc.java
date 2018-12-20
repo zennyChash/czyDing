@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ifugle.czy.router.IBeforeResponse;
@@ -19,6 +17,7 @@ import com.ifugle.czy.utils.JResponse;
 import com.ifugle.czy.utils.bean.SimpleValue;
 @Transactional
 public class BeforeResponseCzfc implements IBeforeResponse{
+	private static Logger log = Logger.getLogger(BeforeResponseCzfc.class);
 	protected JdbcTemplate jdbcTemplate;
 	@Autowired
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate){
@@ -41,7 +40,9 @@ public class BeforeResponseCzfc implements IBeforeResponse{
 			JSONObject res = responses.getJSONObject("_RETURNED");
 			if(res!=null){
 				Map um = getUserMapping(serviceName);
+				log.info("getMsgAfterCheck方法中，转换前的接收者："+res.getString("users"));
 				transformUserString(res,um);
+				log.info("getMsgAfterCheck方法中转换后的接收者："+res.getString("users"));
 			}
 		}
 		for(String key :responses.keySet()){

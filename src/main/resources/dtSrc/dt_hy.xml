@@ -41,13 +41,13 @@ round(bnlj/sum(bnlj) over (partition by ny)*100,2) srzb,case when sntq=0 then 0 
 r.color hycolor
 from (
 SELECT ny,
-case when hd.bm in('C','J','K') then hd.bm else 'Z_X' end  hybm,
-case when hd.bm in('C','J','K') then hd.mc else '其他行业' end hymc,
+case when hd.bm in('C','K','I','O') then hd.bm else 'Z_X' end  hybm,
+case when hd.bm in('C','K','I','O') then hd.mc else '其他行业' end hymc,
 sum(zse) bnlj,sum(zse_s) sntq
 FROM BB_SRTJ_CX r,bm_hy h,bm_hy_dl hd
 WHERE szbm in ('10101','10102','10103','10104','10106','10107','10109','10110','10111','10112','10113','10114','10116','10118','10119','10121')
 and r.hybm=h.bm and h.dlbm=hd.bm and r.lxbm=1
-group by ny,case when hd.bm in('C','J','K') then hd.bm else 'Z_X' end,case when hd.bm in('C','J','K') then hd.mc else '其他行业' end
+group by ny,case when hd.bm in('C','K','I','O') then hd.bm else 'Z_X' end,case when hd.bm in('C','K','I','O') then hd.mc else '其他行业' end
 ) a,czy_renders r
 where r.rptid='hy_tax_fb' and r.lid = a.hybm
 order by ny,hybm
@@ -65,7 +65,7 @@ order by ny,hybm
 	<src id="hy_one_details" name="行业企业税收" description="某行业中排名前若干名的企业的情况" sourceType ="sql">
 		<sql>
 		<![CDATA[
-       SELECT * FROM czy_hyfb_qycx where ny>201412 and ny<=201512 
+       SELECT * FROM czy_hyfb_qycx
 		]]>
 		</sql>
 		<cols>

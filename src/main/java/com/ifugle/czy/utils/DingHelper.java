@@ -1,13 +1,22 @@
 package com.ifugle.czy.utils;
 
+import java.util.List;
+
 import org.apache.ibatis.ognl.OgnlException;
 
 import com.alibaba.fastjson.JSONObject;
 import com.dingtalk.oapi.lib.aes.DingTalkJsApiSingnature;
 import com.dingtalk.open.client.ServiceFactory;
+import com.dingtalk.open.client.api.model.corp.CorpUserList;
+import com.dingtalk.open.client.api.model.corp.Department;
 import com.dingtalk.open.client.api.model.corp.JsapiTicket;
 import com.dingtalk.open.client.api.service.corp.CorpConnectionService;
+import com.dingtalk.open.client.api.service.corp.CorpDepartmentService;
+import com.dingtalk.open.client.api.service.corp.CorpUserService;
 import com.dingtalk.open.client.api.service.corp.JsapiService;
+import com.dingtalk.open.client.common.SdkInitException;
+import com.dingtalk.open.client.common.ServiceException;
+import com.dingtalk.open.client.common.ServiceNotExistException;
 import com.ifugle.utils.Configuration;
 
 public class DingHelper {
@@ -59,7 +68,6 @@ public class DingHelper {
         } else {
         	return accessTokenValue.getString("access_token");
         }
-
         return accToken;
     }
     /**
@@ -107,8 +115,8 @@ public class DingHelper {
     }
     public static String getSsoToken() throws OApiException {
     	String corp_id = Configuration.getConfig().getString("CORP_ID");
-        String corp_secret = Configuration.getConfig().getString("CORP_SECRET");
-        String url = "https://oapi.dingtalk.com/sso/gettoken?corpid=" + corp_id + "&corpsecret=" + corp_secret;
+        String sso_secret = Configuration.getConfig().getString("SSO_SECRET");
+        String url = "https://oapi.dingtalk.com/sso/gettoken?corpid=" + corp_id + "&corpsecret=" + sso_secret;
         JSONObject response = HttpHelper.httpGet(url);
         String ssoToken;
         if (response.containsKey("access_token")) {
@@ -117,6 +125,42 @@ public class DingHelper {
             throw new OApiException("Sso_token");
         }
         return ssoToken;
+    }
+    /**
+     * 管理后台免登时通过CODE换取微应用管理员的身份信息
+     *
+     * @param ssoToken
+     * @param code
+     * @return
+     * @throws OApiException
+     */
+    public static JSONObject getAgentUserInfo(String ssoToken, String code) throws OApiException {
+    	String oa_host = Configuration.getConfig().getString("OAPI_HOST");
+        String url = oa_host + "/sso/getuserinfo?" + "access_token=" + ssoToken + "&code=" + code;
+        JSONObject response = HttpHelper.httpGet(url);
+        return response;
+    }
 
+	 /**
+     * 获取部门列表
+     */
+    public static List<Department> listDepartments(String accessToken, String parentDeptId)
+            throws ServiceNotExistException, SdkInitException, ServiceException {
+        CorpDepartmentService corpDepartmentService = ServiceFactory.getInstance().getOpenService(CorpDepartmentService.class);
+        List<Department> deptList = corpDepartmentService.getDeptList(accessToken, parentDeptId);
+        return deptList;
+    }
+    //获取部门成员
+    public static CorpUserList getDepartmentUser(
+            String accessToken,
+            long departmentId,
+            Long offset,
+            Integer size,
+            String order)
+            throws Exception {
+
+        CorpUserService corpUserService = ServiceFactory.getInstance().getOpenService(CorpUserService.class);
+        return corpUserService.getCorpUserSimpleList(accessToken, departmentId,
+                offset, size, order);
     }
 }

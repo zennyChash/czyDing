@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="sryb_df_ym" name="收入月报-最大月份" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($sryb_month&&$sryb_month.rows.size()>0)
+				"latestValidMonth":"$!{sryb_month.rows[0].ny}",
+				"format":"Ym" 
+			#end	
+			}
+		]]>
+		</jTemplate>
+		<vDs name="sryb_month" refDtSrc="sryb_month" fields="ny">
+            <orderBy name = "ny" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="sryb_year" name="收入月报-有数据的年" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($hy_year&&$hy_year.rows.size()>0)
+				"options":[
+					#foreach($row in $hy_year.rows)
+	   						{"bm":"$!{row.nian}"}#if($velocityCount != $hy_year.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{hy_year.rows[0].nian}"
+			#end	
+			}
+		]]>
+		</jTemplate>
+		<vDs name="hy_year" refDtSrc="sryb_year" fields="nian">
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="sryb_month" name="收入月报有数据的月份选项" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($sryb_month&&$sryb_month.rows.size()>0)
+				"options":[
+					#foreach($row in $sryb_month.rows)
+	   						{"bm":"$!{row.yue}","name":"$!{row.ny}"}#if($velocityCount != $sryb_month.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{sryb_month.rows[0].ny}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="sryb_month" refDtSrc="sryb_month" fields="ny,yue">
+			<filter name = "nian" refParam="year" value="2018"/>
+			<orderBy name = "ny" dir="desc"/>
+		</vDs>
+	</joutput>
+    <joutput id="sryb" name="收入月报" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($sryb_qs&&$sryb_qs.rows.size()>0)	
+					"total_ybggys":{"fpbm":"ALL_00","fp":"全市合计","yss":"$!{sryb_qs.rows[0].yss}","zxjd":"$!{sryb_qs.rows[0].wcbl}","zxs":"$!{sryb_qs.rows[0].bnlj}","sntq":"$!{sryb_qs.rows[0].sntq}","tbzz":"$!{sryb_qs.rows[0].tbzz}"},
+	 				"total_czzsr":{"fpbm":"ALL_00","fp":"全市合计","yss":"$!{sryb_qs.rows[1].yss}","zxjd":"$!{sryb_qs.rows[1].wcbl}","zxs":"$!{sryb_qs.rows[1].bnlj}","sntq":"$!{sryb_qs.rows[1].sntq}","tbzz":"$!{sryb_qs.rows[1].tbzz}"},
+			"pie_ybggys":[
+					#foreach($row in $sryb_ybggyssr.rows)
+	   						{
+	   					"fpbm":"$!{row.dw}",
+						"fp":"$!{row.dw}",
+						"yss":"$!{row.yss}",
+						"zxjd":"$!{row.wcbl}",
+						"zxs":"$!{row.bnlj}",  
+						"sntq":"$!{row.sntq}", 
+						"tbzz":"$!{row.tbzz}",
+						"sszb":"$!{row.srzb}",
+						"color":"$!{row.color}"  
+	   						}#if($velocityCount != $sryb_ybggyssr.rows.size()),#end
+	   					#end
+				],
+			"pie_czzsr":[
+					#foreach($row in $sryb_czzsr.rows)
+	   						{
+	   					"fpbm":"$!{row.dw}",
+						"fp":"$!{row.dw}",
+						"yss":"$!{row.yss}",
+						"zxjd":"$!{row.wcbl}",
+						"zxs":"$!{row.bnlj}",  
+						"sntq":"$!{row.sntq}", 
+						"tbzz":"$!{row.tbzz}",
+						"sszb":"$!{row.srzb}",
+						"color":"$!{row.color}"  
+	   						}#if($velocityCount != $sryb_czzsr.rows.size()),#end
+	   					#end
+				]
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="sryb_qs" refDtSrc="sryb_qs" fields="bnlj,yss,wcbl,sntq,tbzz">
+			<filter name = "ny" refParam="zwrq" value="201804"/>
+			<orderBy name = "kj" dir="desc"/>
+		</vDs>
+		<vDs name="sryb_ybggyssr" refDtSrc="sryb_ybggyssr" fields="dw,bnlj,yss,wcbl,sntq,tbzz,srzb,color">
+			<filter name = "ny" refParam="zwrq" value="201804"/>
+                        <orderBy name = "srzb" dir="desc" dataType="double"/>
+		</vDs>
+		<vDs name="sryb_czzsr" refDtSrc="sryb_czzsr" fields="dw,bnlj,yss,wcbl,sntq,tbzz,srzb,color">
+			<filter name = "ny" refParam="zwrq" value="201804"/>
+                        <orderBy name = "srzb" dir="desc" dataType="double"/>
+		</vDs>
+	</joutput>
+</pages>

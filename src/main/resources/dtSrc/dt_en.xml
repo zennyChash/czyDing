@@ -38,7 +38,7 @@
 	<src id="en_month" name="有数据的月份" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-			select swdjzh,nian,yue,nian||yue ny from CZY_DHCX_NY 
+			select swdjzh,nian,yue,nian||yue ny from CZY_DHCX_NY
 		]]>
 		</sql>
 		<cols>
@@ -51,7 +51,7 @@
 	<src id="en_tax" name="企业税收信息" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-        select ny,swdjzh,mc,czfp,zsebn,zsesn,zseqn from CZY_BB_SRQC_CX 
+        select ny,swdjzh,mc,czfp,zsebn,zsesn,0 zseqn from CZY_BB_SRQC_CX
 		]]>
 		</sql>
 		<cols>

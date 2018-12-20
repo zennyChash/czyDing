@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <routers>
-	<service id="czfc" name="产业扶持" description="" rootURI="http://localhost:8088/CZFC/api">
+	<service id="czfc" name="产业扶持" description="" rootURI="http://localhost:8086/CZFC/api">
 		<method name="getApprovalLists">
 			<request returnProperty="" method="POST" subURI="getApprovalLists2Check" socketTimeout="20000" connTimeout="20000"  before="czyReqProcess">
 				<property name="Content-Type" value="application/json;charset=UTF-8"/>

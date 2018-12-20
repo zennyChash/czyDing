@@ -35,33 +35,33 @@ public class QueryDataController {
 	@Autowired
 	private ReportDataEsService rptEsService;
 	
-	@RequestMapping(value="/queryDataDB",method = RequestMethod.POST)
-	@ResponseBody
-	public JResponse getRptDataDB(@RequestBody RptDataJson params){
-		JResponse jr = null;
-		if(params!=null){
-			String rptID = params.getRptID();
-			Map data = rptDataService.getData(rptID,params);
-			jr = new JResponse("0","",data);
-		}else{
-			jr = new JResponse("9","获取报表数据失败，没有获得正确的请求参数！",null);
-		}
-		return jr;
-	}
-	
-	@RequestMapping(value="/paramOptionsDB",method = RequestMethod.POST)
-	@ResponseBody
-	public JResponse getParamOptionsDB(@RequestBody RptDataJson params){
-		JResponse jr = null;
-		if(params!=null){
-			String rptID = params.getRptID();
-			Map data = rptDataService.getParamOptions(rptID,params);
-			jr = new JResponse("0","",data);
-		}else{
-			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
-		}
-		return jr;
-	}
+//	@RequestMapping(value="/queryDataDB",method = RequestMethod.POST)
+//	@ResponseBody
+//	public JResponse getRptDataDB(@RequestBody RptDataJson params){
+//		JResponse jr = null;
+//		if(params!=null){
+//			String rptID = params.getRptID();
+//			Map data = rptDataService.getData(rptID,params);
+//			jr = new JResponse("0","",data);
+//		}else{
+//			jr = new JResponse("9","获取报表数据失败，没有获得正确的请求参数！",null);
+//		}
+//		return jr;
+//	}
+//	
+//	@RequestMapping(value="/paramOptionsDB",method = RequestMethod.POST)
+//	@ResponseBody
+//	public JResponse getParamOptionsDB(@RequestBody RptDataJson params){
+//		JResponse jr = null;
+//		if(params!=null){
+//			String rptID = params.getRptID();
+//			Map data = rptDataService.getParamOptions(rptID,params);
+//			jr = new JResponse("0","",data);
+//		}else{
+//			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
+//		}
+//		return jr;
+//	}
 //	@RequestMapping(value="/buildIndexOld",method = RequestMethod.POST)
 //	@ResponseBody
 //	public JResponse buildIndex(@RequestBody RptDataJson params){

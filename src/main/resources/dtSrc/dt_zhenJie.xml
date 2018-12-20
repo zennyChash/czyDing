@@ -51,7 +51,7 @@
 	<src id="zjsr_qyxx" name="企业税收信息" description="" sourceType ="sql">
 		<sql>
 		<![CDATA[
-        select ny,swdjzh,mc,czfp,dz,hymc hy,zsebn from CZY_BB_SRQC_CX where ny<=201812 and ny>201806
+        select ny,swdjzh,mc,czfp,dz,hymc hy,zsebn from CZY_BB_SRQC_CX
 		]]>
 		</sql>
 		<cols>

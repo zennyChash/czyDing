@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="ly_lylist" name="获取楼宇清单"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($bd_all&&$bd_all.rows.size()>0)
+					"buildings":[
+						#foreach($row in $bd_all.rows)
+		   				{"bid":"$!{row.bid}","mc":"$!{row.mc}","axisX":"$!{row.x}","axisY":"$!{row.y}"}#if($velocityCount != $bd_all.rows.size()),#end
+		   				#end
+					]
+				#else
+					"buildings":[]
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="bd_all" refDtSrc="buildingbasic" fields="bid,mc,x,y,pyorder" >
+			<orderBy name = "pyorder" dataType="integer" dir="asc"/>
+		</vDs>
+	</joutput>
+	<joutput id="ly_df_ym" name="获取要查询的楼宇有数据的月份" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($bd_maxny&&$bd_maxny.rows.size()>0)
+				"latestValidMonth":"$!{bd_maxny.rows[0].ny}",
+				"format":"Ym" 
+			#end	
+			}
+		]]>
+		</jTemplate>
+		<vDs name="bd_maxny" refDtSrc="bd_maxny" fields="ny">
+			<filter name = "bid" value="1"/>
+		</vDs>
+	</joutput>
+	<joutput id="ly_year" name="有数据的年" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($bd_year&&$bd_year.rows.size()>0)
+				"options":[
+					#foreach($row in $bd_year.rows)
+	   					{"bm":"$!{row.nian}","name":"$!{row.nian}"}#if($velocityCount != $bd_year.rows.size()),#end
+	   				#end
+				],
+				"defaultOp":"$!{bd_year.rows[0].nian}"
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="bd_year" fields="nian">
+			<filter name = "bid" value="1"/>
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="ly_month" name="有数据的月份" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($bd_month&&$bd_month.rows.size()>0)
+				"options":[
+					#foreach($row in $bd_month.rows)
+	   						{"bm":"$!{row.yue}","name":"$!{row.yue}"}#if($velocityCount != $bd_month.rows.size()),#end
+	   					#end
+				],
+				"defaultOp":"$!{bd_month.rows[0].yue}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="bd_month" fields="nian,yue">
+			<filter name = "bid" value="1"/>
+			<filter name = "nian" refParam="year" value="2018"/>
+			<orderBy name = "yue" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="ly_lytax" name="某楼宇的缴税信息"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($bd_one&&$bd_one.rows.size()>0)
+				"bldmc":"$!{bd_one.rows[0].lymc}",
+				"blddz":"$!{bd_one.rows[0].dz}",
+				"encount":"$!{bd_one.rows[0].ecount}", 
+				"bnlj":"$!{bd_one.rows[0].bnlj}", 
+				"sntq":"$!{bd_one.rows[0].sntq}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="bd_one" fields="bid,lymc,dz,ecount,bnlj,sntq">
+			<filter name = "bid" value="1"/>
+			<filter name = "ny" value="201803"/>
+		</vDs>
+	</joutput>
+	<joutput id="ly_enlist" name="楼宇入驻企业信息"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($bd_ens&&$bd_ens.rows.size()>0)
+				"ens":[
+				#foreach($row in $bd_ens.rows)
+		   		{"swdjzh":"$!{row.swdjzh}","mc":"$!{row.mc}"}
+		   			#if($velocityCount != $bd_ens.rows.size()),#end
+		   		#end
+				],
+				"total": "$!{bd_ens.total}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="bd_ens" fields="swdjzh,mc,bnlj,sntq" paging="true">
+			<filter name = "bid" value="1"/>
+			<filter name = "ny" value="201803"/>
+			<orderBy name = "pm" dataType="integer" dir="asc"/>
+		</vDs>
+	</joutput>
+	<joutput id="ly_entax" name="获取指定企业的详细税收信息"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($bd_ens&&$bd_ens.rows.size()>0)
+		   		"swdjzh":"$!{bd_ens.rows[0].swdjzh}",
+		   		"mc":"$!{bd_ens.rows[0].mc}",
+		   		"czfp":"$!{bd_ens.rows[0].czfp}",
+		   		"bnlj":"$!{bd_ens.rows[0].bnlj}",
+		   		"sntq":"$!{bd_ens.rows[0].sntq}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="bd_ens" fields="swdjzh,mc,czfp,bnlj,sntq">
+			<filter name = "bid" value="1"/>
+			<filter name = "swdjzh" value="91330108743492974C"/>
+			<filter name = "ny" value="201803"/>
+		</vDs>
+	</joutput>
+</pages>
+

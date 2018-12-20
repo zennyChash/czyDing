@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="xnjk_year" name="有数据的年份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select distinct substr(ny,1,4) nian from CZY_XNJK
+		]]>
+		</sql>
+		<cols>
+			<col name="nian" canOrder="1"/>
+		</cols>
+	</src>
+	<src id="xnjk_month" name="有数据的月份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select distinct substr(ny,1,4) nian,substr(ny,5,2) yue,ny from CZY_XNJK
+		]]>
+		</sql>
+		<cols>
+			<col name="nian" isFilter="1"/>
+			<col name="yue" isFilter="1"/>
+			<col name="ny" canOrder="1"/>
+		</cols>
+	</src>
+	<src id="xnjk_qq" name="全区虚拟金库" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+select r.ny,r.kj,'全区合计'dw,r.bnlj,y.yss,round(r.bnlj/y.yss*100,8) wcbl,r.sntq,r.tbzz,r.srzb
+from
+(
+SELECT ny,kj,sum(bnlj) bnlj,sum(sntq) sntq,round((sum(bnlj)-sum(sntq))/sum(sntq)*100,8) tbzz,100 srzb FROM  CZY_XNJK
+group by ny,kj
+) r,
+(
+select nian,kj,sum(yss) yss from
+(
+select distinct substr(ny,1,4) nian,kj,yss from CZY_XNJK
+)
+group by nian,kj
+) y
+where substr(r.ny,1,4)=y.nian and r.kj=y.kj
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="kj" canOrder="1" isFilter="1"/>
+			<col name="dw" isFilter="1"/>
+			<col name="bnlj" fldType="double" />
+			<col name="yss" fldType="double" />
+			<col name="wcbl" fldType="double" />
+			<col name="sntq" fldType="double" />
+			<col name="tbzz" fldType="double" />
+			<col name="srzb" fldType="double" />
+		</cols>
+	</src>
+	<src id="xnjk_ybggyssr" name="虚拟金库YBGGYSSR" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+SELECT ny,kj,czfpbm,dw,bnlj,yss,wcbl,sntq,tbzz,round(bnlj/sum(bnlj)over(partition by ny,kj)*100,2) srzb,r.color
+FROM  CZY_XNJK c,RENDERS r
+where  c.dw=r.lid and r.rptid='xnjk' and kj='YBGGYSSR'
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="kj" canOrder="1" isFilter="1"/>
+			<col name="dw" isFilter="1"/>
+			<col name="czfpbm" isFilter="1"/>
+			<col name="bnlj" fldType="double" />
+			<col name="yss" fldType="double" />
+			<col name="wcbl" fldType="double" />
+			<col name="sntq" fldType="double" />
+			<col name="tbzz" fldType="double" />
+			<col name="srzb" canOrder="1" fldType="double" />
+		</cols>
+	</src>	
+	<src id="xnjk_czzsr" name="虚拟金库CZZSR" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+SELECT ny,kj,czfpbm,dw,bnlj,yss,wcbl,sntq,tbzz,round(bnlj/sum(bnlj)over(partition by ny,kj)*100,2) srzb,r.color
+FROM  CZY_XNJK c,RENDERS r
+where c.dw=r.lid and r.rptid='xnjk' and kj='CZZSR'
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="kj" canOrder="1" isFilter="1"/>
+			<col name="dw" isFilter="1"/>
+		    <col name="czfpbm" isFilter="1"/>
+			<col name="bnlj" fldType="double" />
+			<col name="yss" fldType="double" />
+			<col name="wcbl" fldType="double" />
+			<col name="sntq" fldType="double" />
+			<col name="tbzz" fldType="double" />
+			<col name="srzb" canOrder="1" fldType="double" />
+		</cols>
+	</src>
+	<src id="xnkj_ens" name="虚拟金库企业信息" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+select * from
+(
+select ny,swdjzh,mc,czfpbm fpbm,czfp,zsebn bnlj,zsesn sntq,rank()over(partition by ny,czfpbm order by zsebn desc) pm from CZY_BB_SRQC_CX
+)
+where pm<=50
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="swdjzh" isFilter="1"/>
+			<col name="fpbm" isFilter="1"/>
+			<col name="bnlj" fldType="double" />
+			<col name="sntq" fldType="double"/>
+			<col name="pm" fldType="integer" canOrder="1" />
+		</cols>
+	</src>
+</dataSource>

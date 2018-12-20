@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="sryb_year" name="有数据的年份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select distinct substr(ny,1,4) nian from czy_sryb_bbsj
+		]]>
+		</sql>
+		<cols>
+			<col name="nian" canOrder="1"/>
+		</cols>
+	</src>
+	<src id="sryb_month" name="有数据的月份" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select distinct substr(ny,1,4) nian,substr(ny,5,2) yue,ny from czy_sryb_bbsj
+		]]>
+		</sql>
+		<cols>
+			<col name="nian" isFilter="1"/>
+			<col name="yue" isFilter="1"/>
+			<col name="ny" canOrder="1"/>
+		</cols>
+	</src>
+	<src id="sryb_qs" name="全市收入月报" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+SELECT ny,kj,dw,bnlj,yss,wcbl,sntq,tbzz,100 srzb FROM  czy_sryb_bbsj where dw='全市合计'
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="kj" canOrder="1" isFilter="1"/>
+			<col name="dw" isFilter="1"/>
+			<col name="bnlj" fldType="double" />
+			<col name="yss" fldType="double" />
+			<col name="wcbl" fldType="double" />
+			<col name="sntq" fldType="double" />
+			<col name="tbzz" fldType="double" />
+			<col name="srzb" fldType="double" />
+		</cols>
+	</src>
+	<src id="sryb_ybggyssr" name="收入月报YBGGYSSR" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+SELECT ny,kj,dw,bnlj,yss,wcbl,sntq,tbzz,round(bnlj/sum(bnlj)over(partition by ny,kj)*100,2) srzb,r.color
+FROM  czy_sryb_bbsj c,RENDERS r
+where dw<>'全市合计' and c.dw=r.lid and r.rptid='sryb' and kj='YBGGYSSR'
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="kj" canOrder="1" isFilter="1"/>
+			<col name="dw" isFilter="1"/>
+			<col name="bnlj" fldType="double" />
+			<col name="yss" fldType="double" />
+			<col name="wcbl" fldType="double" />
+			<col name="sntq" fldType="double" />
+			<col name="tbzz" fldType="double" />
+			<col name="srzb" canOrder="1" fldType="double" />
+		</cols>
+	</src>	
+	<src id="sryb_czzsr" name="收入月报CZZSR" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+SELECT ny,kj,dw,bnlj,yss,wcbl,sntq,tbzz,round(bnlj/sum(bnlj)over(partition by ny,kj)*100,2) srzb,r.color
+FROM  czy_sryb_bbsj c,RENDERS r
+where dw<>'全市合计' and c.dw=r.lid and r.rptid='sryb' and kj='CZZSR'
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="kj" canOrder="1" isFilter="1"/>
+			<col name="dw" isFilter="1"/>
+			<col name="bnlj" fldType="double" />
+			<col name="yss" fldType="double" />
+			<col name="wcbl" fldType="double" />
+			<col name="sntq" fldType="double" />
+			<col name="tbzz" fldType="double" />
+			<col name="srzb" canOrder="1" fldType="double" />
+		</cols>
+	</src>
+	<src id="zcyb_qs" name="全市支出月报" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+SELECT ny,dw,bnlj,yss,wcbl,sntq,tbzz,100 srzb FROM  czy_zcyb_bbsj where dw='全市合计'
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="dw" isFilter="1"/>
+			<col name="bnlj" fldType="double" />
+			<col name="yss" fldType="double" />
+			<col name="wcbl" fldType="double" />
+			<col name="sntq" fldType="double" />
+			<col name="tbzz" fldType="double" />
+			<col name="srzb" fldType="double" />
+		</cols>
+	</src>
+	<src id="zcyb" name="支出月报" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+SELECT ny,dw,bnlj,yss,wcbl,sntq,tbzz,round(bnlj/sum(bnlj)over(partition by ny)*100,2) srzb,r.color
+FROM  czy_zcyb_bbsj c,RENDERS r
+where dw<>'全市合计' and c.dw=r.lid and r.rptid='sryb'
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="dw" isFilter="1"/>
+			<col name="bnlj" fldType="double" />
+			<col name="yss" fldType="double" />
+			<col name="wcbl" fldType="double" />
+			<col name="sntq" fldType="double" />
+			<col name="tbzz" fldType="double" />
+			<col name="srzb" canOrder="1" fldType="double" />
+		</cols>
+	</src>
+</dataSource>

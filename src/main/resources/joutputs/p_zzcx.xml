@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="zzcx_df_year" name="资助查询-有数据的年" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+				#if($czfc_year&&$czfc_year.rows.size()>0)
+				"options":[
+					#foreach($row in $czfc_year.rows)
+	   					{"bm":"$!{row.nian}","name":"$!{row.nian}"}#if($velocityCount != $czfc_year.rows.size()),#end
+	   				#end
+				],
+				"defaultOp":"$!{czfc_year.rows[0].nian}"
+				#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="czfc_year" refDtSrc="czfc_year" fields="nian">
+			<filter name = "swdjzh" value="913301083524744538"/>
+			<orderBy name = "nian" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="zzcx_entax" name="单户查询——企业获得资助的信息"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($czfc_tax&&$czfc_tax.rows.size()>0)		    
+				"mc":"$!{czfc_tax.rows[0].mc}",
+				"sssr":"$!{czfc_tax.rows[0].sssr}",
+				"sssr_sn":"$!{czfc_tax.rows[0].sssr_sn}",
+				"sssr_qn":"$!{czfc_tax.rows[0].sssr_qn}",
+				"ssgx":"$!{czfc_tax.rows[0].ssgx}",
+				"ssgx_sn":"$!{czfc_tax.rows[0].ssgx_sn}",
+				"ssgx_qn":"$!{czfc_tax.rows[0].ssgx_qn}",
+				"zzje":"$!{czfc_tax.rows[0].zzje}",
+				"zzje_sn":"$!{czfc_tax.rows[0].zzje_sn}",
+				"zzje_qn":"$!{czfc_tax.rows[0].zzje_qn}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="czfc_tax" fields="swdjzh,mc,czfp,sssr,sssr_sn,sssr_qn,ssgx,ssgx_sn,ssgx_qn,zzje,zzje_sn,zzje_qn">
+			<filter name = "swdjzh" value="91330108742940165J"/>
+			<filter name = "nian" refParam="year" value="2018"/>
+		</vDs>
+	</joutput>
+</pages>
+
