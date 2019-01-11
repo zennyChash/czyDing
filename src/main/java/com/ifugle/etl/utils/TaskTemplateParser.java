@@ -88,7 +88,7 @@ public class TaskTemplateParser {
 		parseTaskRoot(rt,root,7);
 		rt.setMethod(rnode.attributeValue("method"));
 		rt.setMode(rnode.attributeValue("mode"));
-		rt.setUri(rnode.attributeValue("uri"));
+		rt.setUri(rnode.elementText("uri"));
 		String sckto = rnode.attributeValue("socketTimeout");
 		String cto = rnode.attributeValue("connTimeout"); 
 		int socketTimeout = 5000, connTimeout = 5000;

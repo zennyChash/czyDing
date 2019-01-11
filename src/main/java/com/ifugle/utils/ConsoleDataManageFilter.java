@@ -24,7 +24,7 @@ public class ConsoleDataManageFilter implements Filter{
         	System.out.println("czyDataManage访问来自IP："+ip);
         }
     	boolean allowed = false;
-    	if(ip.indexOf("0:0:0:0:0:0:0:1")>=0){//本机始终可以访问
+    	if(ip.indexOf("0:0:0:0:0:0:0:1")>=0||ip.indexOf("127.0.0.1")>=0){//本机始终可以访问
     		fchain.doFilter(req, resp);
     	}else {
     		String whiteIPS = Configuration.getConfig().getString("WHITE_IPS", "");

@@ -426,4 +426,41 @@ public class ConsoleController {
 		}
 		return jr;
 	}
+	@RequestMapping(value="/getUsersDfMenus",method = RequestMethod.GET)
+	@ResponseBody
+	public Map getUsersDfMenus(@RequestParam Map<String, String> params){
+		Map infos = new HashMap();
+		if(params!=null){
+			String userid = params.get("userid");
+			infos = csService.getUsersDfMenus(userid);
+		}
+		return infos;
+	}
+	
+	@RequestMapping(value="/saveDfUserMenu",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse saveDfUserMenu(@RequestParam Map<String, String> params){
+		JResponse jr = new JResponse();
+		if(params!=null){
+			String userid = params.get("userid");
+			String strMids = params.get("menus");
+			String strOrders = params.get("orders");
+			if(StringUtils.isEmpty(userid)){
+				jr.setRetCode("9");
+				jr.setRetMsg("缺少要操作的用户ID！");
+				jr.setRetData("");
+			}else{
+				boolean done = csService.saveDfUserMenu(userid,strMids,strOrders);
+				if(done){
+					jr.setRetCode("0");
+					jr.setRetMsg("");
+				}else{
+					jr.setRetCode("9");
+					jr.setRetMsg("保存用户的菜单配置信息失败！");
+					jr.setRetData("");
+				}
+			}
+		}
+		return jr;
+	}
 }

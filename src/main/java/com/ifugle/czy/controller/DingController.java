@@ -14,10 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ifugle.czy.service.ConsoleServeice;
-import com.ifugle.czy.service.CzfcService;
 import com.ifugle.czy.utils.JResponse;
 import com.ifugle.czy.utils.bean.DingMsgJson;
-import com.ifugle.czy.utils.bean.RptDataJson;
 @Controller
 //处理钉钉相关的请求
 public class DingController {
@@ -39,11 +37,31 @@ public class DingController {
 			if(StringUtils.isEmpty(users)){
 				return new JResponse("9","没有指明消息接收者！",null);
 			}
-			Map data = csService.sendDingMsg(msg,users);
+			Map data = csService.sendLinkDingMsg(msg,users);
 			jr = new JResponse("0","",data);
 		}else{
 			jr = new JResponse("9","获取报表数据失败，没有获得正确的请求参数！",null);
 		}
 		return jr;
+	}
+	@RequestMapping(value="/sendDingForDsp",method = RequestMethod.GET)
+	@ResponseBody
+	public Map sendDingForDsp(@RequestParam Map<String, String> params){
+		Map infos = new HashMap();
+		String reqService = params.get("reqService");
+		String reqMethod = params.get("reqMethod");
+		infos = csService.sendDingForDsp(reqService,reqMethod,null,null);
+		return infos;
+	}
+	@RequestMapping(value="/sendDingForDspTest",method = RequestMethod.GET)
+	@ResponseBody
+	public Map sendDingForDspTest(@RequestParam Map<String, String> params){
+		Map infos = new HashMap();
+		String reqService = params.get("reqService");
+		String reqMethod = params.get("reqMethod");
+		log.info("reqService:"+reqService);
+		log.info("reqMethod:"+reqMethod);
+		infos = csService.sendDingForDspTest();
+		return infos;
 	}
 }

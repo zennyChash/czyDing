@@ -66,6 +66,10 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
     <filter>
+      	<filter-name>fltApi</filter-name>
+      	<filter-class>com.ifugle.utils.CzyApiFilter</filter-class>
+  	</filter>
+    <filter>
       	<filter-name>fltUserManager</filter-name>
       	<filter-class>com.ifugle.utils.ConsoleLoginFilter</filter-class>
   	</filter>
@@ -73,6 +77,10 @@
       	<filter-name>fltDataManage</filter-name>
       	<filter-class>com.ifugle.utils.ConsoleDataManageFilter</filter-class>
   	</filter>
+  	<filter-mapping>
+      	<filter-name>fltApi</filter-name>
+      	<url-pattern>/api/*</url-pattern>
+  	</filter-mapping>
   	<filter-mapping>
       	<filter-name>fltUserManager</filter-name>
       	<url-pattern>/manage/*</url-pattern>
@@ -90,9 +98,9 @@
 	<listener> 
 		<listener-class>com.ifugle.utils.InitTemplatesListener</listener-class> 
 	</listener>
-	<!--<listener> 
+	<listener> 
 		<listener-class>com.ifugle.etl.utils.InitTemplatesListener</listener-class> 
-	</listener>-->
+	</listener>
 	<servlet>
         <servlet-name>dispatcher</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -108,6 +116,11 @@
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>3</load-on-startup>
     </servlet>
+    <servlet>
+        <servlet-name>rpcDispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
     <servlet-mapping>
         <servlet-name>dispatcher</servlet-name>
         <url-pattern>/api/*</url-pattern>
@@ -119,5 +132,9 @@
     <servlet-mapping>
         <servlet-name>dataManageDispatcher</servlet-name>
         <url-pattern>/data/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>rpcDispatcher</servlet-name>
+        <url-pattern>/rpc/*</url-pattern>
     </servlet-mapping>
 </web-app>

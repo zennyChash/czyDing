@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task id="sendDing" name="发钉提醒待审批数" description="" type="httpRequest">	
+	<request mode="syn" method="GET" socketTimeout="20000" connTimeout="20000" before="">
+		<uri><![CDATA[http://112.124.8.90:8088/czy/rpc/sendDingForDsp?reqService=czfc&reqMethod=checkDspsByUser]]></uri>
+		<props>
+			<prop name="Content-Type" value="application/json;charset=UTF-8"/>
+		</props>
+		<response before=""/>
+	</request>
+</task>
+

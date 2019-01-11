@@ -1,1 +1,2 @@
 mvn install:install-file -DgroupId=org.elasticsearch -DartifactId=elasticsearch-analysis-ik -Dversion=6.2.4 -Dpackaging=jar -Dfile=elasticsearch-analysis-ik.jar -DgeneratePom=true
+mvn install:install-file -DgroupId=com.dingtalk.open -DartifactId=taobao-sdk-java -Dversion=1.1.0 -Dpackaging=jar -Dfile=taobao-sdk-java-auto_20190107.jar -DgeneratePom=true

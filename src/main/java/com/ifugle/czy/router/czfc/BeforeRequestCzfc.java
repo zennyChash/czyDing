@@ -36,7 +36,7 @@ public class BeforeRequestCzfc implements IBeforeRequest{
 				String subUri = req.getSubURI();
 				String state = jparams.getString("state");
 				if(("getApprovalListsChecked".equals(subUri)&&"0".equals(state))
-						||("getApprovalListsChecked".equals(subUri)&&"0".equals(state))){
+						||("getApprovalLists2Checked".equals(subUri)&&"1".equals(state))){
 					return new String[]{"9",""};
 				}
 			}

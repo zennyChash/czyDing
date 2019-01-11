@@ -65,7 +65,6 @@
 	<bean id="esDtSrcService" class="com.ifugle.czy.service.ESDataSourceService"/>
 	<bean id="csService" class="com.ifugle.czy.service.ConsoleServeice"/>
 	<bean id="rtService" class="com.ifugle.czy.service.RouterService"/>
-	<bean id="czfcService" class="com.ifugle.czy.service.CzfcService"/>
 	<bean id="czyReqProcess" class="com.ifugle.czy.router.czfc.BeforeRequestCzfc"/> 
 	<bean id="czyResponseProcess" class="com.ifugle.czy.router.czfc.BeforeResponseCzfc"/> 
 	<bean id="connFactory" class="com.ifugle.etl.conncet.service.ConnectionFactory"/>

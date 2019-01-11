@@ -105,7 +105,7 @@ Zepto(function($){
 // 					alert("string:"+dt);
 // 				}
 // 			});
-			p = JSON.stringify({"msg":"测试一下啦！神锋无影！","users":"manager431"});
+			/* p = JSON.stringify({"msg":"测试：神锋无影！","users":"manager431"});
 			$.ajax({
 				type: 'post',
 				url: 'api/sendDingMsg',
@@ -117,7 +117,20 @@ Zepto(function($){
 					alert("string:"+dt);
 				}
 			});
-			
+			 */
+			 $.ajax({
+					url : 'api/canAccessTo?mid=xmsp&code=ddddddd&corpid=sfasfsafsadd',
+					type : 'GET',
+					success : function(data, status, xhr) {
+						alert(data);
+						var info = JSON.parse(data);
+					},
+					error : function(xhr, errorType, error) {
+						logger.e("yinyien:" + _config.corpId);
+						alert(errorType + ', ' + error);
+					}
+				});
+				
 // 			p = JSON.stringify({"reqService":"czfc","reqMethod":"getAppListCheckInfo","svParams":{"userid":"manager431","lid":"882"}});
 // 			$.ajax({
 // 				type: 'post',

@@ -160,15 +160,20 @@ public class AuthService {
         return corpUserService.getUserinfo(accessToken, code);
     }
     
-	public User getUserCzyConfig(String accessToken,String code) {
+	public User getUserCzyConfig(String accessToken,String code,boolean czyAuth) {
 		User u = null;
 		try{
 			CorpUserService corpUserService = ServiceFactory.getInstance().getOpenService(CorpUserService.class);
 			CorpUserBaseInfo cbu = corpUserService.getUserinfo(accessToken, code);
 			System.out.println("进入第一层getUserCzyConfig，获取到了CorpUserBaseInfo");
 			if(cbu!=null){
-				String userid = cbu.getUserid();
-				u = getCzyAuth(accessToken,userid);
+				if(czyAuth){
+					String userid = cbu.getUserid();
+					u = getCzyAuth(accessToken,userid);
+				}else{
+					u = new User();
+					u.setUserid(cbu.getUserid());
+				}
 			}else{
 				log.error("登录钉钉验证失败：未获取到钉钉用户信息！");
 			}
@@ -249,6 +254,7 @@ public class AuthService {
 			StringBuffer sql = new StringBuffer("select * from( select distinct m.moduleid,m.name,to_char(m.isleaf)isleaf,m.pid,dorder,");
 			sql.append("nvl(pos,'')pos,notnull,errmsg from ");
 			String dfMenus = cg.getString("defaultMenus", "");
+			System.out.println("用户尚未配置权限，使用默认权限："+dfMenus);
 			sql.append(" (select moduleid from modules where moduleid in('").append(dfMenus.replace(",", "','")).append("')) p,modules m ");
 			sql.append(" where m.moduleid=p.moduleid and isleaf=1 order by dorder) where rownum<=7");
 			menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{});
@@ -296,12 +302,14 @@ public class AuthService {
 		sql.append("nvl(pos,'')pos,to_char(decode(m.qybj,0,9,decode(p.moduleid,null,0,1)))state,notnull,errmsg from ");
 		if(cc==0){
 			String dfMenus = cg.getString("defaultMenus", "");
-			sql.append(" (select moduleid from modules where moduleid in('").append(dfMenus.replace(",", "','")).append("')) p,modules m ");
-			sql.append(" where m.moduleid=p.moduleid(+) order by dorder");
+			System.out.println("获取应用模块，用户尚未配置权限，使用默认权限："+dfMenus);
+			sql.append(" (select distinct moduleid from modules connect by moduleid=prior pid start with moduleid in('");
+			sql.append(dfMenus.replace(",", "','")).append("')) p,modules m ");
+			sql.append(" where m.moduleid=p.moduleid order by dorder");
 			menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{});
 		}else{
 			sql.append(" (select pm.* from user_post u,post_module pm where u.postid=pm.postid and userid=?) p,modules m ");
-			sql.append(" where m.moduleid=p.moduleid(+) order by dorder");
+			sql.append(" where m.moduleid=p.moduleid order by dorder");
 			menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{userid});
 		}
 		if(menus!=null&&menus.size()>0){
@@ -332,6 +340,7 @@ public class AuthService {
 				jms.add(jm);
 			}
 		}
+		System.out.println("获取应用模块，获取到的模块有："+jms.size());
 		return jms;
 	}
 	
@@ -414,5 +423,15 @@ public class AuthService {
 		//记录登录事件
 		//jdbcTemplate.update("insert into user_log(id,userid,etime,eventtype)values(sq_user_log.nextval,?,sysdate,'login')",new Object[]{userid});
 		return u;
+	}
+	public boolean canAccessModule(String userid,String mid) {
+		boolean canAccess = false;
+		StringBuffer sql = new StringBuffer("select count(*)cc from modules m,user_post u,post_module p ");
+		sql.append("where u.postid=p.postid and p.moduleid=m.moduleid and u.userid=? and m.moduleid=?");
+		int cc = jdbcTemplate.queryForObject(sql.toString(), new Object[]{userid,mid},Integer.class);
+		if(cc>0){
+			canAccess = true;
+		}
+		return canAccess;
 	}
 }

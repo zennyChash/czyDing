@@ -55,7 +55,7 @@ public class AuthController {
 		System.out.println("传入的code:"+code);
 		System.out.println("传入的corpID:"+corpid);
 		String accessToken = DingHelper.getAccessToken();
-		User user = authService.getUserCzyConfig(accessToken,code);
+		User user = authService.getUserCzyConfig(accessToken,code,true);
 		if(user!=null){
 			RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
 			if (requestAttributes != null) {
@@ -88,11 +88,16 @@ public class AuthController {
 		System.out.println("传入的code:"+code);
 		System.out.println("传入的corpID:"+corpid);
 		String accessToken = DingHelper.getAccessToken();
-		User user = authService.getUserCzyConfig(accessToken,code);
+		RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+		HttpServletRequest request = null;
+		if (requestAttributes != null) {
+			request = ((ServletRequestAttributes) requestAttributes).getRequest();
+			request.getSession().setAttribute("accessToken", accessToken);
+		}
+		User user = authService.getUserCzyConfig(accessToken,code,true);
 		if(user!=null){
-			RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
 			if (requestAttributes != null) {
-				HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+				request = ((ServletRequestAttributes) requestAttributes).getRequest();
 				request.getSession().setAttribute("user", user);
 			}
 			jr.setRetCode("0");
@@ -141,8 +146,50 @@ public class AuthController {
 		}
 		return jr;
 	}
-
-
+	@RequestMapping("/canAccessTo")
+	@ResponseBody
+	public JResponse canAccessTo(@RequestParam("mid") String mid,@RequestParam("code") String code, @RequestParam("corpid") String corpid){
+		boolean canAccess = false;
+		JResponse jr = new JResponse();
+		JSONObject jo= new JSONObject();
+		String accessToken = DingHelper.getAccessToken();
+		RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+		HttpServletRequest request = null;
+		if (requestAttributes != null) {
+			request = ((ServletRequestAttributes) requestAttributes).getRequest();
+			request.getSession().setAttribute("accessToken", accessToken);
+		}
+		User user = authService.getUserCzyConfig(accessToken,code,false);
+		if(user==null){
+			return new JResponse("9", "登录验证失败！",null);
+		}else{
+			if (requestAttributes != null) {
+				request = ((ServletRequestAttributes) requestAttributes).getRequest();
+				request.getSession().setAttribute("user", user);
+			}
+			try{
+				canAccess = authService.canAccessModule(user.getUserid(),mid);
+				if(canAccess){
+					jr.setRetCode("0");
+					jr.setRetMsg("");
+					jo.put("denied", false);
+					jr.setRetData(jo);
+				}else{
+					jr.setRetCode("0");
+					jr.setRetMsg("");
+					jo.put("denied", true);
+					jr.setRetData(jo);
+				}
+			}catch(Exception e){
+				jr.setRetCode("9");
+				jr.setRetMsg("验证访问权限时发生错误！访问失败");
+				jo.put("denied", true);
+				jr.setRetData(jo);
+			}
+		}
+		return jr;
+	}
+	
 	
 	
 	

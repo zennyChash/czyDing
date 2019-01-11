@@ -18,6 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.dingtalk.api.DefaultDingTalkClient;
+import com.dingtalk.api.DingTalkClient;
+import com.dingtalk.api.request.OapiDingCreateRequest;
+import com.dingtalk.api.response.OapiDingCreateResponse;
 import com.dingtalk.open.client.api.model.corp.CorpUser;
 import com.dingtalk.open.client.api.model.corp.CorpUserList;
 import com.dingtalk.open.client.api.model.corp.Department;
@@ -26,6 +30,7 @@ import com.dingtalk.open.client.api.model.corp.MessageType;
 import com.ifugle.czy.ding.message.LightAppMessageDelivery;
 import com.ifugle.czy.ding.message.MessageHelper;
 import com.ifugle.czy.utils.DingHelper;
+import com.ifugle.czy.utils.JResponse;
 import com.ifugle.czy.utils.TemplatesLoader;
 import com.ifugle.czy.utils.bean.*;
 import com.ifugle.czy.utils.bean.template.DataSrc;
@@ -39,7 +44,8 @@ public class ConsoleServeice {
 	private static final RowCallbackHandler TreeNodeMapper = null;
 	private static Logger log = Logger.getLogger(ConsoleServeice.class);
 	protected JdbcTemplate jdbcTemplate;
-	
+	@Autowired
+	private RouterService rtService;
 	@Autowired
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate){
 		this.jdbcTemplate = jdbcTemplate;
@@ -413,31 +419,7 @@ public class ConsoleServeice {
 		}
 		return flds;
 	}
-	public Map sendDingMsg(String msg,String strUsers) {
-		Map infos = new HashMap();
-		String[] users = strUsers.split(",");
-		for(int i=0;i<users.length;i++){
-			String dingid = users[i];
-			//发钉钉消息
-			String accessToken = DingHelper.getAccessToken();
-			String agentid= cg.getString("AGENT_ID", "163161139");
-			String touser = dingid,toparty="";
-			//组织文本消息
-			MessageBody.TextBody textBody = new MessageBody.TextBody();
-            textBody.setContent(msg);
-            //装配deliver
-			LightAppMessageDelivery delivery = new LightAppMessageDelivery(touser,toparty,agentid);
-			delivery.withMessage(MessageType.TEXT, textBody);
-			try{
-				MessageHelper.send(accessToken, delivery);
-				log.info("发送微应用消息"+"，接收者:"+dingid);
-			}catch(Exception e){
-				
-			}
-		}
-		infos.put("info", "钉钉消息已发送给下一环节负责人！");
-		return infos;
-	}
+	
 	public JSONObject consoleLogin(String code,HttpServletRequest request) {
 		JSONObject js = null;
 		try {
@@ -603,7 +585,7 @@ public class ConsoleServeice {
 			List posts = jdbcTemplate.queryForList(sql.toString(),new Object[]{});
 			infos.put("rows", posts);
 		}catch(Exception e){
-			log.error("获取岗位列表时发生错误："+e.toString());
+			log.error("获取远程服务列表时发生错误："+e.toString());
 		}
 		return infos;
 	}
@@ -621,5 +603,129 @@ public class ConsoleServeice {
 			log.error(e.toString());
 		}
 		return true;
+	}
+	public Map getUsersDfMenus(String userid) {
+		Map infos = new HashMap();
+		try{
+			StringBuffer sql =new StringBuffer("select m.moduleid mid,m.name mname,m.pid,pm.name pname,decode(um.mid,null,0,1)isdf from");
+			sql.append("(select * from modules where isleaf=1) m,(select * from modules where isleaf=0) pm,");
+			sql.append("(select * from user_menus where userid=?)um,");
+			sql.append("(select distinct tm.moduleid from user_post up,post_module tm where up.postid=tm.postid and userid=?)u");
+			sql.append(" where m.moduleid = u.moduleid and m.moduleid=um.mid(+) and m.pid=pm.moduleid order by isdf desc,um.dorder,m.dorder");
+			List menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{userid,userid});
+			infos.put("rows", menus);
+		}catch(Exception e){
+			log.error("获取用户模块信息时发生错误："+e.toString());
+		}
+		return infos;
+	}
+	public boolean saveDfUserMenu(String userid, String strMids,String strOrders) {
+		boolean done = false;
+		try{
+			StringBuffer sql =new StringBuffer("delete from user_menus where userid =?");
+			jdbcTemplate.update(sql.toString(),new Object[]{userid});
+			if(!StringUtils.isEmpty(strMids)){
+				sql =new StringBuffer("insert into user_menus(userid,mid,stime,dorder)values(?,?,sysdate,?)");
+				String[] pids = strMids.split(",");
+				String[] orders = strOrders.split(",");
+				for(int j=0;j<pids.length;j++){
+					String pid = pids[j];
+					jdbcTemplate.update(sql.toString(),new Object[]{userid,pid,new Integer(orders[j])});
+				}
+			}
+			done = true;
+		}catch(Exception e){
+			done=false;
+		}
+		return done;
+	}
+	
+	public Map sendLinkDingMsg(String msg,String strUsers) {
+		Map infos = new HashMap();
+		String[] users = strUsers.split(",");
+		String accessToken = DingHelper.getAccessToken();
+		String agentid= cg.getString("AGENT_ID", "163161139");
+		for(int i=0;i<users.length;i++){
+			String dingid = users[i];
+			//发钉钉消息
+			String touser = dingid,toparty="";
+			//组织消息
+            MessageBody.LinkBody linkBody = new MessageBody.LinkBody();
+            String lingUrl = cg.getString("directLinkToXMSP","http://112.124.8.90:8088/czyweb/index.html?redirectTo=xmsp");
+            linkBody.setMessageUrl(lingUrl);
+            linkBody.setPicUrl("");
+            linkBody.setTitle("待审批");
+            linkBody.setText(msg);
+            //装配deliver
+			LightAppMessageDelivery delivery = new LightAppMessageDelivery(touser,toparty,agentid);
+			delivery.withMessage(MessageType.LINK, linkBody);
+			try{
+				MessageHelper.send(accessToken, delivery);
+				log.info("发送微应用消息"+"，接收者:"+dingid);
+			}catch(Exception e){
+				
+			}
+		}
+		infos.put("info", "钉钉消息已发送给下一环节负责人！");
+		return infos;
+	}
+	
+	public Map sendDingForDsp(String reqService, String reqMethod,String svParams, String userid) {
+		Map infos=new HashMap();
+		//远程调用，按用户统计各自待审批数量。
+		JResponse jr = rtService.routeRequest(reqService,reqMethod,svParams,userid);
+		log.info("sendDing返回："+jr.toString());
+		JSONObject jdsps = jr==null?null:(JSONObject)jr.getRetData();
+		List dsps = jdsps==null?null:(JSONArray)jdsps.get("rows");
+		log.info("dsps长度："+dsps.size());
+		if(dsps==null||dsps.size()==0){
+			return null;
+		}
+		String accessToken = DingHelper.getAccessToken();
+		log.info("发钉前取accessToken："+accessToken);
+		String sender= cg.getString("DINGSENDER", "manager431");
+		for(int i=0;i<dsps.size();i++){
+			Map dsp = (Map)dsps.get(i);
+			String receiver = (String)dsp.get("czyuserid");
+			String scc = (String)dsp.get("cc");
+			int cc = Integer.parseInt(scc);
+			log.info("receiver："+receiver+"，数量："+cc);
+			if(StringUtils.isEmpty(receiver)||cc<=0){
+				continue;
+			}
+			//存在对应钉钉用户的，发钉
+			DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/ding/create");
+			OapiDingCreateRequest request = new OapiDingCreateRequest();
+			request.setCreatorUserid(sender);
+			request.setReceiverUserids(receiver);
+			request.setRemindType(2L);
+			request.setRemindTime(System.currentTimeMillis()+10000);
+			request.setTextContent("您还有"+cc+"条审批单待处理，请及时登录财智云进行审批。");
+			log.info("向用户"+receiver+"发钉！");
+			try{
+				OapiDingCreateResponse response = client.execute(request, accessToken);
+			}catch(Throwable e){
+				log.error("发送钉失败。"+e.toString());
+			}
+		}
+		return infos;
+	}
+	public Map sendDingForDspTest() {
+		String accessToken = DingHelper.getAccessToken();
+		String sender= cg.getString("DINGSENDER", "manager431");
+		DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/ding/create");
+		OapiDingCreateRequest request = new OapiDingCreateRequest();
+		request.setCreatorUserid(sender);
+		request.setReceiverUserids("manager431");
+		request.setRemindType(1L);
+		request.setRemindTime(System.currentTimeMillis()+10000);
+		request.setTextContent("您还有100条审批单待处理，请及时登录财智云进行审批。");
+		log.info("向用户manager431发钉！");
+		try{
+			OapiDingCreateResponse response = client.execute(request, accessToken);
+		}catch(Exception e){
+			log.error("发送钉失败。"+e.toString());
+		}
+		return null;
 	}
 }

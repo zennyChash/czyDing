@@ -44,6 +44,13 @@ public class BeforeResponseCzfc implements IBeforeResponse{
 				transformUserString(res,um);
 				log.info("getMsgAfterCheck方法中转换后的接收者："+res.getString("users"));
 			}
+		}else if("checkDspsByUser".equals(reqMethod)){
+			JSONObject res = responses.getJSONObject("_RETURNED");
+			log.info("钉消息远程返回："+res.toJSONString());
+			if(res!=null){
+				Map um = getUserMapping(serviceName);
+				addDingUserOfRows(res,um);
+			}
 		}
 		for(String key :responses.keySet()){
 			JSONObject strRes = (JSONObject)responses.get(key);
@@ -109,6 +116,21 @@ public class BeforeResponseCzfc implements IBeforeResponse{
 			}
 			String strNeweUsers = StringUtils.join(newUsers, ",");
 			jr.put("users", strNeweUsers);
+		}
+	}
+	private void addDingUserOfRows(JSONObject jr,Map um){
+		JSONArray rows = (JSONArray)jr.getJSONArray("rows");
+		if(rows!=null&&rows.size()>0){
+			for(int j=0;j<rows.size();j++){
+				JSONObject row = (JSONObject)rows.get(j);
+				String userid= row.getString("userid");
+				if(um!=null&&um.containsKey(userid)){
+					SimpleValue fn = (SimpleValue)um.get(userid);
+					row.put("czyuserid", fn.getBm());
+				}else{
+					row.put("czyuserid", "");
+				}
+			}
 		}
 	}
 }
