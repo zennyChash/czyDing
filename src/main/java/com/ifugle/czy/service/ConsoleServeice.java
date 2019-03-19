@@ -604,18 +604,33 @@ public class ConsoleServeice {
 		}
 		return true;
 	}
-	public Map getUsersDfMenus(String userid) {
+	public Map getUsersAllMenus(String userid) {
 		Map infos = new HashMap();
 		try{
 			StringBuffer sql =new StringBuffer("select m.moduleid mid,m.name mname,m.pid,pm.name pname,decode(um.mid,null,0,1)isdf from");
 			sql.append("(select * from modules where isleaf=1) m,(select * from modules where isleaf=0) pm,");
 			sql.append("(select * from user_menus where userid=?)um,");
 			sql.append("(select distinct tm.moduleid from user_post up,post_module tm where up.postid=tm.postid and userid=?)u");
-			sql.append(" where m.moduleid = u.moduleid and m.moduleid=um.mid(+) and m.pid=pm.moduleid order by isdf desc,um.dorder,m.dorder");
+			sql.append(" where m.moduleid = u.moduleid and m.moduleid=um.mid(+) and m.pid=pm.moduleid order by pm.dorder,m.dorder");
 			List menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{userid,userid});
 			infos.put("rows", menus);
 		}catch(Exception e){
 			log.error("获取用户模块信息时发生错误："+e.toString());
+		}
+		return infos;
+	}
+	public Map getUsersDfMenus(String userid) {
+		Map infos = new HashMap();
+		try{
+			StringBuffer sql =new StringBuffer("select m.moduleid mid,m.name mname,m.pid,pm.name pname from");
+			sql.append("(select * from modules where isleaf=1) m,(select * from modules where isleaf=0) pm,");
+			sql.append("(select * from user_menus where userid=?)um,");
+			sql.append("(select distinct tm.moduleid from user_post up,post_module tm where up.postid=tm.postid and userid=?)u");
+			sql.append(" where m.moduleid = u.moduleid and m.moduleid=um.mid and m.pid=pm.moduleid order by um.dorder,m.dorder");
+			List menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{userid,userid});
+			infos.put("rows", menus);
+		}catch(Exception e){
+			log.error("获取用户默认菜单配置信息时发生错误："+e.toString());
 		}
 		return infos;
 	}

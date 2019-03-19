@@ -39,6 +39,7 @@ public class ESClientFactory {
 	}
 	
 	public TransportClient getClient() {
+		System.setProperty("es.set.netty.runtime.available.processors", "false");
 		if(client==null){
 	        //设置集群名称  
 	        Settings settings = Settings.builder().put("cluster.name",esClusterName).put("client.transport.sniff", true).build();// 集群名  

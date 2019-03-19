@@ -118,7 +118,7 @@ Zepto(function($){
 				}
 			});
 			 */
-			 $.ajax({
+/* 			 $.ajax({
 					url : 'api/canAccessTo?mid=xmsp&code=ddddddd&corpid=sfasfsafsadd',
 					type : 'GET',
 					success : function(data, status, xhr) {
@@ -129,7 +129,7 @@ Zepto(function($){
 						logger.e("yinyien:" + _config.corpId);
 						alert(errorType + ', ' + error);
 					}
-				});
+				}); */
 				
 // 			p = JSON.stringify({"reqService":"czfc","reqMethod":"getAppListCheckInfo","svParams":{"userid":"manager431","lid":"882"}});
 // 			$.ajax({
@@ -173,6 +173,28 @@ Zepto(function($){
 // 				type: 'post',
 // 				url: 'api/remoteService',
 // 				data: p,
+// 				headers: {
+// 					"Content-Type": "application/json;charset=utf-8"
+// 			    },
+// 				success: function(dt){
+// 					alert("string:"+dt);
+// 				}
+// 			});
+			$.ajax({
+				type: 'GET',
+				url: 'manage/getUsersAllMenus',
+				data: {"userid":"manager431"},
+				headers: {
+					"Content-Type": "application/json;charset=utf-8"
+			    },
+				success: function(dt){
+					alert(dt);
+				}
+			});
+// 			$.ajax({
+// 				type: 'GET',
+// 				url: 'manage/getUsersDfMenus',
+// 				data: {"userid":"manager431"},
 // 				headers: {
 // 					"Content-Type": "application/json;charset=utf-8"
 // 			    },

@@ -426,6 +426,16 @@ public class ConsoleController {
 		}
 		return jr;
 	}
+	@RequestMapping(value="/getUsersAllMenus",method = RequestMethod.GET)
+	@ResponseBody
+	public Map getUsersAllMenus(@RequestParam Map<String, String> params){
+		Map infos = new HashMap();
+		if(params!=null){
+			String userid = params.get("userid");
+			infos = csService.getUsersAllMenus(userid);
+		}
+		return infos;
+	}
 	@RequestMapping(value="/getUsersDfMenus",method = RequestMethod.GET)
 	@ResponseBody
 	public Map getUsersDfMenus(@RequestParam Map<String, String> params){
@@ -436,7 +446,6 @@ public class ConsoleController {
 		}
 		return infos;
 	}
-	
 	@RequestMapping(value="/saveDfUserMenu",method = RequestMethod.POST)
 	@ResponseBody
 	public JResponse saveDfUserMenu(@RequestParam Map<String, String> params){

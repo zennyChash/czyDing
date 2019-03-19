@@ -81,14 +81,14 @@
       	<filter-name>fltApi</filter-name>
       	<url-pattern>/api/*</url-pattern>
   	</filter-mapping>
-  	<filter-mapping>
+  	<!--<filter-mapping>
       	<filter-name>fltUserManager</filter-name>
       	<url-pattern>/manage/*</url-pattern>
   	</filter-mapping>
   	<filter-mapping>
       	<filter-name>fltDataManage</filter-name>
       	<url-pattern>/data/*</url-pattern>
-  	</filter-mapping>
+  	</filter-mapping>-->
     <listener>
     	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>

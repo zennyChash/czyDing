@@ -226,8 +226,10 @@ public class ConsoleScriptController {
 			Map data = null;
 			try{
 				data = esDataService.getData(rptID,qParams);
-			}catch(Exception e){
+			}catch(Throwable e){
+				log.error("解析"+rptID+"的查询语句时发生错误："+e.toString());
 				jr = new JResponse("9","查询数据时发生异常，未能查找到数据。",null);
+				return jr;
 			}
 			if(data!=null&&data.containsKey("done")){
 				boolean done = (Boolean)data.get("done");
@@ -244,7 +246,6 @@ public class ConsoleScriptController {
 			}else{
 				jr = new JResponse("9","获取页面数据失败！",null);
 			}
-			log.info(rptID+"的输出:"+jr.toString());
 		}else{
 			jr = new JResponse("9","获取报表数据失败，没有获得正确的请求参数！",null);
 		}

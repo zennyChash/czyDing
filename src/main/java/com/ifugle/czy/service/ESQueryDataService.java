@@ -114,7 +114,15 @@ public class ESQueryDataService {
 	public Map getData(String jpID,JSONObject params){
 		Map result = new HashMap();
 		JSONObject jrpt = null;
+		log.info("开始查询"+jpID);
 		TransportClient client = esClient.getClient();
+		if(client==null){
+			result.put("done", false);
+			result.put("info", "连接数据查询服务器失败。");
+			log.equals("连接数据查询服务器失败。，ID："+jpID);
+			return result;
+		}
+		log.info(jpID+"获得ES连接！");
 		JOutput jp = TemplatesLoader.getTemplatesLoader().getJOutput(jpID);
 		if(jp==null){
 			result.put("done", false);
@@ -143,16 +151,21 @@ public class ESQueryDataService {
 			   }
 		   }
 		}  
+        log.info(jpID+"初始化模板并设置参数成功！");
 		List vds = jp.getValuedDs();
 		if(vds!=null){
 			//vds中的ds，逐个查找，加载。
 			//筛选字段的值，在参数params中查找，如果没有，则用设计文件中的值（起默认值的作用）
+			log.info(jpID+"循环解析数据源,共"+vds.size()+"个数据源");
 			for(int i=0;i<vds.size();i++){
 				ValuedDs vd = (ValuedDs)vds.get(i);
 				String dsName = vd.getName();
+				log.info("解析数据源:"+dsName);
 				String dsRef = vd.getRefDtSrc();
 				List flts = vd.getFilterFlds();
 				List orders = vd.getOrderByFlds();
+				log.info(jpID+"筛选字段:"+(flts==null?-1:flts.size())+"个");
+				log.info(jpID+"排序字段:"+(orders==null?-1:orders.size())+"个");
 				SearchRequestBuilder sReq = client.prepareSearch(dsRef).setTypes("_doc");
 				//如果指定了获取的字段，只取指定字段
 				if(!StringUtils.isEmpty(vd.getFields())){
@@ -160,6 +173,7 @@ public class ESQueryDataService {
 				}
 				BoolQueryBuilder qb = QueryBuilders.boolQuery();
 				if(flts!=null){
+					log.info(jpID+"处理筛选字段...");
 					for(int j=0;j<flts.size();j++){
 						FilterField flt = (FilterField)flts.get(j);
 						String ftype = flt.getFtype();
@@ -176,7 +190,7 @@ public class ESQueryDataService {
 						if(StringUtils.isEmpty(fv)){
 							result.put("done", false);
 							result.put("info", "缺少参数"+refParam+"的值。");
-							log.equals("构造JOutput信息失败，ID："+jpID+"，缺少参数"+refParam+"的值。");
+							log.error("构造JOutput信息失败，ID："+jpID+"，缺少参数"+refParam+"的值。");
 							return result;
 						}
 						int dtype = flt.getDataType();
@@ -261,6 +275,7 @@ public class ESQueryDataService {
 					}
 				}
 				if(orders!=null){
+					log.info(jpID+"处理排序字段...");
 					for(int k=0;k<orders.size();k++){
 						OrderField oflt = (OrderField)orders.get(k);
 						SortBuilder sortBuilder = SortBuilders.fieldSort(oflt.getDataType()==0?oflt.getName()+".raw":oflt.getName());
@@ -275,6 +290,7 @@ public class ESQueryDataService {
 				sReq.setQuery(qb);
 				//处理查询的分页。外部。和作为查询筛选条件的参数不一样。
 				if(vd.isPaging()){
+					log.info(jpID+"处理分页字段...");
 					String fromFld = vd.getStartParam();
 					String sizeFld = vd.getSizeParam();
 					int from = 0,size=0;
@@ -289,6 +305,7 @@ public class ESQueryDataService {
 					}
 					sReq.setFrom(from).setSize(size);
 				}else{
+					log.info(jpID+"添加默认分页字段...");
 					String ms =Configuration.getConfig().getString("maxQuerySize", "200");
 					try{
 						sReq.setFrom(0).setSize(Integer.parseInt(ms));
@@ -296,7 +313,7 @@ public class ESQueryDataService {
 						sReq.setFrom(0).setSize(20);
 					}
 				}
-				
+				log.info(jpID+"ES查询语句组织完成，开始查询...");
 				SearchResponse response = sReq.get();
 				SearchHits hits = response.getHits();
 			    long total = hits.getTotalHits();
@@ -309,12 +326,15 @@ public class ESQueryDataService {
 			    }
 			    qinfos.put("rows", rows);
 			    context.put(dsName, qinfos);
+			    log.info("完成"+dsName+"的查询！");
 			}
 		}
 		try{
+			log.info(jpID+"开始合并模板...");
 	        StringWriter sw = new StringWriter();
 	        String tmp=jp.getjTemplate();
 	        Velocity.evaluate(context, sw, jp.getId(), tmp);
+	        log.info(jpID+"模板合并完成...");
 	        String otmp = sw.toString();
 	        JSONObject jtmp = JSONObject.parseObject(otmp);
 	        log.info(jtmp.toJSONString());
