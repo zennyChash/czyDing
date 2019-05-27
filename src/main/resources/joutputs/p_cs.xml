@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="cscscscscscscscs" name="测试测试测试测试测试"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($appLists&&$appLists.rows.size()>0)
+				"options":[
+					#foreach($row in $appLists.rows)
+	   					{"bm":"$!{row.xh}","name":"$!{row.sj}"}#if($velocityCount != $appLists.rows.size()),#end
+	   				#end
+				],
+				"defaultOp":"$!{appLists.rows[0].xh}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="appLists" refDtSrc="cscscscs" paging="1">
+			<filter name = "XH" refParam="xh"/>
+		</vDs>
+	</joutput>
+		<joutput id="scscscscscscsccsccs" name="测试2"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($test2&&$test2.rows.size()>0)
+				"xh":"$!{test2.rows[0].xh}",
+				"sj":"$!{test2.rows[0].sj}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="test2" refDtSrc="scscscscscscsc" paging="false">
+			<filter name = "v_xh" refParam="xh"/>
+		</vDs>
+	</joutput>
+</pages>

@@ -12,7 +12,20 @@ public class User {
 	private List menus;
 	private String postIds;
 	private String postNames ;
-	
+	private int pswd_on;    //默认0，不打开密码校验功能
+	private int pswd_mode;  //默认0，键盘密码模式
+	public int getPswd_on() {
+		return pswd_on;
+	}
+	public void setPswd_on(int pswd_on) {
+		this.pswd_on = pswd_on;
+	}
+	public int getPswd_mode() {
+		return pswd_mode;
+	}
+	public void setPswd_mode(int pswd_mode) {
+		this.pswd_mode = pswd_mode;
+	}
 	public String getCzfp() {
 		return czfp;
 	}

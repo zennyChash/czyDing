@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="rds_test1" name="测试关系型数据库1"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($appLists&&$appLists.rows.size()>0)
+				"options":[
+					#foreach($row in $appLists.rows)
+	   					{"bm":"$!{row.lid}","name":"$!{row.itemname}","totalmoney":"$!{row.totalmoney}"}#if($velocityCount != $appLists.rows.size()),#end
+	   				#end
+				],
+				"defaultOp":"$!{appLists.rows[0].ny}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="appLists" refDtSrc="test1" paging="1">
+			<filter name = "DID" refParam="did"/>
+			<filter name = "Item" refParam="itemmc"/>
+			<filter name = "lid"/>
+		</vDs>
+	</joutput>
+	<joutput id="rds_test2" name="测试关系型数据库2"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($test2&&$test2.rows.size()>0)
+				"ny":"$!{test2.rows[0].ny}",
+				"czfpbm":"$!{test2.rows[0].czfpbm}",
+				"czfp":"$!{test2.rows[0].czfp}",
+				"tax":"$!{test2.rows[0].ttax}",
+				"sszb":"$!{test2.rows[0].sszb}"
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="test2" paging="1">
+			<filter name = "pCzfpbms" refParam="czfpbms"/>
+			<filter name = "pNy" refParam="ny" dataType="1"/>
+		</vDs>
+	</joutput>
+</pages>
+

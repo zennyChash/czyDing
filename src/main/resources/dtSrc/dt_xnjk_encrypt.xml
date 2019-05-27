@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="xnjk_encrypt_aes" name="金库测试_加密" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select ny,czfpbm,czfp,ttax,sszb sszb_i,encrypt_AES(sszb,utl_raw.CAST_TO_VARCHAR2('8F93E35572BA03E234FC74C9F75A074A')) sszb from XNJK_1
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="czfpbm" isFilter="1"/>
+			<col name="czfp"/>
+			<col name="ttax" fldType="double" />
+			<col name="sszb_i" fldType="double"/>
+			<col name="sszb" decipher="1"/>
+		</cols>
+	</src>
+	<src id="xnjk_encrypt_des3" name="金库测试_加密" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select ny,czfpbm,czfp,ttax,sszb sszb_i,encrypt_des3(sszb,utl_raw.CAST_TO_VARCHAR2('37C50DD06617463FAF1FBF8E3B34DC23D46297E05E23D36C')) sszb
+			from XNJK_1
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="czfpbm" isFilter="1"/>
+			<col name="czfp"/>
+			<col name="ttax" fldType="double" />
+			<col name="sszb_i" fldType="double"/>
+			<col name="sszb" decipher="1" algorithm="Des3"/>
+		</cols>
+	</src>	
+</dataSource>

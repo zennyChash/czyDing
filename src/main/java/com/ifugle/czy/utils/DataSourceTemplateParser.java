@@ -58,11 +58,19 @@ public class DataSourceTemplateParser {
 						ProcedureBean procedure = parseProcedure(snode.element("procedure"));
 						ds.setProcedure(procedure);
 				    }
+				    String ut = snode.attributeValue("useType");
+				    if("1".equals(ut)||"query".equalsIgnoreCase(ut)){
+				    	ds.setUseType(1);
+				    }else{
+				    	ds.setUseType(0);
+				    }
 				    if(snode.element("cols")!=null){
 				    	Element fcnode =snode.element("cols");
 					    if(fcnode!=null&&fcnode.elementIterator("col")!=null){
 							List columns=new ArrayList();
 							Map mfcols = new HashMap();
+							List decipherCols = new ArrayList();
+							Map decipherColsMap = new HashMap();
 							for(Iterator cit=fcnode.elementIterator("col");cit.hasNext();){
 								Element clnode=(Element)cit.next();
 								Column col = new Column();
@@ -70,6 +78,7 @@ public class DataSourceTemplateParser {
 								col.setFldType(clnode.attributeValue("fldType"));
 								String scanOrder = clnode.attributeValue("canOrder");
 								String sIsFilter = clnode.attributeValue("isFilter");
+								String sDecipher = clnode.attributeValue("decipher");
 								int canOrder = 0;
 								try{
 									canOrder = Integer.parseInt(scanOrder);
@@ -78,15 +87,28 @@ public class DataSourceTemplateParser {
 								try{
 									isFilter = Integer.parseInt(sIsFilter);
 								}catch(Exception e){}
+								int decipher = 0;
+								try{
+									decipher = Integer.parseInt(sDecipher);
+								}catch(Exception e){}
+								String algorithm =clnode.attributeValue("algorithm"); 
 								col.setCanOrder(canOrder);
 								col.setIsFilter(isFilter);
+								col.setDecipher(decipher);
+								col.setAlgorithm(StringUtils.isEmpty(algorithm)?"AES":algorithm);
 								col.setAnalyzer(clnode.attributeValue("analyzer"));
 								col.setSearch_analyzer(clnode.attributeValue("search_analyzer"));
 								columns.add(col);
-								mfcols.put(col.getName(), col);
+								mfcols.put(col.getName().toLowerCase(), col);
+								if(col.getDecipher()==1){
+									decipherCols.add(col);
+									decipherColsMap.put(col.getName().toLowerCase(), col);
+								}
 							}
 							ds.setCols(columns);
 							ds.setColMap(mfcols);
+							ds.setDecipherCols(decipherCols);
+							ds.setDecipherColsMap(decipherColsMap);
 						}
 					}
 				    tslst.add(ds);
@@ -119,14 +141,14 @@ public class DataSourceTemplateParser {
 		}
 		pro.setTotalIndex(ti);
 		
-		int opIndex=1;
-		try{
-			String sOpIndex=proNode.attributeValue("outPutInfoIndex");
-			opIndex=Integer.parseInt(sOpIndex);
-		}catch(Exception e){
-			opIndex=0;
-		}
-		pro.setOutPutInfoIndex(opIndex);
+//		int opIndex=1;
+//		try{
+//			String sOpIndex=proNode.attributeValue("outPutInfoIndex");
+//			opIndex=Integer.parseInt(sOpIndex);
+//		}catch(Exception e){
+//			opIndex=0;
+//		}
+//		pro.setOutPutInfoIndex(opIndex);
 		
 		//过程的输入参数
 		if(proNode!=null&&proNode.elementIterator("in")!=null){

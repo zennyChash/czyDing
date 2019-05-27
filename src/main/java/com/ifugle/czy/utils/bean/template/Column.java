@@ -5,6 +5,8 @@ public class Column {
 	private String fldType;
 	private int canOrder;
 	private int isFilter;
+	private int decipher;
+	private String algorithm="AES";
 	private String analyzer;
 	private String search_analyzer;
 	public String getAnalyzer() {
@@ -31,6 +33,12 @@ public class Column {
 	public void setIsFilter(int isFilter) {
 		this.isFilter = isFilter;
 	}
+	public int getDecipher() {
+		return decipher;
+	}
+	public void setDecipher(int decipher) {
+		this.decipher = decipher;
+	}
 	public String getName() {
 		return name;
 	}
@@ -42,5 +50,11 @@ public class Column {
 	}
 	public void setFldType(String fldType) {
 		this.fldType = fldType;
+	}
+	public String getAlgorithm() {
+		return algorithm;
+	}
+	public void setAlgorithm(String algorithm) {
+		this.algorithm = algorithm;
 	}
 }

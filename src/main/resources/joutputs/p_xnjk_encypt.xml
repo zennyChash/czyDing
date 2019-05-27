@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="q_xnjk_decrypt_aes" name="虚拟金库-AES解密" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($xnjk_encrypt_aes&&$xnjk_encrypt_aes.rows.size()>0)
+				"options":[
+					#foreach($row in $xnjk_encrypt_aes.rows)
+	   						{"sszb_i":"$!{row.sszb_i}","sszb":"$!{row.sszb}"}#if($velocityCount != $xnjk_encrypt_aes.rows.size()),#end
+	   					#end
+				]
+			#end	
+			}
+		]]>
+		</jTemplate>
+		<vDs name="xnjk_encrypt_aes" fields="ny,czfpbm,czfp,ttax,sszb_i,sszb">
+            <orderBy name = "ny" dir="desc"/>
+		</vDs>
+	</joutput>
+	<joutput id="q_xnjk_encrypt_des3" name="虚拟金库-有数据的年" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($xnjk_encrypt_des3&&$xnjk_encrypt_des3.rows.size()>0)
+				"options":[
+					#foreach($row in $xnjk_encrypt_des3.rows)
+	   						{"sszb_i":"$!{row.sszb_i}","sszb":"$!{row.sszb}"}#if($velocityCount != $xnjk_encrypt_des3.rows.size()),#end
+	   					#end
+				]
+			#end	
+			}
+		]]>
+		</jTemplate>
+		<vDs name="xnjk_encrypt_des3" refDtSrc="xnjk_encrypt_des3" fields="ny,czfpbm,czfp,ttax,sszb_i,sszb">
+			<orderBy name = "ny" dir="desc"/>
+		</vDs>
+	</joutput>
+</pages>

@@ -1,5 +1,7 @@
 package com.ifugle.czy.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +34,7 @@ public class AuthController {
 	private Configuration cg ;
 	@Autowired
 	private AuthService authService;
+	
 	@RequestMapping("/getDingConfig")
 	@ResponseBody
 	public JResponse getDingConfig(HttpServletRequest request){
@@ -71,6 +74,8 @@ public class AuthController {
 			jucfg.put("czfp", StringUtils.isEmpty(user.getCzfp())?"":user.getCzfp());
 			jucfg.put("corpname", cg.getString("corpname", "未知"));
 			jucfg.put("menus", user.getMenus());
+			jucfg.put("pswd_on", user.getPswd_on());
+			jucfg.put("pswd_mode", user.getPswd_mode());
 			jr.setRetData(jucfg);
 			log.info("用户"+ user.getDingname()+"登录权限返回："+JSONObject.toJSONString(jr));
 		}else{
@@ -81,6 +86,53 @@ public class AuthController {
 		}
 		return jr;
 	}
+	
+	@RequestMapping("/validateLogin")
+	@ResponseBody
+	public JResponse validateLogin(@RequestParam("userid") String userid,@RequestParam("pswd") String pswd){
+		JResponse jr = new JResponse();
+		if(StringUtils.isEmpty(pswd)){
+			jr.setRetCode("3");
+			jr.setRetMsg("待验证的密码为空 ！");
+			jr.setRetData(null);
+			return jr;
+		}
+		User user = null;
+		String username =userid;
+		RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+		if (requestAttributes != null) {
+			HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+			user = (User)request.getSession().getAttribute("user");
+		}
+		if(user==null&&StringUtils.isEmpty(userid)){
+			return new JResponse("9", "未知的用户账户或登录超时，请重新登录！",null);
+		}else{
+			userid = user==null?userid:user.getUserid();
+			username = user==null?userid:user.getDingname();
+		    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			try{
+				int flag = authService.validateLogin(userid,pswd);
+				if(flag==0){
+					jr.setRetCode("0");
+					jr.setRetMsg("");
+					log.info("用户"+username+"于"+df.format(new Date())+"登录系统！");
+				}else if(flag==3){
+					jr.setRetCode("3");
+					jr.setRetMsg("用户未设置密码！");
+				}else if(flag==5){
+					jr.setRetCode("5");
+					jr.setRetMsg("用户密码不正确！");
+					jr.setRetData(null);
+					log.info("用户"+username+"于"+df.format(new Date())+"登录时，密码错误！");
+				}
+			}catch(Exception e){
+				log.info("用户"+username+"于"+df.format(new Date())+"登录，发生错误。"+e.toString());
+				return new JResponse("9", "密码验证时发生错误！",null);
+			}
+		}
+		return jr;
+	}
+	
 	@RequestMapping("/getMyMenus")
 	@ResponseBody
 	public JResponse getMyMenus(@RequestParam("code") String code, @RequestParam("corpid") String corpid){
@@ -96,9 +148,15 @@ public class AuthController {
 		}
 		User user = authService.getUserCzyConfig(accessToken,code,true);
 		if(user!=null){
+			log.info("getMyMenus访问时间："+new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss:SSS").format(new Date()));
 			if (requestAttributes != null) {
 				request = ((ServletRequestAttributes) requestAttributes).getRequest();
 				request.getSession().setAttribute("user", user);
+				String sessionId = request.getSession().getId();
+				log.info("存放User到会话，会话ID："+sessionId);
+				log.info("YES!!将user放入会话requestAttributes！");
+			}else{
+				log.error("requestAttributes为空，未能将user放入会话！");
 			}
 			jr.setRetCode("0");
 			jr.setRetMsg("");
@@ -109,6 +167,8 @@ public class AuthController {
 			jucfg.put("czfp", StringUtils.isEmpty(user.getCzfp())?"":user.getCzfp());
 			jucfg.put("corpname", cg.getString("corpname", "未知"));
 			jucfg.put("myMenus", user.getMenus());
+			jucfg.put("pswd_on", user.getPswd_on());
+			jucfg.put("pswd_mode", user.getPswd_mode());
 			jr.setRetData(jucfg);
 			log.info("用户"+ user.getDingname()+"登录权限返回："+JSONObject.toJSONString(jr));
 		}else{
@@ -125,10 +185,15 @@ public class AuthController {
 		JResponse jr = new JResponse();
 		User user = null;
 		RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+		log.info("getUserMenus中，requestAttributes是否为空："+(requestAttributes == null?"是":"否"));
 		if (requestAttributes != null) {
 			HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+			String sessionId = request.getSession()==null?"空sessionid":request.getSession().getId();
+			log.info("从会话取USER值，会话ID："+sessionId);
 			user = (User)request.getSession().getAttribute("user");
 		}
+		log.info("getUserMenus中，user是否为空："+(user == null?"是":"否"));
+		log.info("getUserMenus，获取全部有权访问的模块，访问时间："+new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss:SSS").format(new Date()));
 		if(user==null){
 			return new JResponse("9", "未知的用户账户！",null);
 		}else{
@@ -244,6 +309,8 @@ public class AuthController {
 			jucfg.put("czfp", StringUtils.isEmpty(user.getCzfp())?"":user.getCzfp());
 			jucfg.put("corpname", cg.getString("corpname", "未知"));
 			jucfg.put("menus", user.getMenus());
+			jucfg.put("pswd_on", user.getPswd_on());
+			jucfg.put("pswd_mode", user.getPswd_mode());
 			jr.setRetData(jucfg);
 			log.info("用户"+userid+"登录权限返回："+JSONObject.toJSONString(jr));
 		}else{

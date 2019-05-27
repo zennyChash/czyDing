@@ -308,21 +308,25 @@ public class ConsoleServeice {
 			TemplatesLoader ltmp=TemplatesLoader.getTemplatesLoader();
 			List allDts = ltmp.getDataSrcTemplates();
 			if(allDts!=null&&allDts.size()>0){
-				int tt = allDts.size();
-				infos.put("totalCount", tt);
-				int end = start+limit;
-				List dts = allDts.subList(start, tt>end?end:tt);
-				List rows = new ArrayList();
-				for(int i=0;i<dts.size();i++){
-					DataSrc dt = (DataSrc)dts.get(i);
+				List esDts = new ArrayList();
+				for(int i=0;i<allDts.size();i++){
+					DataSrc dt = (DataSrc)allDts.get(i);
+					if(dt.getUseType()==1){
+						continue;
+					}
 					Map cells = new HashMap();
 					cells.put("id", dt.getId());
 					cells.put("name", dt.getName());
 					cells.put("desc", dt.getDesc());
 					cells.put("sourceType", dt.getSourceType());
+					cells.put("useType", dt.getUseType());
 					cells.put("infile", dt.getInfile());
-					rows.add(cells);
+					esDts.add(cells);
 				}
+				int count = esDts.size();
+				infos.put("totalCount", count);
+				int end = start+limit;
+				List rows = allDts.subList(start, count>end?end:count);
 				infos.put("rows", rows);
 			}else{
 				infos.put("totalCount", 0);

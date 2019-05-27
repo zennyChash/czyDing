@@ -82,18 +82,4 @@ public class ProcedureBean {
 	public void setOutParas(List outParas) {
 		this.outParas = outParas;
 	}
-	/**
-	 * 用于参数加工过程，用过程加工参数时，参数转化后的内容，在输出参数中的索引
-	 * @return 加工后的参数内容，在存储过程的输出参数中的序号。以1为起始。
-	 */
-	public int getOutPutInfoIndex() {
-		return outPutInfoIndex;
-	}
-	/**
-	 * 
-	 * @param outPutInfoIndex
-	 */
-	public void setOutPutInfoIndex(int outPutInfoIndex) {
-		this.outPutInfoIndex = outPutInfoIndex;
-	}
 }

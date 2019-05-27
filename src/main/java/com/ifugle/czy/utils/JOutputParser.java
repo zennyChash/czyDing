@@ -2,6 +2,7 @@ package com.ifugle.czy.utils;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -80,11 +81,16 @@ public class JOutputParser {
 							vds.setFields(dsNode.attributeValue("fields"));
 							if(dsNode.elementIterator("filter")!=null){
 								List filterFlds = new ArrayList();
+								Map filterFldsMap = new HashMap();
 								for(Iterator iflt=dsNode.elementIterator("filter");iflt.hasNext();){
 									Element fNode=(Element)iflt.next();
 									FilterField ffld = new FilterField();
 									ffld.setName(fNode.attributeValue("name"));
-									ffld.setRefParam(fNode.attributeValue("refParam"));
+									
+									String refParam =fNode.attributeValue("refParam");
+									String rp = StringUtils.isEmpty(refParam)?ffld.getName():refParam;
+									ffld.setRefParam(rp);
+									
 									ffld.setValue(fNode.attributeValue("value"));
 									ffld.setFtype(StringUtils.isEmpty(fNode.attributeValue("ftype"))?"term":fNode.attributeValue("ftype"));
 									String sdtype = fNode.attributeValue("dataType");
@@ -96,8 +102,10 @@ public class JOutputParser {
 										ffld.setDataType(0);
 									}
 									filterFlds.add(ffld);
+									filterFldsMap.put(ffld.getName(), ffld);
 								}
 								vds.setFilterFlds(filterFlds);
+								vds.setFilterFldsMap(filterFldsMap);
 							}
 							if(dsNode.elementIterator("orderBy")!=null){
 								List orderByFlds = new ArrayList();

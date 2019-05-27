@@ -8,7 +8,30 @@
 <script type="text/javascript">
 var _config = {};
 Zepto(function($){
-// 			p = JSON.stringify({"rptID":"dzjk_srjd","rptParams":{"zwrq":"20180430"}});
+/* 			p = JSON.stringify({"rptID":"q_xnjk_decrypt_rdpro","rptParams":{"ny":201701,"from":0,"size":10}});
+			$.ajax({
+				type: 'post',
+				url: 'api/queryData',
+				data: p,
+				headers: {
+			        "Content-Type": "application/json;charset=utf-8"
+			    },
+				success: function(dt){
+					alert("string:"+dt);
+				}
+			}); */
+// 			$.ajax({
+// 				type: 'get',
+// 				url: 'api/validateLogin',
+// 				data: {"pswd":"1203",userid:'manager431'},
+// 				headers: {
+// 			        "Content-Type": "application/x-www-form-urlencoded"
+// 			    },
+// 				success: function(dt){
+// 					alert("string:"+dt);
+// 				}
+// 			}); 
+// 			p = JSON.stringify({"rptID":"rds_test2","rptParams":{"did":"2","itemmc":"资","lid":"100","czfpbms":"01,03","ny":201801,"from":0,"size":10}});
 // 			$.ajax({
 // 				type: 'post',
 // 				url: 'api/queryData',
@@ -20,18 +43,30 @@ Zepto(function($){
 // 					alert("string:"+dt);
 // 				}
 // 			});
-// 			p = JSON.stringify({"rptID":"enbasic","rptParams":{"searchKey":"顺海","filterBy":{"czfpbm":"330604002"},"from":0,"size":10}});
-// 		    $.ajax({
+// 			p = JSON.stringify({"rptID":"sryb","rptParams":{"zwrq":"201804","from":0,"size":10}});
+// 			$.ajax({
 // 				type: 'post',
-// 				url: 'api/searchForWord',
+// 				url: 'api/queryData',
 // 				data: p,
 // 				headers: {
 // 			        "Content-Type": "application/json;charset=utf-8"
 // 			    },
 // 				success: function(dt){
-// 					alert(dt);
+// 					alert("string:"+dt);
 // 				}
-// 		    });
+// 			});
+/* 			p = JSON.stringify({"rptID":"enbasic","rptParams":{"searchKey":"公司","filterBy":{"czfpbm":"330108099"},"from":0,"size":10}});
+		    $.ajax({
+				type: 'post',
+				url: 'api/searchForWord',
+				data: p,
+				headers: {
+			        "Content-Type": "application/json;charset=utf-8"
+			    },
+				success: function(dt){
+					alert(dt);
+				}
+		    }); */
 			//330604001 "swdjzh":"91330604146165334B","ny":"201805","from":0,"size":10
 // 			p = JSON.stringify({"rptID":"","rptParams":{}});
 // 			$.ajax({
@@ -56,10 +91,9 @@ Zepto(function($){
 // 					alert("string:"+dt);
 // 				}
 // 			}); 
-			
-// 			$.ajax({
+//  			$.ajax({
 // 				type: 'get',
-// 				url: 'api/getUserMenusTest',
+// 				url: 'api/getUserConfigTest',
 // 				data: {"userid":"manager431"},
 // 				headers: {
 // 			        "Content-Type": "application/x-www-form-urlencoded"
@@ -67,8 +101,19 @@ Zepto(function($){
 // 				success: function(dt){
 // 					alert("string:"+dt);
 // 				}
-// 			});
-// 			p = JSON.stringify({"userid":"0352676957760910","saveContent":{"saveType":"myMenus","saveObj":{"menus":[{"id":"srjd"},{"id":"dhss"}]}}});
+// 			}); 
+			$.ajax({
+				type: 'get',
+				url: 'api/getUserMenusTest',
+				data: {"userid":"manager431"},
+				headers: {
+			        "Content-Type": "application/x-www-form-urlencoded"
+			    },
+				success: function(dt){
+					alert("string:"+dt);
+				}
+ 			});
+// 			p = JSON.stringify({"userid":"manager431","saveContent":{"saveType":"myPswd","saveObj":{"pswd_on":"1","pswd_mode":"1","pswd":"1203"}}});
 // 			$.ajax({
 // 				type: 'post',
 // 				url: 'api/saveUserInfoTest',
@@ -168,19 +213,19 @@ Zepto(function($){
 // 					alert("string:"+dt);
 // 				}
 // 			});
-// 			p = JSON.stringify({"reqService":"czfc","reqMethod":"getApprovalLists","svParams":{"userid":"manager431","state":"0","sort":"","dir":"","start":0,"limit":10,"params":{}}});
-// 			$.ajax({
-// 				type: 'post',
-// 				url: 'api/remoteService',
-// 				data: p,
-// 				headers: {
-// 					"Content-Type": "application/json;charset=utf-8"
-// 			    },
-// 				success: function(dt){
-// 					alert("string:"+dt);
-// 				}
-// 			});
+			p = JSON.stringify({"reqService":"czfc","reqMethod":"getApprovalLists","svParams":{"userid":"manager431","state":"0","sort":"","dir":"","start":0,"limit":10,"params":{}}});
 			$.ajax({
+				type: 'post',
+				url: 'api/remoteService',
+				data: p,
+				headers: {
+					"Content-Type": "application/json;charset=utf-8"
+			    },
+				success: function(dt){
+					alert("string:"+dt);
+				}
+			});
+			/* $.ajax({
 				type: 'GET',
 				url: 'manage/getUsersAllMenus',
 				data: {"userid":"manager431"},
@@ -190,7 +235,7 @@ Zepto(function($){
 				success: function(dt){
 					alert(dt);
 				}
-			});
+			}); */
 // 			$.ajax({
 // 				type: 'GET',
 // 				url: 'manage/getUsersDfMenus',

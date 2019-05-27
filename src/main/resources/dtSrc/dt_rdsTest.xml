@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="test1" name="" description="" sourceType ="sql" useType="1">
+		<sql>
+		<![CDATA[
+			select * from SP_APPLISTS_1 where did={DID} and itemname like %{Item}% and lid>{lid}
+		]]>
+		</sql>
+		<cols>
+			<col name="totalmoney"/>
+		</cols>
+	</src>
+	<src id="test2" name="" description="" sourceType ="procedure" useType="query">
+		<procedure name="pkg_query.test" totalIndex="1" datasetIndex="2">
+			<in referMode="1" referTo="pNy"/>
+			<in referMode="1" referTo="pCzfpbms"/>
+			<in referMode="1" referTo="from"/>
+			<in referMode="1" referTo="size"/>
+			<out dataType="1"/>
+			<out dataType="3"/>
+		</procedure>
+		<cols>
+			<col name="sszb" />
+		</cols>
+	</src>
+</dataSource>
+

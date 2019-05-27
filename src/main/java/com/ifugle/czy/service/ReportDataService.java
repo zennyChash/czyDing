@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -241,6 +242,8 @@ public class ReportDataService {
 			info = saveMyFavorite(userid,sobj);
 		}else if("myMenus".equals(saveInfo.getString("saveType"))){
 			info = saveMyMenus(userid,sobj);
+		}else if("myPswd".equals(saveInfo.getString("saveType"))){
+			info = saveMyPassword(userid,sobj);
 		}
 		return info;
 	}
@@ -283,6 +286,52 @@ public class ReportDataService {
 		info.put("msg", "");
 		return info;
 	}
+	
+	private Map saveMyPassword(String userid,JSONObject sobj){
+		Map info = new HashMap();
+		String oldPswd = sobj.getString("oldPswd");
+		StringBuffer sql = null;
+		if(!StringUtils.isEmpty(oldPswd)){
+			sql = new StringBuffer("select decode(pswd_mode,0,pswd_kb,pswd_gesture)pswd from users where userid=?");
+			String hashed = jdbcTemplate.queryForObject(sql.toString(), new Object[]{userid},String.class);
+			if (!BCrypt.checkpw(oldPswd, hashed)){
+				info.put("saved", false);
+				info.put("msg", "旧密码输入不正确，不能保存设置！");
+				return info;
+			}
+		}
+		String pswd = sobj.getString("pswd");
+		String spswd_on=sobj.getString("pswd_on");
+		String spswd_mode = sobj.getString("pswd_mode");
+		int pswd_on=0,pswd_mode=0;
+		try{
+			pswd_on = Integer.parseInt(spswd_on);
+		}catch(Exception e){
+		}
+		try{
+			pswd_mode = Integer.parseInt(spswd_mode);
+		}catch(Exception e){
+		}
+		if(pswd_on==0){//关闭，清空密码设置信息。开启时需要重新设置
+			jdbcTemplate.update("update users set pswd_on=0,pswd_mode=0,pswd_kb='',pswd_gesture='' where userid=?",new Object[]{userid});
+		}else{
+			String hashed = BCrypt.hashpw(pswd, BCrypt.gensalt());
+			if(pswd_mode==0){
+				jdbcTemplate.update("update users set pswd_on=1,pswd_mode=0,pswd_kb=?,pswd_gesture='' where userid=?",new Object[]{hashed,userid});
+			}else{
+				jdbcTemplate.update("update users set pswd_on=1,pswd_mode=1,pswd_kb='',pswd_gesture=? where userid=?",new Object[]{hashed,userid});
+			}
+		}
+		//记录修改事件
+		jdbcTemplate.update("insert into user_log(id,userid,etime,eventtype)values(sq_user_log.nextval,?,sysdate,?)",
+				new Object[]{userid,"set_myPswd"});
+		
+		info.put("saved", true);
+		info.put("msg", "");
+		return info;
+	}
+	
+	
 	public Map deleteUserInfo(DeleteUserObj dobj) {
 		Map info = new HashMap();
 		String userid = dobj.getUserid();

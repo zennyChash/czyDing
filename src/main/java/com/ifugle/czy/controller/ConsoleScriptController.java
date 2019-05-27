@@ -220,6 +220,7 @@ public class ConsoleScriptController {
 			String rptID = params.get("id");
 			String strParams =params.get("rptParams");
 			JSONObject qParams = new JSONObject();
+			log.info("查询时传递的参数strParams："+strParams);
 			if(!StringUtils.isEmpty(strParams)){
 				qParams = JSONObject.parseObject(strParams);
 			}

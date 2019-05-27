@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<pages>
+	<joutput id="q_xnjk_decrypt_rd" name="虚拟金库-关系型数据库-解密" description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($xnjk_encrypt_rd&&$xnjk_encrypt_rd.rows.size()>0)
+				"options":[
+					#foreach($row in $xnjk_encrypt_rd.rows)
+   						{"sszb_i":"$!{row.sszb_i}",
+   						"aes_i":"$!{row.aes_i}",
+   						"des3_i":"$!{row.des3_i}",
+   						"sszb_aes":"$!{row.sszb_aes}",
+   						"sszb_des3":"$!{row.sszb_des3}"}#if($velocityCount != $xnjk_encrypt_rd.rows.size()),#end
+	   				#end
+				]
+			#end	
+			}
+		]]>
+		</jTemplate>
+		<vDs name="xnjk_encrypt_rd" fields="ny,czfpbm,czfp,ttax,sszb_i,aes_i,des3_i,sszb_des3,sszb_aes">
+            <filter name = "ny"/>
+		</vDs>
+	</joutput>
+	<joutput id="q_xnjk_decrypt_rdpro" name="测试关系型数据库2"  description=""> 
+		<jTemplate>
+		<![CDATA[
+			{
+			#if($xnjk_encrypt_rdpro&&$xnjk_encrypt_rdpro.rows.size()>0)
+				"options":[
+					#foreach($row in $xnjk_encrypt_rdpro.rows)
+	   					{"sszb_i":"$!{row.sszb_i}",
+   						"aes_i":"$!{row.aes_i}",
+   						"des3_i":"$!{row.des3_i}",
+   						"sszb_aes":"$!{row.sszb_aes}",
+   						"sszb_des3":"$!{row.sszb_des3}"}#if($velocityCount != $xnjk_encrypt_rdpro.rows.size()),#end
+	   				#end
+				]
+			#end
+			}
+		]]>
+		</jTemplate>
+		<vDs name="xnjk_encrypt_rdpro" paging="1">
+			<filter name = "pNy" refParam="ny" dataType="1"/>
+		</vDs>
+	</joutput>
+</pages>

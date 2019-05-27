@@ -28,6 +28,7 @@ import com.ifugle.czy.utils.bean.User;
 import com.ifugle.utils.Configuration;
 
 import org.apache.log4j.*;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -192,8 +193,8 @@ public class AuthService {
 				return null;
 			}
 			System.out.println("进入了getCzyAuth，获取到了CorpUserDetail："+ud==null?"":ud.getName());
-			StringBuffer usql = new StringBuffer("select userid,dingname,dinginfo,u.qybj,czfpbm,b.mc czfp from users u,");
-			usql.append("(select * from bm_cont where table_bm='BM_CZFP')b  where  u.czfpbm=b.bm(+) and u.userid=?");
+			StringBuffer usql = new StringBuffer("select userid,dingname,dinginfo,u.qybj,nvl(u.pswd_on,0)pswd_on,nvl(u.pswd_mode,0)pswd_mode,");
+			usql.append("czfpbm,b.mc czfp from users u,(select * from bm_cont where table_bm='BM_CZFP')b where u.czfpbm=b.bm(+) and u.userid=?");
 			List users = jdbcTemplate.queryForList(usql.toString(),new Object[]{userid});
 			if(users==null||users.size()==0){//不存在的，先插入一条新的用户记录。
 				//先增加该用户的记录，再记录登录情况。初始登录的用户，未经过业务系统的权限设置，看不到业务菜单。
@@ -214,6 +215,8 @@ public class AuthService {
 				u.setCzfpbm((String)mu.get("czfpbm"));
 				u.setCzfp((String)mu.get("czfp"));
 				u.setQybj(((BigDecimal)mu.get("qybj")).intValue());
+				u.setPswd_on(((BigDecimal)mu.get("pswd_on")).intValue());
+				u.setPswd_mode(((BigDecimal)mu.get("pswd_mode")).intValue());
 				getMyMenus(userid,u);
 			}
 		}catch(Exception e){
@@ -347,17 +350,22 @@ public class AuthService {
 	
 	public User testAuth(String userid){
 		User u = null;
-		StringBuffer usql = new StringBuffer("select userid,dingname,dinginfo,u.qybj,czfpbm,b.mc czfp from users u,");
-		usql.append("(select * from bm_cont where table_bm='BM_CZFP')b  where  u.czfpbm=b.bm(+) and u.userid=?");
+		StringBuffer usql = new StringBuffer("select userid,dingname,dinginfo,u.qybj,nvl(u.pswd_on,0)pswd_on,nvl(u.pswd_mode,0)pswd_mode,");
+		usql.append("czfpbm,b.mc czfp from users u,(select * from bm_cont where table_bm='BM_CZFP')b where u.czfpbm=b.bm(+) and u.userid=?");
 		List users = jdbcTemplate.queryForList(usql.toString(),new Object[]{userid});
 		u = new User();
-		Map mu =(Map)users.get(0);
+		Map mu = (Map)users.get(0);
 		u.setUserid((String)mu.get("userid"));
 		u.setDingname((String)mu.get("dingname"));
 		u.setDinginfo((String)mu.get("dinginfo"));
 		u.setCzfpbm((String)mu.get("czfpbm"));
 		u.setCzfp((String)mu.get("czfp"));
 		u.setQybj(((BigDecimal)mu.get("qybj")).intValue());
+		u.setPswd_on(((BigDecimal)mu.get("pswd_on")).intValue());
+		System.out.println("pswd_on："+((BigDecimal)mu.get("pswd_on")).intValue());
+		u.setPswd_mode(((BigDecimal)mu.get("pswd_mode")).intValue());
+		System.out.println("pswd_mode："+((BigDecimal)mu.get("pswd_mode")).intValue());
+
 		//查找岗位
 		usql = new StringBuffer("select userid,to_char(u.postid)postid,postname from user_post u,post p where userid=? and u.postid=p.postid");
 		List posts = jdbcTemplate.queryForList(usql.toString(),new Object[]{userid});
@@ -433,5 +441,34 @@ public class AuthService {
 			canAccess = true;
 		}
 		return canAccess;
+	}
+	public int validateLogin(String userid, String pswdToTest) {
+		StringBuffer sql = new StringBuffer("select decode(pswd_mode,0,pswd_kb,pswd_gesture)pswd from users where userid=?");
+		String hashed = jdbcTemplate.queryForObject(sql.toString(), new Object[]{userid},String.class);
+		int flag = 0;
+		if(StringUtils.isEmpty(hashed)){
+			return 3;
+		}
+		try{
+			boolean consist = BCrypt.checkpw(pswdToTest, hashed==null?"":hashed);
+			flag = consist?0:5;
+		}catch(Exception e){
+			log.error(userid+"验证密码时发生错误："+e.toString());
+		}
+		return flag;
+	}
+	
+	public static void main(String[] args) {
+		// Hash a password for the first time
+		String password = "testpassword";
+		String hashed = BCrypt.hashpw(password, BCrypt.gensalt());
+		System.out.println(hashed);
+		String hashed2 = BCrypt.hashpw(password, BCrypt.gensalt(4));
+		String candidate = "testpassword";
+		//String candidate = "wrongtestpassword";
+		if (BCrypt.checkpw(candidate, hashed))
+			System.out.println("It matches");
+		else
+			System.out.println("It does not match");
 	}
 }

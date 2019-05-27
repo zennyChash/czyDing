@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="xnjk_encrypt_rd" name="金库测试_加密" description="" sourceType ="sql" useType="1">
+		<sql>
+		<![CDATA[
+			select ny,czfpbm,czfp,ttax,sszb_i,sszb_aes aes_i,sszb_des3 des3_i,sszb_aes,sszb_des3 from XNJK_2 where ny={ny}
+		]]>
+		</sql>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="czfpbm" isFilter="1"/>
+			<col name="czfp"/>
+			<col name="ttax" fldType="double" />
+			<col name="sszb_i" fldType="double"/>
+			<col name="aes_i"/>
+			<col name="des3_i"/>
+			<col name="sszb_aes" decipher="1"/>
+			<col name="sszb_des3" decipher="1" algorithm="Des3"/>
+		</cols>
+	</src>
+	<src id="xnjk_encrypt_rdpro" name="金库测试_加密" description="" sourceType ="procedure" useType="1">
+		<procedure name="pkg_query.testQueryRd" totalIndex="1" datasetIndex="2">
+			<in referMode="1" referTo="pNy"/>
+			<in referMode="1" referTo="from"/>
+			<in referMode="1" referTo="size"/>
+			<out dataType="1"/>
+			<out dataType="3"/>
+		</procedure>
+		<cols>
+			<col name="ny" canOrder="1" isFilter="1"/>
+			<col name="czfpbm" isFilter="1"/>
+			<col name="czfp"/>
+			<col name="ttax" fldType="double" />
+			<col name="sszb_i" fldType="double"/>
+			<col name="aes_i"/>
+			<col name="des3_i"/>
+			<col name="sszb_aes" decipher="1"/>
+			<col name="sszb_des3" decipher="1" algorithm="Des3"/>
+		</cols>
+	</src>
+</dataSource>

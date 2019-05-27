@@ -1,6 +1,7 @@
 package com.ifugle.czy.utils.bean.template;
 
 import java.util.List;
+import java.util.Map;
 
 //根据数据源定义的描述，在运行时封装好查询、排序等条件，用于查询具体数据集。
 public class ValuedDs {
@@ -15,7 +16,14 @@ public class ValuedDs {
 	private String fields;
 	private List filterFlds;
 	private List orderByFlds;
+	private Map filterFldsMap;
 	
+	public Map getFilterFldsMap(){
+		return filterFldsMap;
+	}
+	public void setFilterFldsMap(Map filterFldsMap){
+		this.filterFldsMap= filterFldsMap;
+	}
 	public String getFields() {
 		return fields;
 	}
