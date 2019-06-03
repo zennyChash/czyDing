@@ -185,15 +185,12 @@ public class AuthController {
 		JResponse jr = new JResponse();
 		User user = null;
 		RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
-		log.info("getUserMenus中，requestAttributes是否为空："+(requestAttributes == null?"是":"否"));
 		if (requestAttributes != null) {
 			HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
 			String sessionId = request.getSession()==null?"空sessionid":request.getSession().getId();
 			log.info("从会话取USER值，会话ID："+sessionId);
 			user = (User)request.getSession().getAttribute("user");
 		}
-		log.info("getUserMenus中，user是否为空："+(user == null?"是":"否"));
-		log.info("getUserMenus，获取全部有权访问的模块，访问时间："+new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss:SSS").format(new Date()));
 		if(user==null){
 			return new JResponse("9", "未知的用户账户！",null);
 		}else{

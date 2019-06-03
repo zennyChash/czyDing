@@ -42,23 +42,28 @@ public class DingHelper {
      */
     public static String getAccessToken(){
         long curTime = System.currentTimeMillis();
-        String corp_id = Configuration.getConfig().getString("CORP_ID");
-        String corp_secret = Configuration.getConfig().getString("CORP_SECRET");
+        String authType = Configuration.getConfig().getString("DingAuthType","app");
+    	String key = Configuration.getConfig().getString("APP_KEY");
+    	String secret = Configuration.getConfig().getString("APP_SECRET");
+    	if("corp".equals(authType)){
+    		key = Configuration.getConfig().getString("CORP_ID");
+    		secret = Configuration.getConfig().getString("CORP_SECRET");
+    	}
         //如果有缓存的access_token,可以取出来用。
-        JSONObject accessTokenValue = (JSONObject) FileUtils.getValue("accesstoken", corp_id);
+        JSONObject accessTokenValue = (JSONObject) FileUtils.getValue("accesstoken", key);
         String accToken = "";
         JSONObject jsontemp = new JSONObject();
         if (accessTokenValue == null || curTime - accessTokenValue.getLong("begin_time") >= cacheTime) {
             try {
                 ServiceFactory serviceFactory = ServiceFactory.getInstance();
                 CorpConnectionService corpConnectionService = serviceFactory.getOpenService(CorpConnectionService.class);
-                accToken = corpConnectionService.getCorpToken(corp_id, corp_secret);
+                accToken = corpConnectionService.getCorpToken(key, secret);
                 // save accessToken
                 JSONObject jsonAccess = new JSONObject();
                 jsontemp.clear();
                 jsontemp.put("access_token", accToken);
                 jsontemp.put("begin_time", curTime);
-                jsonAccess.put(corp_id, jsontemp);
+                jsonAccess.put(key, jsontemp);
                 //真实项目中最好保存到数据库中
                 FileUtils.write2File(jsonAccess, "accesstoken");
             } catch (Exception e) {
@@ -75,9 +80,13 @@ public class DingHelper {
      * 正常的情况下，jsapi_ticket的有效期为7200秒，所以开发者需要在某个地方设计一个定时器，定期去更新jsapi_ticket
      */
     public static String getJsapiTicket(String accessToken) throws OgnlException {
-    	String corp_id = Configuration.getConfig().getString("CORP_ID");
-        String corp_secret = Configuration.getConfig().getString("CORP_SECRET");
-        JSONObject jsTicketValue = (JSONObject) FileUtils.getValue("jsticket", corp_id);
+    	//根据配置，适应不同的验证方式
+    	String authType = Configuration.getConfig().getString("DingAuthType","app");
+    	String key = Configuration.getConfig().getString("APP_KEY");
+    	if("corp".equals(authType)){
+    		key = Configuration.getConfig().getString("CORP_ID");
+    	}
+        JSONObject jsTicketValue = (JSONObject) FileUtils.getValue("jsticket", key);
         long curTime = System.currentTimeMillis();
         String jsTicket = "";
 
@@ -95,7 +104,7 @@ public class DingHelper {
                 jsontemp.clear();
                 jsontemp.put("ticket", jsTicket);
                 jsontemp.put("begin_time", curTime);
-                jsonTicket.put(Configuration.getConfig().getString("CORP_ID"), jsontemp);
+                jsonTicket.put(key, jsontemp);
                 FileUtils.write2File(jsonTicket, "jsticket");
             } catch (Exception e) {
                 e.printStackTrace();
