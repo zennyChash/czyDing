@@ -411,7 +411,7 @@
 				<configuration>
 					<scanIntervalSeconds>10</scanIntervalSeconds>
 					<webAppConfig>
-						<contextPath>/czy</contextPath>
+						<contextPath>/czyDing</contextPath>
 						<defaultsDescriptor>src/main/config/jetty/webdefault.xml</defaultsDescriptor>
 					</webAppConfig>
 					<stopKey>foo</stopKey>

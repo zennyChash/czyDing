@@ -68,6 +68,7 @@ public class AuthController {
 			jr.setRetCode("0");
 			jr.setRetMsg("");
 			JSONObject jucfg = new JSONObject();
+			jucfg.put("userid", user.getUserid());
 			jucfg.put("username", user.getDingname());
 			jucfg.put("postname", user.getPostNames());
 			jucfg.put("czfpbm", StringUtils.isEmpty(user.getCzfpbm())?"":user.getCzfpbm());
@@ -161,6 +162,7 @@ public class AuthController {
 			jr.setRetCode("0");
 			jr.setRetMsg("");
 			JSONObject jucfg = new JSONObject();
+			jucfg.put("userid", user.getUserid());
 			jucfg.put("username", user.getDingname());
 			jucfg.put("postname", user.getPostNames());
 			jucfg.put("czfpbm", StringUtils.isEmpty(user.getCzfpbm())?"":user.getCzfpbm());
@@ -300,6 +302,7 @@ public class AuthController {
 			jr.setRetCode("0");
 			jr.setRetMsg("");
 			JSONObject jucfg = new JSONObject();
+			jucfg.put("userid", user.getUserid());
 			jucfg.put("username", user.getDingname());
 			jucfg.put("postname", user.getPostNames());
 			jucfg.put("czfpbm", StringUtils.isEmpty(user.getCzfpbm())?"":user.getCzfpbm());
