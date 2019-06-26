@@ -5,21 +5,23 @@
 <title>test</title>
 <script type="text/javascript" src="libs/zepto.js">
 </script>
+<script type="text/javascript" src="js/md5.js">
+</script>
 <script type="text/javascript">
-var _config = {};
-Zepto(function($){
-/* 			p = JSON.stringify({"rptID":"q_xnjk_decrypt_rdpro","rptParams":{"ny":201701,"from":0,"size":10}});
-			$.ajax({
-				type: 'post',
-				url: 'api/queryData',
-				data: p,
-				headers: {
-			        "Content-Type": "application/json;charset=utf-8"
-			    },
-				success: function(dt){
-					alert("string:"+dt);
-				}
-			}); */
+// var _config = {};
+// Zepto(function($){
+// 			p = JSON.stringify({"rptID":"q_xnjk_decrypt_rdpro","rptParams":{"ny":201701,"from":0,"size":10}});
+// 			$.ajax({
+// 				type: 'post',
+// 				url: 'api/queryData',
+// 				data: p,
+// 				headers: {
+// 			        "Content-Type": "application/json;charset=utf-8"
+// 			    },
+// 				success: function(dt){
+// 					alert("string:"+dt);
+// 				}
+// 			}); 
 // 			$.ajax({
 // 				type: 'get',
 // 				url: 'api/validateLogin',
@@ -102,7 +104,7 @@ Zepto(function($){
 // 					alert("string:"+dt);
 // 				}
 // 			}); 
-			$.ajax({
+			/* $.ajax({
 				type: 'get',
 				url: 'api/getUserMenusTest',
 				data: {"userid":"manager431"},
@@ -112,7 +114,7 @@ Zepto(function($){
 				success: function(dt){
 					alert("string:"+dt);
 				}
- 			});
+ 			}); */
 // 			p = JSON.stringify({"userid":"manager431","saveContent":{"saveType":"myPswd","saveObj":{"pswd_on":"1","pswd_mode":"1","pswd":"1203"}}});
 // 			$.ajax({
 // 				type: 'post',
@@ -213,7 +215,7 @@ Zepto(function($){
 // 					alert("string:"+dt);
 // 				}
 // 			});
-			p = JSON.stringify({"reqService":"czfc","reqMethod":"getApprovalLists","svParams":{"userid":"manager431","state":"0","sort":"","dir":"","start":0,"limit":10,"params":{}}});
+/* 			p = JSON.stringify({"reqService":"czfc","reqMethod":"getApprovalLists","svParams":{"userid":"manager431","state":"0","sort":"","dir":"","start":0,"limit":10,"params":{}}});
 			$.ajax({
 				type: 'post',
 				url: 'api/remoteService',
@@ -224,7 +226,7 @@ Zepto(function($){
 				success: function(dt){
 					alert("string:"+dt);
 				}
-			});
+			}); */
 			/* $.ajax({
 				type: 'GET',
 				url: 'manage/getUsersAllMenus',
@@ -247,8 +249,20 @@ Zepto(function($){
 // 					alert("string:"+dt);
 // 				}
 // 			});
-})
-
+			p = JSON.stringify({"dataID":"search","params":{"word":"杭州孚嘉科技"}});
+ 			$.ajax({
+				type: 'post',
+				url: 'api/queryTyc',
+				data: p,
+				headers: {
+			        "Content-Type": "application/json;charset=utf-8"
+			    },
+				success: function(dt){
+					alert(dt);
+				}
+			});
+//});
+  
 </script>
 
 </head>

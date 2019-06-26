@@ -72,6 +72,7 @@
 	<bean id="dbExp" class="com.ifugle.etl.task.extract.service.DBExtractService"/>
 	<bean id="dbImp" class="com.ifugle.etl.task.imp.service.DBImportService"/>
 	<bean id="mngService" class="com.ifugle.etl.utils.service.ManageService"/>
+	<bean id="tycServicev" class="com.ifugle.czy.service.TianyanchaService"/>
 	<context:annotation-config />
 	<tx:annotation-driven transaction-manager="txManager" />  
 	<!--<context:spring-configured />

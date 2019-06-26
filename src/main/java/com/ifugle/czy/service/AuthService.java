@@ -460,11 +460,11 @@ public class AuthService {
 	
 	public static void main(String[] args) {
 		// Hash a password for the first time
-		String password = "testpassword";
+		String password = "11";
 		String hashed = BCrypt.hashpw(password, BCrypt.gensalt());
 		System.out.println(hashed);
 		String hashed2 = BCrypt.hashpw(password, BCrypt.gensalt(4));
-		String candidate = "testpassword";
+		String candidate = "11";
 		//String candidate = "wrongtestpassword";
 		if (BCrypt.checkpw(candidate, hashed))
 			System.out.println("It matches");

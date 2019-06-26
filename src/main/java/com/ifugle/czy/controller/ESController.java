@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSONObject;
 import com.ifugle.czy.service.ESDataSourceService;
 import com.ifugle.czy.service.ESQueryDataService;
+import com.ifugle.czy.service.TianyanchaService;
 import com.ifugle.czy.utils.JResponse;
 import com.ifugle.czy.utils.TemplatesLoader;
 import com.ifugle.czy.utils.bean.DataSourceJson;
+import com.ifugle.czy.utils.bean.QueryParam;
 import com.ifugle.czy.utils.bean.RptDataJson;
 import com.ifugle.czy.utils.bean.template.DataSrc;
 import com.ifugle.czy.utils.bean.template.JOutput;
@@ -29,6 +31,8 @@ public class ESController {
 	private ESQueryDataService esDataService;
 	@Autowired
 	private ESDataSourceService esDtSrcServicev;
+	@Autowired
+	private TianyanchaService tycServicev;
 	@Autowired
 	private Configuration cg;
 	
@@ -122,12 +126,24 @@ public class ESController {
 		}
 		return jr;
 	}
-	
-	
-	
-	
-	
-	
+	@RequestMapping(value="/queryTyc",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse queryTyc(@RequestBody QueryParam tycParams){
+		JResponse jr = null;
+		if(tycParams!=null){
+			String dataID = tycParams.getDataID();
+			if(StringUtils.isEmpty(dataID)){
+				return new JResponse("9","未指定要查询的数据类型！",null);
+			}else{
+				JSONObject params = tycParams.parseQParams();
+				JSONObject data = tycServicev.queryTianyanCha(dataID,params);
+				jr = new JResponse("0","",data);
+			}
+		}else{
+			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
+		}
+		return jr;
+	}
 	
 	@RequestMapping(value="/indexAllData2ES",method = RequestMethod.POST)
 	@ResponseBody
