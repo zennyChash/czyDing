@@ -20,18 +20,7 @@ Zepto(function($){
 // 					alert("string:"+dt);
 // 				}
 // 			});
-			p = JSON.stringify({"dsID":"","dsParams":{"reIndex":true,"deleteOldData":true}});
-			$.ajax({
-				type: 'post',
-				url: 'api/indexAllData2ES',
-				data: p,
-				headers: {
-			        "Content-Type": "application/json;charset=utf-8"
-			    },
-				success: function(dt){
-					alert("string:"+dt);
-				}
-			});
+			
 			
 })
 

@@ -18,101 +18,18 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ifugle.czy.service.ESQueryDataService;
-import com.ifugle.czy.service.ReportDataEsService;
-import com.ifugle.czy.service.ReportDataService;
+import com.ifugle.czy.service.SysSetService;
 import com.ifugle.czy.utils.JResponse;
 import com.ifugle.czy.utils.bean.DeleteUserObj;
 import com.ifugle.czy.utils.bean.QueryUserObj;
-import com.ifugle.czy.utils.bean.RptDataJson;
 import com.ifugle.czy.utils.bean.SaveUserObj;
 import com.ifugle.czy.utils.bean.User;
 
 @Controller
-public class QueryDataController {
+public class SysSetController {
 	@Autowired
-	private ReportDataService rptDataService;
-	@Autowired
-	private ReportDataEsService rptEsService;
+	private SysSetService sysSetService;
 	
-//	@RequestMapping(value="/queryDataDB",method = RequestMethod.POST)
-//	@ResponseBody
-//	public JResponse getRptDataDB(@RequestBody RptDataJson params){
-//		JResponse jr = null;
-//		if(params!=null){
-//			String rptID = params.getRptID();
-//			Map data = rptDataService.getData(rptID,params);
-//			jr = new JResponse("0","",data);
-//		}else{
-//			jr = new JResponse("9","获取报表数据失败，没有获得正确的请求参数！",null);
-//		}
-//		return jr;
-//	}
-//	
-//	@RequestMapping(value="/paramOptionsDB",method = RequestMethod.POST)
-//	@ResponseBody
-//	public JResponse getParamOptionsDB(@RequestBody RptDataJson params){
-//		JResponse jr = null;
-//		if(params!=null){
-//			String rptID = params.getRptID();
-//			Map data = rptDataService.getParamOptions(rptID,params);
-//			jr = new JResponse("0","",data);
-//		}else{
-//			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
-//		}
-//		return jr;
-//	}
-//	@RequestMapping(value="/buildIndexOld",method = RequestMethod.POST)
-//	@ResponseBody
-//	public JResponse buildIndex(@RequestBody RptDataJson params){
-//		JResponse jr = null;
-//		if(params!=null){
-//			String rptID = params.getRptID();
-//			if(StringUtils.isEmpty(rptID)){
-//				return new JResponse("9","未设置索引的类型！",null);
-//			}else{
-//				String data = rptEsService.addIndexAndDocumentEn("rptdata", rptID.toLowerCase(),params);
-//				jr = new JResponse("0","",data);
-//			}
-//		}else{
-//			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
-//		}
-//		return jr;
-//	}
-//	@RequestMapping(value="/deleteIndex",method = RequestMethod.POST)
-//	@ResponseBody
-//	public JResponse deleteIndex(@RequestBody RptDataJson params){
-//		JResponse jr = null;
-//		if(params!=null){
-//			String rptID = params.getRptID();
-//			if(StringUtils.isEmpty(rptID)){
-//				return new JResponse("9","未设置索引的类型！",null);
-//			}else{
-//				String data = rptEsService.deleteIndex("rptdata");
-//				jr = new JResponse("0","",data);
-//			}
-//		}else{
-//			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
-//		}
-//		return jr;
-//	}
-//	@RequestMapping(value="/searchForWordOld",method = RequestMethod.POST)
-//	@ResponseBody
-//	public JResponse searchForWord(@RequestBody RptDataJson params){
-//		JResponse jr = null;
-//		if(params!=null){
-//			String rptID = params.getRptID();
-//			if(StringUtils.isEmpty(rptID)){
-//				return new JResponse("9","未设置索引的类型！",null);
-//			}else{
-//				Map data = rptEsService.searchForWord("rptdata", rptID.toLowerCase(),params);
-//				jr = new JResponse("0","",data);
-//			}
-//		}else{
-//			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
-//		}
-//		return jr;
-//	}
 	@RequestMapping(value="/saveUserInfo",method = RequestMethod.POST)
 	@ResponseBody
 	public JResponse saveUserInfo(@RequestBody SaveUserObj so){
@@ -133,7 +50,7 @@ public class QueryDataController {
 			}else if(user!=null){
 				so.setUserid(user.getUserid());
 			}
-			Map result = rptDataService.saveUserInfo(so);
+			Map result = sysSetService.saveUserInfo(so);
 			if((boolean)result.get("saved")){
 				jr = new JResponse("0","",result);
 			}else{
@@ -154,7 +71,7 @@ public class QueryDataController {
 			if(jsave==null){
 				return new JResponse("9", "未找到要保存的信息！",null);
 			}
-			Map result = rptDataService.saveUserInfo(so);
+			Map result = sysSetService.saveUserInfo(so);
 			if((boolean)result.get("saved")){
 				jr = new JResponse("0","",result);
 			}else{
@@ -187,7 +104,7 @@ public class QueryDataController {
 			}else if(user!=null){
 				dobj.setUserid(user.getUserid());
 			}
-			Map result = rptDataService.deleteUserInfo(dobj);
+			Map result = sysSetService.deleteUserInfo(dobj);
 			if((boolean)result.get("deleted")){
 				jr = new JResponse("0","",result);
 			}else{
@@ -219,7 +136,7 @@ public class QueryDataController {
 			}else if(user!=null){
 				qo.setUserid(user.getUserid());
 			}
-			jr = rptDataService.getUserInfo(user,qo);
+			jr = sysSetService.getUserInfo(user,qo);
 		}else{
 			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
 		}

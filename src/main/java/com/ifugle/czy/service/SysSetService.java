@@ -24,8 +24,8 @@ import com.ifugle.czy.utils.bean.SaveUserObj;
 import com.ifugle.czy.utils.bean.User;
 
 @Transactional
-public class ReportDataService {
-	private static Logger log = Logger.getLogger(ReportDataService.class);
+public class SysSetService {
+	private static Logger log = Logger.getLogger(SysSetService.class);
 	protected JdbcTemplate jdbcTemplate;
 	@Autowired
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate){

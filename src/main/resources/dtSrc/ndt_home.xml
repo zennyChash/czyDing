@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="yssr" name="" description="" sourceType ="sql" useType="1">
+		<sql>
+		<![CDATA[
+			            select zwrq,sum(yssr) yssr,sum(yssr_s) yssr_s
+			            from (
+			            select to_char(r.zwrq_jk) zwrq,sum(r.ssqb+r.sbjjdf) yssr,0 yssr_s from yssr_czy r,YSSR_ZWRQ_SNTQ t
+			            where r.zwrq_jk=t.zwrq_bn and r.zwrq_jk>=(select substr(max(zwrq_jk),1,4)||'0101' from YSSR_INDEX)
+			            group by  r.zwrq_jk
+			            union all
+			            select t.zwrq_bn zwrq,0 yssr,sum(r.ssqb+r.sbjjdf) yssr_s from yssr_czy r,YSSR_ZWRQ_SNTQ t
+			            where  r.zwrq_jk=t.zwrq_sn and t.zwrq_bn>=(select substr(max(zwrq_jk),1,4)||'0101' from YSSR_INDEX)
+                                    group by t.zwrq_bn
+                                    )
+                                    group by zwrq
+                                    order by zwrq
+		]]>
+		</sql>
+		<cols>
+			
+		</cols>
+	</src>
+	<src id="yssr_jhs" name="" description="" sourceType ="sql" useType="1">
+		<sql>
+		<![CDATA[
+			select zwrq,yssr,round(yssr/jhs*100,2) wcjd,jhs
+			from (
+			select zwrq_jk zwrq,sum(ssqb+sbjjdf) yssr,t.yss jhs from yssr_czy r,YSSR_TB t  where   substr(zwrq_jk,1,4)=t.nian and t.kj='CZZSR'
+                        group by zwrq_jk,t.yss
+                        ) where zwrq=(select max(zwrq_jk) from yssr_index)
+
+		]]>
+		</sql>
+		<cols>			
+		</cols>
+	</src>
+	<src id="yssr_fsz" name="" description="" sourceType ="sql" useType="1">
+		<sql>
+		<![CDATA[
+with t
+as
+(
+select ny,zwrq_jk,szbm,sz,se,round((se/sum(se)over(partition by zwrq_jk))*100,2) srzb
+from
+(
+select ny,zwrq_jk,szbm,b.mc sz,se
+from
+(
+SELECT substr(zwrq_jk,1,6) ny,y.zwrq_jk,case when y.szbm not in ('10101','10104','10106','10109','10113') then '99999' else y.szbm end szbm,
+sum(ssqb+sbjjdf) se FROM yssr_czy y
+group by substr(zwrq_jk,1,6),y.zwrq_jk,case when y.szbm not in ('10101','10104','10106','10109','10113') then '99999' else y.szbm end
+) r,yssr_bm_sz b
+where r.szbm=b.bm
+)
+union all
+select '999999' ny,99999999 zwrq_jk,bm,mc sz,0 se,0 srzb from yssr_bm_sz
+)
+select ny,szbm,sz,bnlj,sntq,tbzf,srzb,color from
+(
+select t.zwrq_jk,t.ny,t.szbm,t.sz,t.se bnlj,s.se sntq,decode(s.se,0,0,round((t.se-s.se)/s.se*100,2)) tbzf,t.srzb,r.color
+from t,t s,yssr_zwrq_sntq rq,RENDERS r
+where t.zwrq_jk=rq.zwrq_bn and s.zwrq_jk=rq.zwrq_sn and t.szbm=s.szbm and t.sz=s.sz and r.rptid='dzjk_fsz' and t.szbm=r.lid
+)
+where zwrq_jk in (select zwrq_jk from yssr_zwrq)
+and ny={ny}
+order by szbm
+		]]>
+		</sql>
+		<cols>			
+		</cols>
+	</src>
+</dataSource>
+

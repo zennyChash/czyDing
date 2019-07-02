@@ -19,6 +19,7 @@ import com.ifugle.czy.service.TianyanchaService;
 import com.ifugle.czy.utils.JResponse;
 import com.ifugle.czy.utils.TemplatesLoader;
 import com.ifugle.czy.utils.bean.DataSourceJson;
+import com.ifugle.czy.utils.bean.LogInfo;
 import com.ifugle.czy.utils.bean.QueryParam;
 import com.ifugle.czy.utils.bean.RptDataJson;
 import com.ifugle.czy.utils.bean.template.DataSrc;
@@ -29,10 +30,10 @@ public class ESController {
 	private static Logger log = Logger.getLogger(ESController.class);
 	@Autowired
 	private ESQueryDataService esDataService;
+	/*@Autowired
+	private ESDataSourceService esDtSrcService;*/
 	@Autowired
-	private ESDataSourceService esDtSrcServicev;
-	@Autowired
-	private TianyanchaService tycServicev;
+	private TianyanchaService tycService;
 	@Autowired
 	private Configuration cg;
 	
@@ -69,7 +70,7 @@ public class ESController {
 		}
 		return jr;
 	}
-	@RequestMapping(value="/indexData2ES",method = RequestMethod.POST)
+	/*@RequestMapping(value="/indexData2ES",method = RequestMethod.POST)
 	@ResponseBody
 	public JResponse indexData2ES(@RequestBody DataSourceJson jds){
 		JResponse jr = null;
@@ -108,7 +109,7 @@ public class ESController {
 			jr = new JResponse("9","加载参数选项失败，没有获得正确的请求参数！",null);
 		}
 		return jr;
-	}
+	}*/
 	@RequestMapping(value="/searchForWord",method = RequestMethod.POST)
 	@ResponseBody
 	public JResponse searchForWord(@RequestBody RptDataJson params){
@@ -136,7 +137,7 @@ public class ESController {
 				return new JResponse("9","未指定要查询的数据类型！",null);
 			}else{
 				JSONObject params = tycParams.parseQParams();
-				JSONObject data = tycServicev.queryTianyanCha(dataID,params);
+				JSONObject data = tycService.queryTianyanCha(dataID,params);
 				jr = new JResponse("0","",data);
 			}
 		}else{
@@ -145,7 +146,7 @@ public class ESController {
 		return jr;
 	}
 	
-	@RequestMapping(value="/indexAllData2ES",method = RequestMethod.POST)
+	/*@RequestMapping(value="/indexAllData2ES",method = RequestMethod.POST)
 	@ResponseBody
 	public JResponse indexAllData2ES(@RequestBody DataSourceJson jds){
 		JResponse jr = null;
@@ -169,7 +170,7 @@ public class ESController {
 		}
 		jr = new JResponse("0","","{done:true,info:'共生成"+(dts==null?"0":dts.size())+"个数据源索引'}");
 		return jr;
-	}
+	}*/
 	
 	@RequestMapping(value="/testQueryData",method = RequestMethod.POST)
 	@ResponseBody

@@ -326,7 +326,7 @@ public class ConsoleServeice {
 				int count = esDts.size();
 				infos.put("totalCount", count);
 				int end = start+limit;
-				List rows = allDts.subList(start, count>end?end:count);
+				List rows = esDts.subList(start, count>end?end:count);
 				infos.put("rows", rows);
 			}else{
 				infos.put("totalCount", 0);

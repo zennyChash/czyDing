@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="szfb" name="" description="" sourceType ="sql" useType="1">
+		<sql>
+		<![CDATA[
+with t
+as
+(
+select ny,zwrq_jk,szbm,sz,se,round((se/sum(se)over(partition by zwrq_jk))*100,2) srzb
+from
+(
+select ny,zwrq_jk,szbm,b.mc sz,se
+from
+(
+SELECT substr(zwrq_jk,1,6) ny,y.zwrq_jk,case when y.szbm not in ('10101','10104','10106','10109','10113') then '99999' else y.szbm end szbm,
+sum(ssqb+sbjjdf) se FROM yssr_czy y
+group by substr(zwrq_jk,1,6),y.zwrq_jk,case when y.szbm not in ('10101','10104','10106','10109','10113') then '99999' else y.szbm end
+) r,yssr_bm_sz b
+where r.szbm=b.bm
+)
+union all
+select '999999' ny,99999999 zwrq_jk,bm,mc sz,0 se,0 srzb from yssr_bm_sz
+)
+select ny,szbm,sz,bnlj,sntq,tbzf,srzb,color from
+(
+select t.zwrq_jk,t.ny,t.szbm,t.sz,t.se bnlj,s.se sntq,decode(s.se,0,0,round((t.se-s.se)/s.se*100,2)) tbzf,t.srzb,r.color
+from t,t s,yssr_zwrq_sntq rq,RENDERS r
+where t.zwrq_jk=rq.zwrq_bn and s.zwrq_jk=rq.zwrq_sn and t.szbm=s.szbm and t.sz=s.sz and r.rptid='dzjk_fsz' and t.szbm=r.lid
+)
+where zwrq_jk in (select zwrq_jk from yssr_zwrq)
+and ny={ny}
+order by szbm
+		]]>
+		</sql>
+		<cols>			
+		</cols>
+	</src>
+</dataSource>
+

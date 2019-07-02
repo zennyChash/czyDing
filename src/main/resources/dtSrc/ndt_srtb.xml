@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="yssr_line" name="" description="" sourceType ="sql" useType="1">
+		<sql>
+		<![CDATA[
+			            SELECT * FROM YSSR_SRQS  order by kj desc,nian desc
+		]]>
+		</sql>
+		<cols>			
+		</cols>
+	</src>
+</dataSource>
+

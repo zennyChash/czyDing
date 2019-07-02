@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource>
+	<src id="enbasic" name="企业基本登记信息" description="" sourceType ="sql">
+		<sql>
+		<![CDATA[
+			select a.*,rownum pyorder from(select swdjzh,mc from czy_dj
+			order by NLSSORT(mc,'NLS_SORT=SCHINESE_PINYIN_M'))a
+		]]>
+		</sql>
+		<cols>
+			<col name="swdjzh" canOrder="1" isFilter="1"/>
+			<col name="mc" canOrder="1" isFilter="1"/>
+		</cols>
+	</src>
+	<src id="dhcx_mk" name="" description="" sourceType ="sql" useType="1">
+		<sql>
+		<![CDATA[
+			select b.sxmc,b.sxbm,r.sxz,'' btys,'' ys  from 
+			(
+                        select to_char(djxh) djxh,mkbm,sxbm,sxz from DHCX_SX
+			union all
+			select djxh,'104' mkbm,sxbm,sxz from DHCX_DJ
+			union all
+			select djxh,'201' mkbm,sxbm,to_char(sxz) from DHCX_sr
+			union all
+			select djxh,'301' mkbm,case when sxbm='BNRK' then 'SNZZ' when sxbm='SNRK' then 'QNZZ' when sxbm='QNRK' then 'DQNZZ' ELSE NULL end sxbm,to_char(sxz) from DHCX_sr
+			) 
+			r,bm_sx b where r.mkbm=b.mkbm and r.sxbm=b.sxbm and r.mkbm={menuid} and r.djxh={swdjzh}
+
+		]]>
+		</sql>
+		<cols>			
+		</cols>
+	</src>	
+	<src id="dhcx_cwbb" name="" description="" sourceType ="sql" useType="1">
+		<sql>
+		<![CDATA[
+                select * from DHCX_CWBB_cl
+                 where djxh={swdjzh}
+                 order by xh
+		]]>
+		</sql>
+		<cols>
+			
+		</cols>
+	</src>
+	<src id="dhcx_tzfxx" name="" description="" sourceType ="sql" useType="1">
+		<sql>
+		<![CDATA[
+                select * from dhcx_tzfxx_cl
+                 where djxh={swdjzh}
+		]]>
+		</sql>
+		<cols>
+			
+		</cols>
+	</src>	
+	<src id="dhcx_zzqc" name="" description="" sourceType ="sql" useType="1">
+		<sql>
+		<![CDATA[
+                select * from DHCX_ZZQC
+                 where djxh={swdjzh}
+		]]>
+		</sql>
+		<cols>
+			
+		</cols>
+	</src>
+	<src id="dhcx_sxdy" name="" description="" sourceType ="sql" useType="1">
+		<sql>
+		<![CDATA[
+                select sxbm,sxmc,width,align from BM_SX where mkbm={menuid}
+		]]>
+		</sql>
+		<cols>
+			
+		</cols>
+	</src>
+</dataSource>
+

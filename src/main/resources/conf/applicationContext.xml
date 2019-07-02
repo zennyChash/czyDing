@@ -59,8 +59,7 @@
 	</bean>
 	<bean id="config" class="com.ifugle.utils.Configuration"/>
 	<bean id="authService" class="com.ifugle.czy.service.AuthService"/>
-	<bean id="rptDataService" class="com.ifugle.czy.service.ReportDataService"/>
-	<bean id="rptEsService" class="com.ifugle.czy.service.ReportDataEsService"/>
+	<bean id="sysSetService" class="com.ifugle.czy.service.SysSetService"/>
 	<bean id="esDataService" class="com.ifugle.czy.service.ESQueryDataService"/>
 	<bean id="esDtSrcService" class="com.ifugle.czy.service.ESDataSourceService"/>
 	<bean id="csService" class="com.ifugle.czy.service.ConsoleServeice"/>
@@ -72,7 +71,8 @@
 	<bean id="dbExp" class="com.ifugle.etl.task.extract.service.DBExtractService"/>
 	<bean id="dbImp" class="com.ifugle.etl.task.imp.service.DBImportService"/>
 	<bean id="mngService" class="com.ifugle.etl.utils.service.ManageService"/>
-	<bean id="tycServicev" class="com.ifugle.czy.service.TianyanchaService"/>
+	<bean id="tycService" class="com.ifugle.czy.service.TianyanchaService"/>
+	<bean id="logService" class="com.ifugle.czy.service.LogService"/>
 	<context:annotation-config />
 	<tx:annotation-driven transaction-manager="txManager" />  
 	<!--<context:spring-configured />
