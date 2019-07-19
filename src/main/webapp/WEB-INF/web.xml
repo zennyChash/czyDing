@@ -73,7 +73,7 @@
 		<filter-name>fltDataManage</filter-name>
 		<filter-class>com.ifugle.utils.ConsoleDataManageFilter</filter-class>
 	</filter>
-	<filter-mapping>
+	<!--<filter-mapping>
 		<filter-name>fltApi</filter-name>
 		<url-pattern>/api/*</url-pattern>
 	</filter-mapping>
@@ -84,7 +84,7 @@
 	<filter-mapping>
 		<filter-name>fltDataManage</filter-name>
 		<url-pattern>/data/*</url-pattern>
-	</filter-mapping>
+	</filter-mapping>-->
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>

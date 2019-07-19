@@ -50,6 +50,7 @@ public class AppRouterController {
 			}else{
 				JSONObject jp = params.parseJRemoteParams();
 				String userid = jp==null?"":jp.getString("userid");
+				log.info("remoteService请求中带着userid："+userid);
 				if(StringUtils.isEmpty(userid)){
 					User user = null;
 					RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
@@ -59,6 +60,7 @@ public class AppRouterController {
 					}
 					if(user!=null){
 						userid = user.getUserid();
+						log.info("remoteService请求，会话中的userid："+userid);
 					}
 				}
 				jr = rtService.routeRequest(reqService,reqMethod,svParams,userid);

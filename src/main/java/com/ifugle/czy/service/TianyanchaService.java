@@ -52,9 +52,11 @@ public class TianyanchaService {
 	            String p = (String) entry.getKey();  
 	            String v = "";
 	            try{
-	            	v = (String)entry.getValue(); 
+	            	Object ov = entry.getValue(); 
+	            	v = ov.toString();
 	            	//v = java.net.URLEncoder.encode(v,"utf-8");
 	            }catch (Exception e) {
+	            	log.error(e.toString());
 	            }
 	            reqUri=reqUri.concat(p).concat("=").concat(v).concat("&");
 			} 

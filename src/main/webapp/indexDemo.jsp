@@ -249,19 +249,19 @@
 // 					alert("string:"+dt);
 // 				}
 // 			});
-// 			p = JSON.stringify({"dataID":"search","params":{"word":"杭州孚嘉科技"}});
-//  			$.ajax({
-// 				type: 'post',
-// 				url: 'api/queryTyc',
-// 				data: p,
-// 				headers: {
-// 			        "Content-Type": "application/json;charset=utf-8"
-// 			    },
-// 				success: function(dt){
-// 					alert(dt);
-// 				}
-// 			}); 
-			p = JSON.stringify({"logType":"user","logId":"login","userid":"admin","log":{"event":"changePswd"}});
+			p = JSON.stringify({"dataID":"annualReport","params":{"id":"1232777414"}});
+ 			$.ajax({
+				type: 'post',
+				url: 'api/queryTyc',
+				data: p,
+				headers: {
+			        "Content-Type": "application/json;charset=utf-8"
+			    },
+				success: function(dt){
+					alert(dt);
+				}
+			}); 
+			/* p = JSON.stringify({"logType":"user","logId":"login","userid":"admin","log":{"event":"changePswd"}});
  			$.ajax({
 				type: 'post',
 				url: 'api/log',
@@ -272,7 +272,7 @@
 				success: function(dt){
 					alert(dt);
 				}
-			}); 
+			});  */
 //});
   
 </script>
