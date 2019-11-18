@@ -49,7 +49,7 @@ public class AppRouterController {
 				jr.setRetData("");
 			}else{
 				JSONObject jp = params.parseJRemoteParams();
-				String userid = jp==null?"":jp.getString("userid");
+				String userid = jp!=null&&jp.containsKey("userid")?"":jp.getString("userid");
 				log.info("remoteService请求中带着userid："+userid);
 				if(StringUtils.isEmpty(userid)){
 					User user = null;
@@ -68,5 +68,4 @@ public class AppRouterController {
 		}
 		return jr;
 	}
-	
 }
