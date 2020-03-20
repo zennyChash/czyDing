@@ -689,6 +689,53 @@ public class ConsoleServeice {
 		return infos;
 	}
 	
+	public Map sendTextDingMsgProxy(String msg,String strUsers) {
+		Map infos = new HashMap();
+		String[] users = strUsers.split(",");
+		String accessToken = DingHelper.getAccessToken();
+		String agentid= cg.getString("AGENT_ID", "163161139");
+		Map um = getUserMapping("czfc");
+		for(int i=0;i<users.length;i++){
+			SimpleValue su = (SimpleValue)um.get(users[i]);
+			if(su==null){
+				continue;
+			}
+			String dingid = su.getBm();
+			String touser = dingid,toparty="";
+			MessageBody.TextBody textBody = new MessageBody.TextBody();
+            textBody.setContent(msg);
+            //装配deliver
+			LightAppMessageDelivery delivery = new LightAppMessageDelivery(touser,toparty,agentid);
+			delivery.withMessage(MessageType.TEXT, textBody);
+			try{
+				MessageHelper.send(accessToken, delivery);
+				log.info("发送微应用文本消息"+"，接收者:"+dingid);
+			}catch(Exception e){
+				
+			}
+		}
+		infos.put("info", "钉钉消息已发送！");
+		return infos;
+	}
+	private Map getUserMapping(String serviceName){
+		Map um = new HashMap();
+		try{
+			String sql = "select userid,dingid,dingname from usermapping where servicename=? ";
+			List users = jdbcTemplate.queryForList(sql,new Object[]{serviceName});
+			if(users!=null){
+				for(int i=0;i<users.size();i++){
+					Map u = (Map)users.get(i);
+					String userid = (String)u.get("userid");
+					String dingid = (String)u.get("dingid");
+					String dingname = (String)u.get("dingname");
+					SimpleValue fn = new SimpleValue(dingid, dingname);
+					um.put(userid, fn);
+				}
+			}
+		}catch(Exception e){}
+		return um;
+	}
+	
 	public Map sendDingForDsp(String reqService, String reqMethod,String svParams, String userid) {
 		Map infos=new HashMap();
 		//远程调用，按用户统计各自待审批数量。

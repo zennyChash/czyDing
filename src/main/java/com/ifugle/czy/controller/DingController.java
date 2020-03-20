@@ -44,6 +44,27 @@ public class DingController {
 		}
 		return jr;
 	}
+	@RequestMapping(value="/sendTextMsgProxy",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse sendTextMsgProxy(@RequestBody DingMsgJson params){
+		JResponse jr = null;
+		if(params!=null){
+			String msg = params.getMsg();
+			String users = params.getUsers();
+			log.info("sendTextMsgProxy接收者，原系统userid:"+users);
+			if(StringUtils.isEmpty(msg)){
+				return new JResponse("9","要发送的消息内容为空！",null);
+			}
+			if(StringUtils.isEmpty(users)){
+				return new JResponse("9","没有指明消息接收者！",null);
+			}
+			Map data = csService.sendTextDingMsgProxy(msg,users);
+			jr = new JResponse("0","",data);
+		}else{
+			jr = new JResponse("9","获取报表数据失败，没有获得正确的请求参数！",null);
+		}
+		return jr;
+	}
 	@RequestMapping(value="/sendDingForDsp",method = RequestMethod.GET)
 	@ResponseBody
 	public Map sendDingForDsp(@RequestParam Map<String, String> params){
@@ -57,10 +78,10 @@ public class DingController {
 	@ResponseBody
 	public Map sendDingForDspTest(@RequestParam Map<String, String> params){
 		Map infos = new HashMap();
-		String reqService = params.get("reqService");
-		String reqMethod = params.get("reqMethod");
-		log.info("reqService:"+reqService);
-		log.info("reqMethod:"+reqMethod);
+//		String reqService = params.get("reqService");
+//		String reqMethod = params.get("reqMethod");
+//		log.info("reqService:"+reqService);
+//		log.info("reqMethod:"+reqMethod);
 		infos = csService.sendDingForDspTest();
 		return infos;
 	}
