@@ -8,14 +8,24 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import com.ifugle.czy.service.ESQueryDataService;
 public class Configuration {
+	private static Logger log = Logger.getLogger(Configuration.class);
 	protected JdbcTemplate jdbcTemplate;
 	@Autowired
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate){
 		this.jdbcTemplate = jdbcTemplate;
 	}
+	protected JdbcTemplate jdbcTemplateDt;
+	@Autowired
+	public void setJdbcTemplateDt(JdbcTemplate jdbcTemplateDt){
+		this.jdbcTemplateDt = jdbcTemplateDt;
+	}
+	
 	private static Configuration systemConfig = null;
 	private static ResourceBundle resources = null;
 	private List systemSets = null;
@@ -23,6 +33,10 @@ public class Configuration {
 	private Map logMap = new HashMap();
 	private Map taskStatus = new HashMap();
 	private Map taskScriptsCount = new HashMap();
+	//2020-05 全文检索索引
+	private Map mapOraIdx = null;
+	private List lstOraIdx = null;
+	
 	private Configuration(){
 	    try{
 	    	resources = ResourceBundle.getBundle("Resource", Locale.getDefault());
@@ -62,16 +76,21 @@ public class Configuration {
 	        	result = sysSet==null?null:(String)sysSet.get("ivalue");
 	        }
 	        if(result==null){
-	        	result=resources.getString(key);
-	        }
-	        if(result==null){
-	        	result = defaultValue;
+	        	try{
+	        		result=resources.getString(key);
+	        	}catch(Exception e){
+	        		result = defaultValue;
+	        	}
 	        }
 	    }catch(Exception e){
 	        result = defaultValue;
 	    }
         return result;
     }
+    public void reloadSystemSets(){
+  		loadSystemSets();
+  		loadOraIndice();
+  	}
     //加载系统设置
   	private void loadSystemSets(){
   		try{
@@ -88,8 +107,40 @@ public class Configuration {
   		}catch(Exception e){
 	  	}
   	}
-  	public void reloadSystemSets(){
-  		loadSystemSets();
+  	//加载oracle全文检索索引设置
+  	private void loadOraIndice(){
+  		try{
+	  		StringBuffer sql = new StringBuffer("select idx,mc,tb,fld,remark,qsql from fts_idx order by showorder");
+	  		List idx =jdbcTemplateDt.queryForList(sql.toString(),new Object[]{});
+	  		if(idx!=null&&idx.size()>0){
+	  			mapOraIdx = new HashMap();
+	  			lstOraIdx = new ArrayList();
+	  	    	for(int i=0;i<idx.size();i++){
+	  	    		//完整信息放在map中便于查找
+	  	    		Map o = (Map)idx.get(i);
+	  	    		mapOraIdx.put((String)o.get("idx"), o);
+	  	    		//列表只需要名值对
+	  	    		Map noi = new HashMap();	
+	  	  			noi.put("idx", (String)o.get("idx"));
+	  	  			noi.put("mc", (String)o.get("mc"));
+	  	  			lstOraIdx.add(noi);
+	  	    	}
+	  		}
+  		}catch(Exception e){
+  			log.error(e.toString());
+	  	}
+  	}
+  	public Map getOraFtsIdxMap(){
+  		if(mapOraIdx==null){
+  			loadOraIndice();
+  		}
+  		return mapOraIdx;
+  	}
+  	public List getOraFtsIdx(){
+  		if(lstOraIdx==null){
+  			loadOraIndice();
+  		}
+  		return lstOraIdx;
   	}
     /**
      * 获取指定配置项的值。

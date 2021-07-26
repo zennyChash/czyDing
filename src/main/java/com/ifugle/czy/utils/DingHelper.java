@@ -1,10 +1,15 @@
 package com.ifugle.czy.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.ibatis.ognl.OgnlException;
 
 import com.alibaba.fastjson.JSONObject;
+import com.dingtalk.api.DefaultDingTalkClient;
+import com.dingtalk.api.DingTalkClient;
+import com.dingtalk.api.request.OapiDepartmentListRequest;
+import com.dingtalk.api.response.OapiDepartmentListResponse;
 import com.dingtalk.oapi.lib.aes.DingTalkJsApiSingnature;
 import com.dingtalk.open.client.ServiceFactory;
 import com.dingtalk.open.client.api.model.corp.CorpUserList;
@@ -18,6 +23,7 @@ import com.dingtalk.open.client.common.SdkInitException;
 import com.dingtalk.open.client.common.ServiceException;
 import com.dingtalk.open.client.common.ServiceNotExistException;
 import com.ifugle.utils.Configuration;
+import com.taobao.api.ApiException;
 
 public class DingHelper {
 	// 调整到1小时50分钟
@@ -158,6 +164,22 @@ public class DingHelper {
         CorpDepartmentService corpDepartmentService = ServiceFactory.getInstance().getOpenService(CorpDepartmentService.class);
         List<Department> deptList = corpDepartmentService.getDeptList(accessToken, parentDeptId);
         return deptList;
+    }
+    public static String getDepartmentByPid(String token,String parentDid,boolean recursive){
+    	String resp = "{}";
+    	try {
+    		DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/department/list");
+			OapiDepartmentListRequest req = new OapiDepartmentListRequest();
+			req.setFetchChild(recursive);
+			req.setId(parentDid);
+			req.setHttpMethod("GET");
+			OapiDepartmentListResponse rsp = client.execute(req, token);
+			resp = rsp.getBody();
+			System.out.println(rsp.getBody());
+		} catch (ApiException e) {
+			e.printStackTrace();
+		}
+    	return resp;
     }
     //获取部门成员
     public static CorpUserList getDepartmentUser(

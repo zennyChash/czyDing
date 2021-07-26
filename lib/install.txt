@@ -1,0 +1,2 @@
+
+mvn install:install-file -DgroupId=org.elasticsearch -DartifactId=elasticsearch-analysis-ik -Dversion=6.2.4 -Dpackaging=jar -Dfile=elasticsearch-analysis-ik-6.2.4.jar -DgeneratePom=true

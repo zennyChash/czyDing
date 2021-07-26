@@ -3,6 +3,8 @@ package com.ifugle.czy.controller;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
@@ -19,6 +22,7 @@ import com.ifugle.czy.service.TianyanchaService;
 import com.ifugle.czy.utils.JResponse;
 import com.ifugle.czy.utils.TemplatesLoader;
 import com.ifugle.czy.utils.bean.DataSourceJson;
+import com.ifugle.czy.utils.bean.FtsParam;
 import com.ifugle.czy.utils.bean.LogInfo;
 import com.ifugle.czy.utils.bean.QueryParam;
 import com.ifugle.czy.utils.bean.RptDataJson;
@@ -202,5 +206,96 @@ public class ESController {
 		}
 		jr = new JResponse("0","","{done:true,info:'共输出"+(jps==null?"0":jps.size())+"个数据展示结果'}");
 		return jr;
+	}
+	//oracle全文检索，返回可用的索引类型
+	@RequestMapping("/getOraIdx")
+	@ResponseBody
+	public JResponse getOraIdxes(HttpServletRequest request){
+		JResponse jr = new JResponse();
+		List idx = cg.getOraFtsIdx();
+		jr.setRetCode("0");
+		jr.setRetMsg("");
+		jr.setRetData(idx);
+		return jr;
+	}
+	
+	//oracle全文检索，返回可用的索引类型
+	@RequestMapping("/getFtsResources")
+	@ResponseBody
+	public JResponse getFtsResources(@RequestParam("idx") String idx){
+		JResponse jr = new JResponse();
+		List rs = null;
+		try{
+			rs = esDataService.getFtsResources(idx);
+			jr.setRetCode("0");
+			jr.setRetMsg("");
+			jr.setRetData(rs);
+		}catch(Exception e){
+			jr.setRetCode("9");
+			jr.setRetMsg(e.toString());
+			jr.setRetData(null);
+		}
+		
+		return jr;
+	}
+	
+	@RequestMapping(value="/ftsWords",method = RequestMethod.POST)
+	@ResponseBody
+	public JResponse ftsWords(@RequestBody FtsParam params){
+		JResponse jr = null;
+		if(params!=null){
+			String idx = params.getIdx();
+			if(StringUtils.isEmpty(idx)){
+				return new JResponse("9","未指定要查询的索引！",null);
+			}else{
+				try{
+					Map data = esDataService.oraFtsByKeyWord(idx,params);
+					jr = new JResponse("0","",data);
+				}catch(Exception e){
+					jr = new JResponse("9",e.getMessage(),null);
+				}
+			}
+		}else{
+			jr = new JResponse("9","未提供全文检索需要的参数！",null);
+		}
+		return jr;
+	}
+
+	
+	@RequestMapping("/getOraIdx_o")
+	@ResponseBody
+	public List getOraIdxes_o(HttpServletRequest request){
+		JResponse jr = new JResponse();
+		List idx = cg.getOraFtsIdx();
+		return idx;
+	}
+	//oracle全文检索，返回可用的索引类型
+	@RequestMapping("/getFtsResources_o")
+	@ResponseBody
+	public List getFtsResources_o(@RequestParam("idx") String idx){
+		List rs = null;
+		try{
+			rs = esDataService.getFtsResources(idx);
+		}catch(Exception e){
+		}
+		return rs;
+	}
+		
+	@RequestMapping(value="/ftsWords_o",method = RequestMethod.POST)
+	@ResponseBody
+	public List ftsWords_o(@RequestBody FtsParam params){
+		if(params!=null){
+			String idx = params.getIdx();
+			if(StringUtils.isEmpty(idx)){
+				return null;
+			}else{
+				try{
+					Map data = esDataService.oraFtsByKeyWord(idx,params);
+					return (List)data.get("matches");
+				}catch(Exception e){
+				}
+			}
+		}
+		return null;
 	}
 }

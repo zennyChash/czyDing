@@ -25,7 +25,7 @@
         <param name="encoding" value="UTF-8" />
         <param name="threshold" value="INFO" />
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} %p %m%n" />
+            <param name="ConversionPattern" value=" %d{yyyy-MM-dd HH:mm:ss,SSS} %p %m%n" />
         </layout>
     </appender>
  

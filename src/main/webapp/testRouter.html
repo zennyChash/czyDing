@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>test</title>
+<script type="text/javascript" src="libs/zepto.js">
+</script>
+<script type="text/javascript">
+var _config = {};
+Zepto(function($){
+			//p = JSON.stringify({"dsID":"en_tax","dsParams":{"reIndex":true,"deleteOldData":true}});
+			$.ajax({
+				type: 'get',
+				url: 'http://localhost:8188/cyzz/setSession?info=helloWorld',
+				data: p,
+				headers: {
+			        "Content-Type": "application/json;charset=utf-8"
+			    },
+				success: function(dt){
+					alert(dt);
+				}
+			});
+			
+			
+})
+
+</script>
+
+</head>
+<body >
+</body>
+</html>

@@ -1,6 +1,8 @@
 package com.ifugle.czy.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -109,6 +111,45 @@ public class ConsoleController {
 				limit = Integer.parseInt(sLimit);
 			}catch(Exception e){}
 			infos = csService.getUsers(start,limit);
+		}
+		return infos;
+	}
+	@RequestMapping(value="/getDepartments",method = RequestMethod.GET)
+	@ResponseBody
+	public Map getDepartments(@RequestParam Map<String, String> params){
+		Map infos = new HashMap();
+		List deps = new ArrayList();
+		String pdid = "";
+		boolean recursive = false;
+		if(params!=null){
+			pdid = params.get("pdid");
+			String src = params.get("recursive");
+			recursive = "true".equals(src)||"1".equals(src);
+		}
+		deps = csService.getDepartments(pdid,recursive);
+		infos.put("rows", deps);
+		return infos;
+	}
+	@RequestMapping(value="/getUsersFromDingTalkByDepartment",method = RequestMethod.GET)
+	@ResponseBody
+	public Map getUsersFromDingTalkByDepartment(@RequestParam Map<String, String> params){
+		Map infos = new HashMap();
+		if(params!=null){
+			String sStart = params.get("start");
+			String sLimit = params.get("limit");
+			String sdid = params.get("did");
+			int start =0,limit=0;
+			long did = 0;
+			try{
+				start = Integer.parseInt(sStart);
+			}catch(Exception e){}
+			try{
+				limit = Integer.parseInt(sLimit);
+			}catch(Exception e){}
+			try{
+				did = Long.parseLong(sdid);
+			}catch(Exception e){}
+			infos = csService.getUsersFromDingTalkByDepartment(start,limit,did);
 		}
 		return infos;
 	}

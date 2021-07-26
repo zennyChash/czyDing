@@ -2,7 +2,14 @@ package com.ifugle.czy.utils.bean;
 
 public class DingMsgJson {
 	private String users;
+	private String mobiles;
 	private String msg;
+	public String getMobiles() {
+		return mobiles;
+	}
+	public void setMobiles(String mobiles) {
+		this.mobiles = mobiles;
+	}
 	public String getUsers() {
 		return users;
 	}

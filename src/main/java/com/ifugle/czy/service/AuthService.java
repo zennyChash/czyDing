@@ -13,16 +13,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.ognl.OgnlException;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.dingtalk.oapi.lib.aes.DingTalkJsApiSingnature;
 import com.dingtalk.open.client.ServiceFactory;
 import com.dingtalk.open.client.api.model.corp.CorpUserBaseInfo;
 import com.dingtalk.open.client.api.model.corp.CorpUserDetail;
-import com.dingtalk.open.client.api.model.corp.JsapiTicket;
-import com.dingtalk.open.client.api.service.corp.CorpConnectionService;
 import com.dingtalk.open.client.api.service.corp.CorpUserService;
-import com.dingtalk.open.client.api.service.corp.JsapiService;
 import com.ifugle.czy.utils.DingHelper;
 import com.ifugle.czy.utils.bean.User;
 import com.ifugle.utils.Configuration;
@@ -259,7 +253,7 @@ public class AuthService {
 			String dfMenus = cg.getString("defaultMenus", "");
 			System.out.println("用户尚未配置权限，使用默认权限："+dfMenus);
 			sql.append(" (select moduleid from modules where moduleid in('").append(dfMenus.replace(",", "','")).append("')) p,modules m ");
-			sql.append(" where m.moduleid=p.moduleid and isleaf=1 order by dorder) where rownum<=7");
+			sql.append(" where m.moduleid=p.moduleid and isleaf=1 order by dorder) ");
 			menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{});
 		}else{
 			//设置了权限的，先找用户配置，无用户配置就用权限表的配置
@@ -273,7 +267,7 @@ public class AuthService {
 				sql.append(",p.dorder from (select mid moduleid,dorder from user_menus where userid=?) p,modules m ");
 				sql.append(" where m.moduleid=p.moduleid and isleaf=1 order by p.dorder");
 			}
-			sql.append(") where rownum<=7");
+			sql.append(") ");
 			menus = jdbcTemplate.queryForList(sql.toString(),new Object[]{userid});
 		}
 		if(menus!=null&&menus.size()>0){

@@ -1,0 +1,305 @@
+
+.x-grid3-cell-inner{
+        border-right:1px solid #eceff6;
+}
+.x-selectable, .x-selectable * {  
+    -moz-user-select: text!important;  
+    -khtml-user-select: text!important; 
+    user-select:text; 
+}
+.expExcel{
+	background-image:url(../images/expExcel.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.expPdf{
+	background-image:url(../images/expPdf.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.readOnly{
+	background-color:#C3FF8F !important;
+	color:black;
+	font-weight:bold;
+}
+.subTt{
+	font-size:12px;
+	color:#333333;
+	font-family:airial;
+	font-weight:bold;
+} 
+
+.add {
+    background-image:url(../images/add.gif) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.copy{
+	background-image:url(../images/cancelAdd.gif) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.remove {
+    background-image:url(../images/delete.gif) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.removeAll{
+	background-image:url(../images/deleteAll.gif) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.refresh {
+    background-image:url(../images/reload.gif) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.details {
+    background-image:url(../images/details.gif) !important;
+}
+.addUser{
+	background-image:url(../images/user_add.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.editUser{
+	background-image:url(../images/user_edit.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.removeUser{
+	background-image:url(../images/user_delete.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.userPost{
+	background-image:url(../images/user_go.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.addPost{
+	background-image:url(../images/group_add.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.modifyPost{
+	background-image:url(../images/group_edit.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.removePost{
+	background-image:url(../images/group_delete.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.publish{
+	background-image:url(../images/transmit_add.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.unPublish{
+	background-image:url(../images/transmit_delete.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.batchCheck{
+	background-image:url(../images/batch.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.addPz{
+	background-image:url(../images/note_add.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.pzInfo{
+	background-image:url(../images/note_edit.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.removePz{
+	background-image:url(../images/note_delete.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.edit {
+	background-image:url(../images/edit.gif) !important;
+}
+.save {
+    background-image:url(../images/save.gif) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.help{
+	background-image:url(../images/help.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.iReturn{
+	background-image:url(../images/back.gif) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.accept{
+	background-image:url(../images/accept.gif) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.filter{
+	background-image:url(../images/filter.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.complexFilter{
+	background-image:url(../images/advscreen.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.morePara{
+	background-image:url(../images/cog_edit.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.zeroHideShow{
+	background-image:url(../images/zeroHideShow.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.impExcel{
+	background-image:url(../images/impExcel.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.viewMenu{
+	background-image:url(../images/preview.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.expExcel{
+	background-image:url(../images/expExcel.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.chart{
+	background-image:url(../images/chart_bar.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.lock{
+	background-image:url(../images/lock.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.unlock{
+	background-image:url(../images/unlock.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.autoMap{
+	background-image:url(../images/link_add.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.unMap{
+	background-image:url(../images/link_break.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.saveAs{
+	background-image:url(../images/save_as.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.schema{
+	background-image:url(../images/paste_plain.png) !important;
+    background-repeat:no-repeat;
+    background-position:center left;
+}
+.lockedRow{
+	background-color:#d7d3c9 !important;
+	/*filter: Alpha(Opacity=50);*/
+	color:black;
+}
+.deletedRow{
+	background-color:#d7d3c9 !important;
+	filter: Alpha(Opacity=50);
+	color:black;
+}
+
+.invalid{
+	filter: Alpha(Opacity=51);
+	color: gray;
+}
+.changed{
+	background-color:#FF6A6A !important;
+	filter: Alpha(Opacity=51);
+	color:black;
+}
+.suitRow{
+	background-color:#ed6b27 !important;
+	filter: Alpha(Opacity=51);
+	color:black;
+}
+.sumRow{
+	background-color:#d4d4d4!important;
+	filter: Alpha(Opacity=51);
+	color:black;
+	font-weight:bold;
+	font-size: 16px;
+}
+.newEn table{
+	color: blue;
+}
+.deletedEn table{
+	color: #FF0000;
+}
+.icon-up {
+  background: url(../images/arrow_up.png) no-repeat center left !important;
+}
+
+.icon-down {
+  background: url(../images/arrow_down.png) no-repeat center left !important;
+}
+
+.icon-left {
+  background: url(../images/arrow_left.png) no-repeat center left !important;
+}
+
+.icon-right {
+  background: url(../images/arrow_right.png) no-repeat center left !important;
+}
+.loadDefault {
+  	background: url(../images/back.gif) no-repeat center left !important;
+}
+.loadSchema{
+	background: url(../images/cog_go.png) no-repeat center left !important;
+}
+.headTitle {
+	font-family: Arial, sans-serif;
+	font-size: 24px;
+	font-weight:bold;
+}
+.subTitleL {
+	font-family: Arial, sans-serif;
+	font-size: 12px;
+}
+.subTitleC {
+	font-family: Arial, sans-serif;
+	font-size: 12px;
+}
+.subTitleR {
+	font-family: Arial, sans-serif;
+	font-size: 12px;
+}
+.footL {
+	font-family: Arial, sans-serif;
+	font-size: 12px;
+}
+.footC {
+	font-family: Arial, sans-serif;
+	font-size: 12px;
+}
+.footR {
+	font-family: Arial, sans-serif;
+	font-size: 12px;
+}

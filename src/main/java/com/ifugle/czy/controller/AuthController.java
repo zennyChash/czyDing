@@ -134,9 +134,9 @@ public class AuthController {
 		return jr;
 	}
 	
-	@RequestMapping("/getMyMenus")
+	@RequestMapping("/getDingSsoInfo")
 	@ResponseBody
-	public JResponse getMyMenus(@RequestParam("code") String code, @RequestParam("corpid") String corpid){
+	public JResponse getDingSsoInfo(@RequestParam("code") String code, @RequestParam("corpid") String corpid){
 		JResponse jr = new JResponse();
 		System.out.println("传入的code:"+code);
 		System.out.println("传入的corpID:"+corpid);
@@ -149,7 +149,7 @@ public class AuthController {
 		}
 		User user = authService.getUserCzyConfig(accessToken,code,true);
 		if(user!=null){
-			log.info("getMyMenus访问时间："+new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss:SSS").format(new Date()));
+			log.info("getDingSsoInfo访问时间："+new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss:SSS").format(new Date()));
 			if (requestAttributes != null) {
 				request = ((ServletRequestAttributes) requestAttributes).getRequest();
 				request.getSession().setAttribute("user", user);
@@ -171,6 +171,7 @@ public class AuthController {
 			jucfg.put("myMenus", user.getMenus());
 			jucfg.put("pswd_on", user.getPswd_on());
 			jucfg.put("pswd_mode", user.getPswd_mode());
+			jucfg.put("dingInfo", user.getDinginfo());
 			jr.setRetData(jucfg);
 			log.info("用户"+ user.getDingname()+"登录权限返回："+JSONObject.toJSONString(jr));
 		}else{

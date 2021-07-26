@@ -37,29 +37,32 @@
 		<jTemplate>
 		<![CDATA[
 			{
-			#if($dzjk_srjd&&$dzjk_srjd.rows.size()>0)
+			#if($dzjk_srjd1&&$dzjk_srjd1.rows.size()>0)
 				ggys:{
-					"nlj_jk":"$!{dzjk_srjd.rows[0].bnlj}",
-					"wcjd":"$!{dzjk_srjd.rows[0].wcbl}",
-		        	"ysjh":"$!{dzjk_srjd.rows[0].yss}",
-					"snlj_jk":"$!{dzjk_srjd.rows[0].sntq}",
-					"tbzz":"$!{dzjk_srjd.rows[0].tbzf}"
+					"nlj_jk":"$!{dzjk_srjd1.rows[0].bnlj}",
+					"wcjd":"$!{dzjk_srjd1.rows[0].wcbl}",
+		        	"ysjh":"$!{dzjk_srjd1.rows[0].yss}",
+					"snlj_jk":"$!{dzjk_srjd1.rows[0].sntq}",
+					"tbzz":"$!{dzjk_srjd1.rows[0].tbzf}"
 				},
 				czzsr:{
-					"nlj_jk":"$!{dzjk_srjd.rows[1].bnlj}",
-					"wcjd":"$!{dzjk_srjd.rows[1].wcbl}",
-		         	"ysjh":"$!{dzjk_srjd.rows[1].yss}",
-					"snlj_jk":"$!{dzjk_srjd.rows[0].sntq}",
-					"tbzz":"$!{dzjk_srjd.rows[0].tbzf}"
+					"nlj_jk":"$!{dzjk_srjd2.rows[1].bnlj}",
+					"wcjd":"$!{dzjk_srjd2.rows[1].wcbl}",
+		         	"ysjh":"$!{dzjk_srjd2.rows[1].yss}",
+					"snlj_jk":"$!{dzjk_srjd2.rows[0].sntq}",
+					"tbzz":"$!{dzjk_srjd2.rows[0].tbzf}"
 				}
 			#end
 			}
 		]]>
 		</jTemplate>
-		<vDs name="dzjk_srjd" refDtSrc="dzjk_srjd" fields="bnlj,sntq,yss,wcbl,tbzf">
+		<vDs name="dzjk_srjd1" refDtSrc="dzjk_srjd1" fields="bnlj,sntq,yss,wcbl,tbzf">
 			<filter name = "zwrq_jk" refParam="zwrq" value="20180428"/>
 			<orderBy name = "kj" dir="desc"/>
 		</vDs>
+		<vDs name="dzjk_srjd2" refDtSrc="dzjk_srjd2" fields="bnlj,sntq,yss,wcbl,tbzf">
+			<filter name = "zwrq_jk" refParam="zwrq" value="20180428"/>
+			<orderBy name = "kj" dir="desc"/>
 	</joutput>
 		<joutput id="srjd_line" name="收入进度3年折线图"  description=""> 
 		<jTemplate>

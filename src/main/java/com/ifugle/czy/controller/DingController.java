@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ifugle.czy.service.ConsoleServeice;
 import com.ifugle.czy.utils.JResponse;
 import com.ifugle.czy.utils.bean.DingMsgJson;
@@ -51,17 +52,25 @@ public class DingController {
 		if(params!=null){
 			String msg = params.getMsg();
 			String users = params.getUsers();
+			String mobiles = params.getMobiles();
 			log.info("sendTextMsgProxy接收者，原系统userid:"+users);
 			if(StringUtils.isEmpty(msg)){
 				return new JResponse("9","要发送的消息内容为空！",null);
 			}
-			if(StringUtils.isEmpty(users)){
-				return new JResponse("9","没有指明消息接收者！",null);
+			//发短信
+			JSONObject jResults = new JSONObject();
+			if(!StringUtils.isEmpty(mobiles)){
+				JSONObject mData = csService.sendMobileMsgProxy(msg,mobiles);
+				jResults.put("mobileText", mData);
 			}
-			Map data = csService.sendTextDingMsgProxy(msg,users);
-			jr = new JResponse("0","",data);
+			//发送钉钉工作消息
+			if(!StringUtils.isEmpty(users)){
+				JSONObject dData = csService.sendTextDingMsgProxy(msg,users);
+				jResults.put("dingMsg", dData);
+			}
+			jr = new JResponse("0","",jResults);
 		}else{
-			jr = new JResponse("9","获取报表数据失败，没有获得正确的请求参数！",null);
+			jr = new JResponse("9","发送消息失败，没有发送消息所需要的参数！",null);
 		}
 		return jr;
 	}

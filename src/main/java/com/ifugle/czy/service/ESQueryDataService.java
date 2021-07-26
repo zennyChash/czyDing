@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,6 +54,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ifugle.czy.utils.JResponse;
 import com.ifugle.czy.utils.SecureUtils;
 import com.ifugle.czy.utils.TemplatesLoader;
+import com.ifugle.czy.utils.bean.FtsParam;
 import com.ifugle.czy.utils.bean.RptDataJson;
 import com.ifugle.czy.utils.bean.template.Column;
 import com.ifugle.czy.utils.bean.template.DataSrc;
@@ -67,6 +69,8 @@ import com.ifugle.utils.Configuration;
 
 public class ESQueryDataService {
 	private static Logger log = Logger.getLogger(ESQueryDataService.class);
+	@Autowired
+	private Configuration cg;
 	protected ESClientFactory esClient;
 	@Autowired
 	public void setEsService(ESClientFactory esClient){
@@ -79,7 +83,6 @@ public class ESQueryDataService {
 	}
 	
 	public Map searchByKeyWord(String rptID,RptDataJson params){
-		Map info = null;
 		JSONObject jparams = params==null?null:params.parseJRptParams();
 		String str="",fld = "",fldsToGet="";
 		int from =0,size=10;
@@ -373,7 +376,7 @@ public class ESQueryDataService {
 			sReq.setFrom(from).setSize(size);
 		}else{
 			log.info(jpID+"添加默认分页字段...");
-			String ms =Configuration.getConfig().getString("maxQuerySize", "200");
+			String ms =cg.getString("maxQuerySize", "200");
 			try{
 				sReq.setFrom(0).setSize(Integer.parseInt(ms));
 			}catch(Exception e){
@@ -992,7 +995,7 @@ public class ESQueryDataService {
 					}
 					sReq.setFrom(from).setSize(size);
 				}else{
-					String ms =Configuration.getConfig().getString("maxQuerySize", "200");
+					String ms =cg.getString("maxQuerySize", "200");
 					try{
 						sReq.setFrom(0).setSize(Integer.parseInt(ms));
 					}catch(Exception e){
@@ -1012,5 +1015,67 @@ public class ESQueryDataService {
 	private String doDecipher(String rawValue,String algorithm){
 		String newVal = SecureUtils.decipher(rawValue,algorithm);
 		return newVal;
+	}
+	//2020-05 获取全文检索可关联的资源
+	public List getFtsResources(String idx) throws Exception{
+		List objs = new ArrayList();
+		StringBuffer sql =new StringBuffer("select * from fts_resource where idx =? order by showorder");
+		List rows = jdbcTemplateDt.queryForList(sql.toString(),new Object[]{idx});
+	    for(int i=0;i<rows.size();i++) {
+	    	Map row = (Map)rows.get(i);
+	    	Map o = new HashMap();
+	    	Iterator it = row.entrySet().iterator();
+            while(it.hasNext()) {
+                Entry<String, Object> entry = (Entry)it.next();
+                o.put(((String)entry.getKey()).toLowerCase(), row.get(entry.getKey()));
+            }
+	    	objs.add(o);
+	    }
+		return objs;
+	}
+
+	public Map oraFtsByKeyWord(String idx, FtsParam params) throws Exception{
+		Map result = new HashMap();
+		long total =0; 
+	    List objs = null;
+		JSONObject jparams = params==null?null:params.parseFtsParams();
+		String searchKey = jparams.containsKey("searchKey")?jparams.getString("searchKey"):null;
+		if(StringUtils.isEmpty(searchKey)){
+			result.put("total", total);
+		    result.put("matches", objs);
+	        return result;
+		}
+		int searchSize = jparams.containsKey("searchSize")?jparams.getIntValue("searchSize"):5;
+		//sql查找
+		Map midx = cg.getOraFtsIdxMap();
+		if(midx==null){
+			throw new Exception("未配置可用的全文检索索引！");
+		}
+		if(!midx.containsKey(idx)){
+			throw new Exception("未找到指定索引"+idx+"的配置信息！");
+		}
+		Map oi=(Map)midx.get(idx);
+		String sql = (String)oi.get("qsql");
+		if(sql==null||"".equals(sql)){
+			throw new Exception("未找到指定索引"+idx+"的配置搜索语句配置信息！"); 
+		}
+		List rows = jdbcTemplateDt.queryForList(sql.toString(),new Object[]{searchKey,searchSize});
+	    if(rows!=null){
+	    	total = rows.size();
+	    	objs = new ArrayList();
+		    for(int i=0;i<rows.size();i++) {
+		    	Map row = (Map)rows.get(i);
+		    	Map o = new HashMap();
+		    	Iterator it = row.entrySet().iterator();
+	            while(it.hasNext()) {
+	                Entry<String, Object> entry = (Entry)it.next();
+	                o.put(((String)entry.getKey()).toLowerCase(), row.get(entry.getKey()));
+	            }
+		    	objs.add(o);
+		    }
+	    }
+	    result.put("total", total);
+	    result.put("matches", objs);
+        return result;
 	}
 }

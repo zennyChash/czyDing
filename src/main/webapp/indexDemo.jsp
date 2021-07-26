@@ -8,8 +8,8 @@
 <script type="text/javascript" src="js/md5.js">
 </script>
 <script type="text/javascript">
-// var _config = {};
-// Zepto(function($){
+var _config = {};
+Zepto(function($){
 // 			p = JSON.stringify({"rptID":"q_xnjk_decrypt_rdpro","rptParams":{"ny":201701,"from":0,"size":10}});
 // 			$.ajax({
 // 				type: 'post',
@@ -249,18 +249,18 @@
 // 					alert("string:"+dt);
 // 				}
 // 			});
-			p = JSON.stringify({"dataID":"annualReport","params":{"id":"1232777414"}});
- 			$.ajax({
-				type: 'post',
-				url: 'api/queryTyc',
-				data: p,
-				headers: {
-			        "Content-Type": "application/json;charset=utf-8"
-			    },
-				success: function(dt){
-					alert(dt);
-				}
-			}); 
+// 			p = JSON.stringify({"dataID":"annualReport","params":{"id":"1232777414"}});
+//  			$.ajax({
+// 				type: 'post',
+// 				url: 'api/queryTyc',
+// 				data: p,
+// 				headers: {
+// 			        "Content-Type": "application/json;charset=utf-8"
+// 			    },
+// 				success: function(dt){
+// 					alert(dt);
+// 				}
+// 			}); 
 			/* p = JSON.stringify({"logType":"user","logId":"login","userid":"admin","log":{"event":"changePswd"}});
  			$.ajax({
 				type: 'post',
@@ -272,8 +272,20 @@
 				success: function(dt){
 					alert(dt);
 				}
-			});  */
-//});
+			});  */  13867463716,13588276007,15990045618,17681822860,13588749314
+			p = JSON.stringify({"mobiles":"13867463716","users":"mx","msg":"测试消息，收到请回复！"});
+			$.ajax({
+				type: 'post',
+				url: 'api/sendTextMsgProxy',
+				data: p,
+				headers: {
+					"Content-Type": "application/json;charset=utf-8"
+			    },
+				success: function(dt){
+					alert("string:"+dt);
+				}
+			});
+});
   
 </script>
 

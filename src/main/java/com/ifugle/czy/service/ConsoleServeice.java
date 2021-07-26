@@ -1,14 +1,32 @@
 package com.ifugle.czy.service;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,7 +48,9 @@ import com.dingtalk.open.client.api.model.corp.MessageType;
 import com.ifugle.czy.ding.message.LightAppMessageDelivery;
 import com.ifugle.czy.ding.message.MessageHelper;
 import com.ifugle.czy.utils.DingHelper;
+import com.ifugle.czy.utils.HttpHelper;
 import com.ifugle.czy.utils.JResponse;
+import com.ifugle.czy.utils.MD5Util;
 import com.ifugle.czy.utils.TemplatesLoader;
 import com.ifugle.czy.utils.bean.*;
 import com.ifugle.czy.utils.bean.template.DataSrc;
@@ -461,6 +481,9 @@ public class ConsoleServeice {
 	            for (int j = 0; j < corpUserList.getUserlist().size(); j++) {
 	            	CorpUser user = (CorpUser)corpUserList.getUserlist().get(j);
 	            	JSONObject juser = (JSONObject)JSONObject.toJSON(user);
+	            	Department d = (Department)departments.get(i);
+	            	long did = d.getId();
+	            	juser.put("departmentID", did);
 	                users.add(juser);
 	                log.info(JSON.toJSONString(juser));
 	            }
@@ -499,6 +522,88 @@ public class ConsoleServeice {
 		}
 		return infos;
 	}
+	
+	public List getDepartments(String pdid,boolean recursive){
+		JSONArray jdeps = new JSONArray();
+		JSONObject jdepobj = new JSONObject();
+		String accessToken = DingHelper.getAccessToken();
+		log.info("准备获取钉钉部门："+accessToken);
+		try{
+			//如果传递的父id是空，取根部门id配置
+			if(StringUtils.isEmpty(pdid)){
+				String rdid = cg.getString("rootDid","1");
+				pdid=rdid;
+			}
+	        //departments = DingHelper.listDepartments(accessToken, pdid);
+	        String strDeps = DingHelper.getDepartmentByPid(accessToken, pdid,recursive);
+	        jdepobj = JSONObject.parseObject(strDeps);
+	        jdeps = jdepobj.getJSONArray("department");
+	        log.info("共"+jdeps.size()+"个部门。");
+		} catch (Exception e) {
+	        e.printStackTrace();
+		}
+		return jdeps;
+	}
+	
+	public Map getUsersFromDingTalkByDepartment(int start, int limit,long did) {
+		Map infos = new HashMap();
+		String accessToken = DingHelper.getAccessToken();
+		log.info("准备获取钉钉用户："+accessToken);
+		try{
+	  
+	        List users = new ArrayList();
+        	log.info("部门ID"+did);
+            CorpUserList corpUserList =  DingHelper.getDepartmentUser(accessToken, Long.valueOf(did)
+                        ,0L,100, null);
+            if (corpUserList.getUserlist().size() == 0) {
+    	        infos.put("totalCount", 0);
+    			infos.put("rows", null);
+            }
+            for (int j = 0; j < corpUserList.getUserlist().size(); j++) {
+            	CorpUser user = (CorpUser)corpUserList.getUserlist().get(j);
+            	JSONObject juser = (JSONObject)JSONObject.toJSON(user);
+            	juser.put("departmentID", did);
+                users.add(juser);
+                log.info(JSON.toJSONString(juser));
+            }
+	        Map czyUserMap=null;
+			List czyUsers = jdbcTemplate.queryForList("select userid,dingname from users u",new Object[]{});
+			if(czyUsers!=null&&czyUsers.size()>0){
+				czyUserMap= new HashMap();
+				for(int i=0;i<czyUsers.size();i++){
+					Map row = (Map)czyUsers.get(i);
+					czyUserMap.put(row.get(("userid")), 1);
+				}
+			}
+			//剔除已经存在于czy的用户
+			List resultUsers = new ArrayList();
+			if(czyUserMap==null||czyUserMap.size()==0){
+				resultUsers = users;
+			}else{
+				for(int i=0;i<users.size();i++){
+					JSONObject juser = (JSONObject)users.get(i);
+					if(czyUserMap.containsKey(juser.getString("userid"))){
+						continue;
+					}
+					resultUsers.add(juser);
+				}
+			}
+	        int cc = resultUsers.size();
+	        infos.put("totalCount", cc);
+	        int end = ((start+limit)<cc)?(start+limit):cc;
+	        List page = resultUsers.subList(start, end);
+			infos.put("rows", page);
+	    } catch (Exception e) {
+	    	infos.put("totalCount", 0);
+			infos.put("rows", null);
+	        e.printStackTrace();
+		}
+		return infos;
+	}
+	
+	
+	
+	
 	public boolean addUserFromDingTalk(String strDingUsers) {
 		try{
 			JSONArray jusers = JSON.parseArray(strDingUsers);
@@ -688,15 +793,23 @@ public class ConsoleServeice {
 		infos.put("info", "钉钉消息已发送给下一环节负责人！");
 		return infos;
 	}
-	
-	public Map sendTextDingMsgProxy(String msg,String strUsers) {
-		Map infos = new HashMap();
+	//发送钉钉工作消息
+	public JSONObject sendTextDingMsgProxy(String msg,String strUsers) {
+		JSONObject infos = new JSONObject();
 		String[] users = strUsers.split(",");
+		System.out.println("原始用户数组:"+strUsers);
+		Set userSet = new HashSet();
+		CollectionUtils.addAll(userSet, users);
+		List ulist = new ArrayList(userSet);
+		String[] usersNoDup = new String[ulist.size()];
+		ulist.toArray(usersNoDup);
+		System.out.println("不重复的用户:"+StringUtils.join(usersNoDup, ","));
+		
 		String accessToken = DingHelper.getAccessToken();
 		String agentid= cg.getString("AGENT_ID", "163161139");
 		Map um = getUserMapping("czfc");
-		for(int i=0;i<users.length;i++){
-			SimpleValue su = (SimpleValue)um.get(users[i]);
+		for(int i=0;i<usersNoDup.length;i++){
+			SimpleValue su = (SimpleValue)um.get(usersNoDup[i]);
 			if(su==null){
 				continue;
 			}
@@ -711,12 +824,103 @@ public class ConsoleServeice {
 				MessageHelper.send(accessToken, delivery);
 				log.info("发送微应用文本消息"+"，接收者:"+dingid);
 			}catch(Exception e){
-				
+				log.error(e.toString());
+				infos.put("code", 9);
+				infos.put("msg", "钉钉发送失败！具体错误原因请参考日志。");
+				return infos;
 			}
 		}
-		infos.put("info", "钉钉消息已发送！");
+		infos.put("code", 0);
+		infos.put("msg", "钉钉消息已发送！");
 		return infos;
 	}
+	//通过短信平台发送短信
+	public JSONObject sendMobileMsgProxy(String msg, String mobiles) {
+		String url = cg.getString("mtUrl", "http://api.eyun.openmas.net/yunmas_api/smsApi/batchSendMessage");
+		String applicationId = cg.getString("mtApplicationId", "1JbAqrjhyGp2LtI5jcw8HnsOppOp4E1BkIM");
+		String password = cg.getString("mtPassword", "VGXw5iAOHxhTpHI");
+		String[] mobile_list = mobiles.split(",");
+		System.out.println("原始手机号数组:"+mobiles);
+		Set mobileSet = new HashSet();
+		CollectionUtils.addAll(mobileSet, mobile_list);
+		List mlist = new ArrayList(mobileSet);
+		String[] mobileNoDup = new String[mlist.size()];
+		mlist.toArray(mobileNoDup);
+		System.out.println("不重复的手机号码:"+StringUtils.join(mobileNoDup, ","));
+		
+		Date d = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		String requestTime=sdf.format(d);
+		String funcode = cg.getString("mtFuncode", "1002");
+		String signTOKEN= cg.getString("mtSignToken", "kXa8Tvc2SPjLSwU");
+		System.out.println("用于sign的数据：" + applicationId+password+requestTime+signTOKEN);
+		String sign = MD5Util.MD5(applicationId+password+requestTime+signTOKEN);
+		
+		JSONObject p = new JSONObject();
+		p.put("applicationId", applicationId);
+		p.put("password", password);
+		p.put("requestTime", requestTime);
+		p.put("funCode", funcode);
+		p.put("mobiles", mobileNoDup);
+		p.put("content", msg);
+		p.put("sendTime", "");
+		p.put("extendCode", "");
+		p.put("sign", sign);
+		HttpPost httpPost = new HttpPost(url);
+		CloseableHttpResponse response = null;
+		int isout = 2000,icout = 2000;
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        RequestConfig requestConfig = RequestConfig.custom().
+        		setSocketTimeout(isout).setConnectTimeout(icout).build();
+        httpPost.setConfig(requestConfig);
+        httpPost.addHeader("Content-Type", "application/json;charset=utf-8");
+        try {
+        	StringEntity requestEntity = new StringEntity(JSON.toJSONString(p), "utf-8");
+        	System.out.println("短信平台url：" + url);
+        	System.out.println("发送短信时的参数：" + p.toJSONString());
+            httpPost.setEntity(requestEntity);
+            response = httpClient.execute(httpPost, new BasicHttpContext());
+            System.out.println("短信平台的响应：" + response.toString());
+            if (response.getStatusLine().getStatusCode() != 200) {
+                System.out.println("request url failed, http code=" + response.getStatusLine().getStatusCode()
+                                   + ", url=" + url);
+                JSONObject res = new JSONObject();
+                res.put("code", "9");
+                res.put("msg", "短信平台连接错误，错误码:"+response.getStatusLine().getStatusCode());
+                return res;
+            }
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                String resultStr = EntityUtils.toString(entity, "utf-8");
+                System.out.println("短信平台的响应Entity：" + resultStr);
+                JSONObject result = JSON.parseObject(resultStr);
+                JSONObject res = new JSONObject();
+                if(result.containsKey("resultCode")&&result.getInteger("resultCode")==0){
+                	res.put("code", 0);
+                	res.put("msg", "短信已发送！");
+                }else{
+                	res.put("code", 9);
+                	res.put("msg", result.getString("resultMsg"));
+                }
+                return res;
+            }
+        } catch (IOException e) {
+            System.out.println("request url=" + url + ", exception, msg=" + e.getMessage());
+            e.printStackTrace();
+            JSONObject res = new JSONObject();
+            res.put("code", "9");
+            res.put("msg", "短信平台IO发生错误，具体情况请查看日志！");
+            return res;
+        } finally {
+            if (response != null) try {
+                response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return new JSONObject();
+	}
+	
 	private Map getUserMapping(String serviceName){
 		Map um = new HashMap();
 		try{
