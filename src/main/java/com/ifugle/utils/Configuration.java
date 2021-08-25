@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.ifugle.czy.service.ESQueryDataService;
+import com.ifugle.czyDing.service.ESQueryDataService;
 public class Configuration {
 	private static Logger log = Logger.getLogger(Configuration.class);
 	protected JdbcTemplate jdbcTemplate;

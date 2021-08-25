@@ -4,9 +4,9 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javax.servlet.ServletContextEvent; 
-import javax.servlet.ServletContextListener; 
+import javax.servlet.ServletContextListener;
 
-import com.ifugle.czy.utils.TemplatesLoader;
+import com.ifugle.czyDing.utils.TemplatesLoader;
 
 public class InitTemplatesListener implements ServletContextListener{ 
    

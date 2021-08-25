@@ -9,7 +9,7 @@ import javax.servlet.http.*;
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSON;
-import com.ifugle.czy.utils.JResponse;
+import com.ifugle.czyDing.utils.JResponse;
 
 public class ConsoleLoginFilter implements Filter{
     public void destroy() {

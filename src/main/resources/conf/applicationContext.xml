@@ -52,27 +52,27 @@
 	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource"/>
 	</bean>
-	<bean id="esClient" class="com.ifugle.czy.service.ESClientFactory" >
+	<bean id="esClient" class="com.ifugle.czyDing.service.ESClientFactory" >
 		<property name="esClusterName" value="${ES_CLUSTER_NAME}" />
 		<property name="esIP" value="${ES_IP}" />
 		<property name="esPort" value="${ES_PORT}" />
 	</bean>
 	<bean id="config" class="com.ifugle.utils.Configuration"/>
-	<bean id="authService" class="com.ifugle.czy.service.AuthService"/>
-	<bean id="sysSetService" class="com.ifugle.czy.service.SysSetService"/>
-	<bean id="esDataService" class="com.ifugle.czy.service.ESQueryDataService"/>
-	<bean id="esDtSrcService" class="com.ifugle.czy.service.ESDataSourceService"/>
-	<bean id="csService" class="com.ifugle.czy.service.ConsoleServeice"/>
-	<bean id="rtService" class="com.ifugle.czy.service.RouterService"/>
-	<bean id="czyReqProcess" class="com.ifugle.czy.router.czfc.BeforeRequestCzfc"/> 
-	<bean id="czyResponseProcess" class="com.ifugle.czy.router.czfc.BeforeResponseCzfc"/> 
+	<bean id="authService" class="com.ifugle.czyDing.service.AuthService"/>
+	<bean id="sysSetService" class="com.ifugle.czyDing.service.SysSetService"/>
+	<bean id="esDataService" class="com.ifugle.czyDing.service.ESQueryDataService"/>
+	<bean id="esDtSrcService" class="com.ifugle.czyDing.service.ESDataSourceService"/>
+	<bean id="csService" class="com.ifugle.czyDing.service.ConsoleServeice"/>
+	<bean id="rtService" class="com.ifugle.czyDing.service.RouterService"/>
+	<bean id="czyReqProcess" class="com.ifugle.czyDing.router.czfc.BeforeRequestCzfc"/> 
+	<bean id="czyResponseProcess" class="com.ifugle.czyDing.router.czfc.BeforeResponseCzfc"/> 
 	<bean id="connFactory" class="com.ifugle.etl.conncet.service.ConnectionFactory"/>
 	<bean id="mnService" class="com.ifugle.etl.utils.service.ManageService"/>
 	<bean id="dbExp" class="com.ifugle.etl.task.extract.service.DBExtractService"/>
 	<bean id="dbImp" class="com.ifugle.etl.task.imp.service.DBImportService"/>
 	<bean id="mngService" class="com.ifugle.etl.utils.service.ManageService"/>
-	<bean id="tycService" class="com.ifugle.czy.service.TianyanchaService"/>
-	<bean id="logService" class="com.ifugle.czy.service.LogService"/>
+	<bean id="tycService" class="com.ifugle.czyDing.service.TianyanchaService"/>
+	<bean id="logService" class="com.ifugle.czyDing.service.LogService"/>
 	<context:annotation-config />
 	<tx:annotation-driven transaction-manager="txManager" />  
 	<!--<context:spring-configured />
